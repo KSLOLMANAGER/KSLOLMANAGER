@@ -535,6 +535,51 @@ button{font:inherit}.app{min-height:100vh;width:100%;max-width:1240px;margin:0 a
 }
 </style>
 
+
+<style>
+/* ===== V61 MOBILE END CHAT: TALL VERTICAL LAYOUT ===== */
+@media (max-width:700px){
+  .end-overlay{
+    justify-content:flex-start!important;
+    overflow-y:auto!important;
+    padding:12px 10px calc(18px + env(safe-area-inset-bottom))!important;
+  }
+  .end-emblem{
+    width:min(92vw,430px)!important;
+    max-width:92vw!important;
+    padding:20px 14px 18px!important;
+    margin-top:4px!important;
+  }
+  .end-word{font-size:42px!important;line-height:1.05!important;}
+  .end-sub{margin:6px 0 12px!important;}
+  .end-chat{
+    width:min(92vw,560px)!important;
+    height:52dvh!important;
+    min-height:340px!important;
+    max-height:560px!important;
+    flex:0 0 auto!important;
+  }
+  .end-chat .match-all-chat-head{
+    flex:0 0 42px!important;
+    height:42px!important;
+    font-size:13px!important;
+  }
+  .end-chat .match-all-chat-body{
+    font-size:14px!important;
+    line-height:1.75!important;
+    padding:14px 16px 20px!important;
+  }
+  .result-chat-body{
+    min-height:300px!important;
+    height:42dvh!important;
+    max-height:520px!important;
+  }
+}
+@media (max-width:390px){
+  .end-chat{height:50dvh!important;min-height:320px!important;}
+  .result-chat-body{min-height:280px!important;height:40dvh!important;}
+}
+</style>
 </head>
 <body>
 <div class="app" id="app"></div>
@@ -1633,5 +1678,16 @@ render();
   .end-emblem{padding:22px 14px 18px!important}
   .end-word{font-size:42px!important}
   .end-chat{height:36dvh!important;min-height:210px!important}
+}
+</style>
+<style>
+/* ===== V60 MOBILE FINAL PICK: 5 CHAMPIONS ONLY ===== */
+@media (max-width:800px){
+  /* Mobile order: waiting pool -> all 5 allied champions -> chat -> ready */
+  .final-team .player-row.you{display:flex!important;}
+  .final-team:before{content:'우리 팀 챔피언'!important;}
+  .final-center{display:none!important;}
+  .final-main{padding-bottom:0!important;}
+  .final-team{padding-bottom:8px!important;}
 }
 </style>
