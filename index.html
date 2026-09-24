@@ -708,7 +708,51 @@ const SIGNATURE_CHAMPS={siljeom:"pyke",molcho:"swain",dwaemesa:"samira",joguk:"s
 const SIGNATURE_CHAT={siljeom:"돈 드리겠습니다~",molcho:"보여줄게",dwaemesa:"월월 감사합니다 월월",joguk:"왔다 내 사랑",nguyen:"케권이 횽이야","3patourwan":"흐에!!",mundolmaeng:"티모횽이야",galio:"야 든든하게 막아줄게",dage:"야 게임 끝났어"};
 let signatureRequests=[],signatureRequest=null,signatureChatDone=new Set(),signatureChatLog=[],molchoDealerChatDone=false,pickSpecialChatDone=new Set();
 let mode="select", callMode=null, me=null, selected=[], party=[], chatMembers=[], declinedMembers=[], replies=0, privateIndex=0, privateAnswered=false, privateTargets=[], searching=false, queueSeconds=0, queueTimer=null, found=false, champOptions=[], teamPicks=[], chosenChamp=null, finalPool=[], enemyTeam=[], loadingSeconds=10, loadingTimer=null, loadingTransitionTimer=null, battleState=null, battleTimer=null, matchResult=null;
-let battleRafPending=false, battleWatchdogTimer=null;
+let battleRafPending=false, battleWatchdogTimer=null, battleUiSyncTimer=null;
+
+function syncLiveBattleHud(){
+  const bs=battleState;
+  if(mode!=='battle'||!bs)return;
+
+  // 상단 킬 수 + 전투 현황.
+  // 이 함수들은 전역 스코프에 있어야 하며, UI 동기화 오류가 전투 엔진을 멈추지 않게 분리한다.
+  try{syncBattleScoreboard();}catch(err){console.error('[battle-ui-score]',err);}
+
+  // LIVE MATCH LOG
+  const log=document.querySelector('.b2-log');
+  if(log){
+    const version=bs.logVersion||0;
+    if(Number(log.dataset.version||-1)!==version){
+      log.innerHTML=(bs.log||[]).slice(-40).map(x=>`<div>${x}</div>`).join('');
+      log.dataset.version=String(version);
+      log.scrollTop=log.scrollHeight;
+    }
+  }
+
+  // 전체 채팅
+  const chat=document.querySelector('.match-all-chat-body');
+  if(chat){
+    const count=(bs.chat||[]).length;
+    if(Number(chat.dataset.count||-1)!==count){
+      chat.innerHTML=(bs.chat||[]).slice(-30).map(x=>`<div>${x}</div>`).join('');
+      chat.dataset.count=String(count);
+      chat.scrollTop=chat.scrollHeight;
+    }
+  }
+
+  const clock=document.querySelector('.b2-clock');
+  if(clock)clock.textContent=formatBattleTime(bs.time||0);
+}
+function armBattleUiSync(){
+  clearInterval(battleUiSyncTimer);
+  battleUiSyncTimer=setInterval(syncLiveBattleHud,100);
+  setTimeout(syncLiveBattleHud,0);
+}
+function stopBattleUiSync(){
+  clearInterval(battleUiSyncTimer);
+  battleUiSyncTimer=null;
+}
+
 function scheduleBattleFrame(){
   if(mode!=="battle"||!battleState||battleRafPending)return;
   battleRafPending=true;
@@ -748,65 +792,6 @@ function hasBatchim(text){
 }
 function josa(text,withBatchim,withoutBatchim){return hasBatchim(text)?withBatchim:withoutBatchim}
 
-function render(){
-let body="";
-if(mode==="select"){
- body=`<div class="section"><span>01</span><div><h2>캐릭터를 선택하세요</h2><p>선택한 캐릭터가 이번 게임의 당신입니다.</p></div></div>
- <div class="grid">${chars.map((c,i)=>`<button class="card ${me?.id===c.id?"sel":""}" onclick="choose('${c.id}')"><span class="num">0${i+1}</span><span class="nick">${c.nickname}</span><span class="real">${c.name}</span><span class="signature-label">시그니처 챔피언 - ${signatureChampionName(c.id)}</span><span class="check">${me?.id===c.id?"✓":""}</span></button>`).join("")}</div>
- ${button(me?me.nickname+"으로 계속하기 →":"캐릭터를 먼저 선택하세요",!me,"goMethod()")}`;
-}
-if(mode==="method"){
-body=`<div class="section"><span>02</span><div><h2>어떻게 호출할까요?</h2><p><b>${me.nickname}</b> · ${me.name}으로 플레이합니다.</p></div></div>
-<div class="calls"><button class="call" onclick="startGroup()"><div class="n">01</div><div class="ico">↗</div><h3>1. 단톡</h3><p>랜덤으로 멤버가 구해집니다.</p></button>
-<button class="call" onclick="mode='manual';render()"><div class="n">02</div><div class="ico">＋</div><h3>2. 갠톡</h3><p>직접 게임 같이 할 멤버를 선택합니다.</p></button></div>
-<button class="back" onclick="mode='select';render()">← 캐릭터 다시 선택</button>`;
-}
-if(mode==="group"){
-body=`<div class="phonewrap"><div class="phone"><div class="head"><button onclick="mode='method';render()">‹</button><div><strong>곡선중</strong><small>9명</small></div><em>•••</em></div><div class="chat"><div class="date">오늘</div>
-<div class="msg mine"><div class="who">${me.name}</div><div class="bubble">겜 ㄱ?</div></div>
-${chatMembers.slice(0,Math.min(replies,4)).map((c,i)=>`<div class="msg"><div class="who">${c.name}</div><div class="bubble">${i===3?"ㄱㄱ":"ㄱ"}</div></div>`).join("")}
-${declinedMembers.slice(0,Math.max(0,replies-4)).map(c=>`<div class="msg"><div class="who">${c.name}</div><div class="bubble">${declineReason(c)}</div></div>`).join("")}
-${replies<8?`<div class="typing"><i></i><i></i><i></i></div>`:`<div class="system">5명이 게임에 참가했습니다.</div>`}</div><div class="input"><span>메시지를 입력하세요</span><b>＋</b><b>➤</b></div></div>
-${button(replies<8?"친구들이 대답하는 중...":"파티 확인 →",replies<8,"finishGroup()")}</div>`;
-}
-if(mode==="manual"){
-body=`<div class="section"><span>03</span><div><h2>파티원을 선택하세요</h2><p>본인을 제외하고 <b>4명</b>을 선택하세요.</p></div><div class="counter">${selected.length} / 4</div></div>
-<div class="members">${chars.filter(c=>c.id!==me.id).map(c=>`<button class="member ${selected.includes(c.id)?"sel":""}" onclick="toggle('${c.id}')"><span class="box">${selected.includes(c.id)?"✓":""}</span><span><b>${c.nickname}</b><small>${c.name}</small></span></button>`).join("")}</div>
-${button("개인톡 보내기 →",selected.length!==4,"startPrivate()")}<button class="back" onclick="mode='method';render()">← 호출 방식</button>`;
-}
-if(mode==="private"){
-const target=privateTargets[privateIndex];
-body=`<div class="phonewrap"><div class="phone"><div class="head"><button>‹</button><div><strong>${target.name}</strong><small>개인 대화</small></div><em>•••</em></div><div class="chat"><div class="date">오늘</div>
-<div class="msg mine"><div class="who">${me.name}</div><div class="bubble">겜 ㄱ?</div></div>
-${privateAnswered?`<div class="msg"><div class="who">${target.name}</div><div class="bubble">ㄱ</div></div>`:`<div class="typing"><i></i><i></i><i></i></div>`}
-${privateIndex===3&&privateAnswered?`<div class="system">4명 모두에게서 답장이 왔습니다.</div>`:""}</div><div class="input"><span>메시지를 입력하세요</span><b>＋</b><b>➤</b></div></div>
-${button(privateIndex===3&&privateAnswered?"파티 확인 →":privateAnswered?"다음 친구 호출 →":"답장 기다리는 중...",!privateAnswered,"nextPrivate()")}</div>`;
-}
-if(mode==="champSelect"){
-body=`<div class="champ-screen"><div class="champ-top"><div class="champ-timer">12</div><div class="title"><small>무작위 총력전 · 아수라장</small><strong>챔피언 선택</strong></div><div style="width:90px;text-align:right;color:#75878c;font-size:9px">내 차례</div></div>
-<div class="unused-select-row">${champions.filter(c=>!champOptions.some(o=>o.id===c.id)).slice(0,10).map(c=>`<div class="unused-select-mini ${isSignaturePick(me,c)?'my-signature':''}"><img src="assets/champions/${championImageId(c.id)}_0.jpg" onerror="this.style.display='none';this.parentElement.textContent='${c.icon}'"></div>`).join("")}</div>
-<div class="champ-body"><div class="team-side"><div class="side-title">우리 팀</div>${party.map((c,i)=>`<div class="player-row ${i===0?"you":""}"><div class="avatar">${teamPicks[i]?teamPicks[i].icon:"?"}</div><div><strong>${c.nickname}</strong><small>${teamPicks[i]?teamPicks[i].name:"선택 중..."}</small></div>${i===0?"<em>YOU</em>":""}</div>`).join("")}</div>
-<div class="center-select"><div class="sub">YOUR TURN</div><h2>챔피언을 선택하세요</h2><p>무작위로 제시된 3명의 챔피언 중 하나를 선택합니다.<br><b class="signature-help">시그니처 캐릭터는 전투 능력이 향상됩니다.</b></p><div class="champ-options">${champOptions.map(c=>`<button class="champ-card ${isSignaturePick(me,c)?'my-signature':''}" onclick="pickChampion('${c.id}')"><div class="champ-art"><img src="assets/champions/${championImageId(c.id)}_0.jpg" onerror="this.style.display='none';this.parentElement.textContent='${c.icon}'"></div><div class="cc-bottom"><strong>${c.name}</strong><small>${isSignaturePick(me,c)?'★ SIGNATURE · 전투 능력 향상':c.title}</small></div></button>`).join("")}</div></div>
-<div class="enemy-side"><div class="side-title">상대 팀</div>${[1,2,3,4,5].map(i=>`<div class="player-row"><div class="avatar">?</div><div><strong>상대 ${i}</strong><small>선택 중...</small></div></div>`).join("")}</div></div></div>`;
-}
-if(mode==="finalChamp"){
-const tip=`<div class="chat-line tip"><strong>[TIP]</strong> 팀원들의 챔피언을 바꿀 수 있습니다. 사람마다 맞는 챔피언과 챔피언의 유형이 있으므로 잘 선택하시기 바랍니다</div>`;
-const special=[];
-const finalChatLine=(id,msg)=>{const member=party.find(c=>c.id===id);if(!member)return;const mine=party[0]&&party[0].id===id;special.push(`<div class="chat-line ${mine?'my-chat':''}"><strong>${member.nickname}:</strong> ${msg}</div>`)};
-finalChatLine("molcho","캐리해줄게");
-finalChatLine("dwaemesa","원딜 ㅈㅂㅈㅂㅈㅂㅈㅂ");
-finalChatLine("mundolmaeng","블루윙 수원 블루윙");
-if(party.some(c=>c.id==="molcho") && party.some(c=>c.id==="dwaemesa")) finalChatLine("dwaemesa","병욱아 진짜 그거 골랐으면 캐리해야된다");
-signatureChatLog.forEach(x=>special.push(`<div class="chat-line"><strong>${x.name}:</strong> ${x.msg}</div>`));
-const sigPopup=signatureRequest?`<div class="chat-event-overlay"><div class="chat-event-card"><div class="event-mark">!</div><h2>${signatureRequest.member.name}${josa(signatureRequest.member.name,'이','가')} ${signatureRequest.champ.name}${josa(signatureRequest.champ.name,'을','를')} 원하고 있습니다.</h2><p>챔피언을 주시겠습니까?</p><div class="chat-event-actions"><button onclick="answerSignatureRequest(true)">예</button><button class="deny" onclick="answerSignatureRequest(false)">아니오</button></div></div></div>`:"";
-body=`<div class="final-screen"><div class="final-top"><div class="unused-pool" aria-label="남은 챔피언">${finalPool.map((c,i)=>`<div class="unused swap-zone ${isSignaturePick(me,c)?'my-signature':''}" draggable="true" data-swap-type="pool" data-swap-index="${i}" onclick="mobileSwapTap(event,'pool',${i})" ondragstart="dragStart(event,'pool',${i})" ondragover="allowDrop(event)" ondragenter="dragEnter(event)" ondragleave="dragLeave(event)" ondrop="dropSwap(event,'pool',${i})" ondragend="dragEnd(event)"><img src="assets/champions/${championImageId(c.id)}_0.jpg" onerror="this.remove();this.parentElement.textContent='${c.icon}'"></div>`).join("")}</div><div class="swap-hint">DRAG TO SWAP</div></div>
-<div class="final-main"><div class="final-team"><div class="side-title">우리 팀 · 선택한 챔피언</div>${party.map((c,i)=>`<div class="player-row swap-zone ${i===0?"you":""}" draggable="true" data-swap-type="team" data-swap-index="${i}" onclick="mobileSwapTap(event,'team',${i})" ondragstart="dragStart(event,'team',${i})" ondragover="allowDrop(event)" ondragenter="dragEnter(event)" ondragleave="dragLeave(event)" ondrop="dropSwap(event,'team',${i})" ondragend="dragEnd(event)"><div class="avatar"><img src="assets/champions/${championImageId(teamPicks[i].id)}_0.jpg" onerror="this.remove();this.parentElement.textContent='${teamPicks[i].icon}'"></div><div class="pick-meta"><strong>${teamPicks[i].name}</strong><small>${c.nickname}</small></div>${i===0?"<em>YOU</em>":""}</div>`).join("")}</div>
-<div class="final-center"><div class="final-label">YOUR CHAMPION</div><div class="hero-champ"><div class="hero-art"><img src="assets/champions/${championImageId(chosenChamp.id)}_0.jpg" onerror="this.remove();this.parentElement.textContent='${chosenChamp.icon}'"></div><h2>${chosenChamp.name}</h2></div><button class="game-start-btn desktop-ready" onclick="startGame()">준비 완료</button></div>
-<div class="final-enemy"><div class="enemy-list"><div class="side-title">상대 팀 · 챔피언 비공개</div>${[1,2,3,4,5].map(i=>`<div class="enemy-row"><div class="enemy-hidden">?</div><div class="pick-meta"><strong>적${i}</strong><small>챔피언 비공개</small></div></div>`).join("")}</div><div class="composition-tip"><b>TIP</b><span>조합과 숙련도가 승패를 좌우합니다.<br>전방·원거리 딜러·마법 피해·지원 역할을 고르게 구성하고, 각 플레이어가 잘 다루는 포지션과 시그니처 챔피언을 활용하세요.</span></div></div></div><div class="final-chat final-chat-left"><div class="final-chat-head">CHAT</div><div class="final-chat-body">${tip}${special.join("")}</div></div><button class="game-start-btn mobile-ready" onclick="startGame()">준비 완료</button>${sigPopup}</div>`;
-}
-if(mode==="loading"){
-body=`<div class="loading-screen"><div class="loading-inner"><div class="loading-kicker">무작위 총력전 · 아수라장</div><h2>게임을 불러오는 중</h2><div class="loading-vs"><div class="loading-team"><div class="loading-title">우리 팀</div>${teamPicks.map((c,i)=>`<div class="loading-card blue-card"><div class="loading-art"><img src="assets/champions/${championImageId(c.id)}_0.jpg" onerror="this.style.display='none';this.parentElement.innerHTML='<span>${c.icon}</span>'"></div><div class="loading-champ">${c.name}</div><div class="loading-nick">${party[i].nickname}</div></div>`).join("")}</div><div class="vs-mark">VS</div><div class="loading-team enemy-loading"><div class="loading-title">적 팀</div>${enemyTeam.map((e,i)=>`<div class="loading-card red-card"><div class="loading-art"><img src="assets/champions/${championImageId(e.champ.id)}_0.jpg" onerror="this.style.display='none';this.parentElement.innerHTML='<span>${e.champ.icon}</span>'"></div><div class="loading-champ">${e.champ.name}</div><div class="loading-nick">${e.nick}</div></div>`).join("")}</div></div><div class="loading-count">${loadingSeconds}</div><div class="loading-bar"><div style="width:${((10-loadingSeconds)/10)*100}%"></div></div><p>전장이 준비되고 있습니다...</p></div></div>`;
-}
 function battleItemSymbol(u,i){
  const pool=['✦','◆','◈','⬟','◇','✧'];
  const role=(u?.champ?.roles||[])[0]||'Fighter';
@@ -883,6 +868,66 @@ function syncBattleScoreboard(){
    });
  });
 }
+
+function render(){
+let body="";
+if(mode==="select"){
+ body=`<div class="section"><span>01</span><div><h2>캐릭터를 선택하세요</h2><p>선택한 캐릭터가 이번 게임의 당신입니다.</p></div></div>
+ <div class="grid">${chars.map((c,i)=>`<button class="card ${me?.id===c.id?"sel":""}" onclick="choose('${c.id}')"><span class="num">0${i+1}</span><span class="nick">${c.nickname}</span><span class="real">${c.name}</span><span class="signature-label">시그니처 챔피언 - ${signatureChampionName(c.id)}</span><span class="check">${me?.id===c.id?"✓":""}</span></button>`).join("")}</div>
+ ${button(me?me.nickname+"으로 계속하기 →":"캐릭터를 먼저 선택하세요",!me,"goMethod()")}`;
+}
+if(mode==="method"){
+body=`<div class="section"><span>02</span><div><h2>어떻게 호출할까요?</h2><p><b>${me.nickname}</b> · ${me.name}으로 플레이합니다.</p></div></div>
+<div class="calls"><button class="call" onclick="startGroup()"><div class="n">01</div><div class="ico">↗</div><h3>1. 단톡</h3><p>랜덤으로 멤버가 구해집니다.</p></button>
+<button class="call" onclick="mode='manual';render()"><div class="n">02</div><div class="ico">＋</div><h3>2. 갠톡</h3><p>직접 게임 같이 할 멤버를 선택합니다.</p></button></div>
+<button class="back" onclick="mode='select';render()">← 캐릭터 다시 선택</button>`;
+}
+if(mode==="group"){
+body=`<div class="phonewrap"><div class="phone"><div class="head"><button onclick="mode='method';render()">‹</button><div><strong>곡선중</strong><small>9명</small></div><em>•••</em></div><div class="chat"><div class="date">오늘</div>
+<div class="msg mine"><div class="who">${me.name}</div><div class="bubble">겜 ㄱ?</div></div>
+${chatMembers.slice(0,Math.min(replies,4)).map((c,i)=>`<div class="msg"><div class="who">${c.name}</div><div class="bubble">${i===3?"ㄱㄱ":"ㄱ"}</div></div>`).join("")}
+${declinedMembers.slice(0,Math.max(0,replies-4)).map(c=>`<div class="msg"><div class="who">${c.name}</div><div class="bubble">${declineReason(c)}</div></div>`).join("")}
+${replies<8?`<div class="typing"><i></i><i></i><i></i></div>`:`<div class="system">5명이 게임에 참가했습니다.</div>`}</div><div class="input"><span>메시지를 입력하세요</span><b>＋</b><b>➤</b></div></div>
+${button(replies<8?"친구들이 대답하는 중...":"파티 확인 →",replies<8,"finishGroup()")}</div>`;
+}
+if(mode==="manual"){
+body=`<div class="section"><span>03</span><div><h2>파티원을 선택하세요</h2><p>본인을 제외하고 <b>4명</b>을 선택하세요.</p></div><div class="counter">${selected.length} / 4</div></div>
+<div class="members">${chars.filter(c=>c.id!==me.id).map(c=>`<button class="member ${selected.includes(c.id)?"sel":""}" onclick="toggle('${c.id}')"><span class="box">${selected.includes(c.id)?"✓":""}</span><span><b>${c.nickname}</b><small>${c.name}</small></span></button>`).join("")}</div>
+${button("개인톡 보내기 →",selected.length!==4,"startPrivate()")}<button class="back" onclick="mode='method';render()">← 호출 방식</button>`;
+}
+if(mode==="private"){
+const target=privateTargets[privateIndex];
+body=`<div class="phonewrap"><div class="phone"><div class="head"><button>‹</button><div><strong>${target.name}</strong><small>개인 대화</small></div><em>•••</em></div><div class="chat"><div class="date">오늘</div>
+<div class="msg mine"><div class="who">${me.name}</div><div class="bubble">겜 ㄱ?</div></div>
+${privateAnswered?`<div class="msg"><div class="who">${target.name}</div><div class="bubble">ㄱ</div></div>`:`<div class="typing"><i></i><i></i><i></i></div>`}
+${privateIndex===3&&privateAnswered?`<div class="system">4명 모두에게서 답장이 왔습니다.</div>`:""}</div><div class="input"><span>메시지를 입력하세요</span><b>＋</b><b>➤</b></div></div>
+${button(privateIndex===3&&privateAnswered?"파티 확인 →":privateAnswered?"다음 친구 호출 →":"답장 기다리는 중...",!privateAnswered,"nextPrivate()")}</div>`;
+}
+if(mode==="champSelect"){
+body=`<div class="champ-screen"><div class="champ-top"><div class="champ-timer">12</div><div class="title"><small>무작위 총력전 · 아수라장</small><strong>챔피언 선택</strong></div><div style="width:90px;text-align:right;color:#75878c;font-size:9px">내 차례</div></div>
+<div class="unused-select-row">${champions.filter(c=>!champOptions.some(o=>o.id===c.id)).slice(0,10).map(c=>`<div class="unused-select-mini ${isSignaturePick(me,c)?'my-signature':''}"><img src="assets/champions/${championImageId(c.id)}_0.jpg" onerror="this.style.display='none';this.parentElement.textContent='${c.icon}'"></div>`).join("")}</div>
+<div class="champ-body"><div class="team-side"><div class="side-title">우리 팀</div>${party.map((c,i)=>`<div class="player-row ${i===0?"you":""}"><div class="avatar">${teamPicks[i]?teamPicks[i].icon:"?"}</div><div><strong>${c.nickname}</strong><small>${teamPicks[i]?teamPicks[i].name:"선택 중..."}</small></div>${i===0?"<em>YOU</em>":""}</div>`).join("")}</div>
+<div class="center-select"><div class="sub">YOUR TURN</div><h2>챔피언을 선택하세요</h2><p>무작위로 제시된 3명의 챔피언 중 하나를 선택합니다.<br><b class="signature-help">시그니처 캐릭터는 전투 능력이 향상됩니다.</b></p><div class="champ-options">${champOptions.map(c=>`<button class="champ-card ${isSignaturePick(me,c)?'my-signature':''}" onclick="pickChampion('${c.id}')"><div class="champ-art"><img src="assets/champions/${championImageId(c.id)}_0.jpg" onerror="this.style.display='none';this.parentElement.textContent='${c.icon}'"></div><div class="cc-bottom"><strong>${c.name}</strong><small>${isSignaturePick(me,c)?'★ SIGNATURE · 전투 능력 향상':c.title}</small></div></button>`).join("")}</div></div>
+<div class="enemy-side"><div class="side-title">상대 팀</div>${[1,2,3,4,5].map(i=>`<div class="player-row"><div class="avatar">?</div><div><strong>상대 ${i}</strong><small>선택 중...</small></div></div>`).join("")}</div></div></div>`;
+}
+if(mode==="finalChamp"){
+const tip=`<div class="chat-line tip"><strong>[TIP]</strong> 팀원들의 챔피언을 바꿀 수 있습니다. 사람마다 맞는 챔피언과 챔피언의 유형이 있으므로 잘 선택하시기 바랍니다</div>`;
+const special=[];
+const finalChatLine=(id,msg)=>{const member=party.find(c=>c.id===id);if(!member)return;const mine=party[0]&&party[0].id===id;special.push(`<div class="chat-line ${mine?'my-chat':''}"><strong>${member.nickname}:</strong> ${msg}</div>`)};
+finalChatLine("molcho","캐리해줄게");
+finalChatLine("dwaemesa","원딜 ㅈㅂㅈㅂㅈㅂㅈㅂ");
+finalChatLine("mundolmaeng","블루윙 수원 블루윙");
+if(party.some(c=>c.id==="molcho") && party.some(c=>c.id==="dwaemesa")) finalChatLine("dwaemesa","병욱아 진짜 그거 골랐으면 캐리해야된다");
+signatureChatLog.forEach(x=>special.push(`<div class="chat-line"><strong>${x.name}:</strong> ${x.msg}</div>`));
+const sigPopup=signatureRequest?`<div class="chat-event-overlay"><div class="chat-event-card"><div class="event-mark">!</div><h2>${signatureRequest.member.name}${josa(signatureRequest.member.name,'이','가')} ${signatureRequest.champ.name}${josa(signatureRequest.champ.name,'을','를')} 원하고 있습니다.</h2><p>챔피언을 주시겠습니까?</p><div class="chat-event-actions"><button onclick="answerSignatureRequest(true)">예</button><button class="deny" onclick="answerSignatureRequest(false)">아니오</button></div></div></div>`:"";
+body=`<div class="final-screen"><div class="final-top"><div class="unused-pool" aria-label="남은 챔피언">${finalPool.map((c,i)=>`<div class="unused swap-zone ${isSignaturePick(me,c)?'my-signature':''}" draggable="true" data-swap-type="pool" data-swap-index="${i}" onclick="mobileSwapTap(event,'pool',${i})" ondragstart="dragStart(event,'pool',${i})" ondragover="allowDrop(event)" ondragenter="dragEnter(event)" ondragleave="dragLeave(event)" ondrop="dropSwap(event,'pool',${i})" ondragend="dragEnd(event)"><img src="assets/champions/${championImageId(c.id)}_0.jpg" onerror="this.remove();this.parentElement.textContent='${c.icon}'"></div>`).join("")}</div><div class="swap-hint">DRAG TO SWAP</div></div>
+<div class="final-main"><div class="final-team"><div class="side-title">우리 팀 · 선택한 챔피언</div>${party.map((c,i)=>`<div class="player-row swap-zone ${i===0?"you":""}" draggable="true" data-swap-type="team" data-swap-index="${i}" onclick="mobileSwapTap(event,'team',${i})" ondragstart="dragStart(event,'team',${i})" ondragover="allowDrop(event)" ondragenter="dragEnter(event)" ondragleave="dragLeave(event)" ondrop="dropSwap(event,'team',${i})" ondragend="dragEnd(event)"><div class="avatar"><img src="assets/champions/${championImageId(teamPicks[i].id)}_0.jpg" onerror="this.remove();this.parentElement.textContent='${teamPicks[i].icon}'"></div><div class="pick-meta"><strong>${teamPicks[i].name}</strong><small>${c.nickname}</small></div>${i===0?"<em>YOU</em>":""}</div>`).join("")}</div>
+<div class="final-center"><div class="final-label">YOUR CHAMPION</div><div class="hero-champ"><div class="hero-art"><img src="assets/champions/${championImageId(chosenChamp.id)}_0.jpg" onerror="this.remove();this.parentElement.textContent='${chosenChamp.icon}'"></div><h2>${chosenChamp.name}</h2></div><button class="game-start-btn desktop-ready" onclick="startGame()">준비 완료</button></div>
+<div class="final-enemy"><div class="enemy-list"><div class="side-title">상대 팀 · 챔피언 비공개</div>${[1,2,3,4,5].map(i=>`<div class="enemy-row"><div class="enemy-hidden">?</div><div class="pick-meta"><strong>적${i}</strong><small>챔피언 비공개</small></div></div>`).join("")}</div><div class="composition-tip"><b>TIP</b><span>조합과 숙련도가 승패를 좌우합니다.<br>전방·원거리 딜러·마법 피해·지원 역할을 고르게 구성하고, 각 플레이어가 잘 다루는 포지션과 시그니처 챔피언을 활용하세요.</span></div></div></div><div class="final-chat final-chat-left"><div class="final-chat-head">CHAT</div><div class="final-chat-body">${tip}${special.join("")}</div></div><button class="game-start-btn mobile-ready" onclick="startGame()">준비 완료</button>${sigPopup}</div>`;
+}
+if(mode==="loading"){
+body=`<div class="loading-screen"><div class="loading-inner"><div class="loading-kicker">무작위 총력전 · 아수라장</div><h2>게임을 불러오는 중</h2><div class="loading-vs"><div class="loading-team"><div class="loading-title">우리 팀</div>${teamPicks.map((c,i)=>`<div class="loading-card blue-card"><div class="loading-art"><img src="assets/champions/${championImageId(c.id)}_0.jpg" onerror="this.style.display='none';this.parentElement.innerHTML='<span>${c.icon}</span>'"></div><div class="loading-champ">${c.name}</div><div class="loading-nick">${party[i].nickname}</div></div>`).join("")}</div><div class="vs-mark">VS</div><div class="loading-team enemy-loading"><div class="loading-title">적 팀</div>${enemyTeam.map((e,i)=>`<div class="loading-card red-card"><div class="loading-art"><img src="assets/champions/${championImageId(e.champ.id)}_0.jpg" onerror="this.style.display='none';this.parentElement.innerHTML='<span>${e.champ.icon}</span>'"></div><div class="loading-champ">${e.champ.name}</div><div class="loading-nick">${e.nick}</div></div>`).join("")}</div></div><div class="loading-count">${loadingSeconds}</div><div class="loading-bar"><div style="width:${((10-loadingSeconds)/10)*100}%"></div></div><p>전장이 준비되고 있습니다...</p></div></div>`;
+}
 if(mode==="battle"){
 const bs=battleState || {time:0,status:"전투 준비 중",team:[],enemy:[],log:[],speed:1,structures:[],relics:[],fx:[]};
 const portrait=(u)=>`<div class="portrait"><img src="assets/champions/${championImageId(u.champ.id)}_0.jpg" onerror="this.style.display='none';this.parentElement.textContent='${u.icon}'"></div>`;
@@ -932,6 +977,7 @@ ${searching?`<button class="findbtn searching">게임 찾는 중...</button><but
 ${found?`<div class="matchfound"><div class="mf-inner"><div class="mf-icon"><span>⚔</span></div><div class="eyebrow">ARAM · CHAOS</div><h2>게임을 찾았습니다!</h2><p>무작위 총력전 · 아수라장</p><button class="accept" onclick="acceptMatch()">수락</button><button class="decline" onclick="stopQueue()">거절</button></div></div>`:""}`;
 }
 app.innerHTML=header(mode==="select"?"01 / CHARACTER":mode==="method"?"02 / CALL":"03 / PARTY")+`<main>${body}</main>`;
+if(mode==='battle')setTimeout(syncLiveBattleHud,0);
 // V51: 새 카톡 메시지가 렌더링될 때 항상 최신 메시지가 보이도록 자동 스크롤
 if(mode==="group" || mode==="private"){
   requestAnimationFrame(()=>{const chat=app.querySelector('.phone .chat');if(chat){chat.scrollTop=chat.scrollHeight;requestAnimationFrame(()=>chat.scrollTop=chat.scrollHeight);setTimeout(()=>{chat.scrollTop=chat.scrollHeight},80);}});
@@ -1274,7 +1320,7 @@ function buildBalancedEnemyTeam(pool){
 
 function startGame(){
   if(!chosenChamp)return;
-  clearInterval(loadingTimer); clearTimeout(loadingTransitionTimer); clearInterval(battleTimer);
+  clearInterval(loadingTimer); clearTimeout(loadingTransitionTimer); clearInterval(battleTimer); stopBattleUiSync();
   const protectedIds=new Set(teamPicks.map(c=>c.id).concat(finalPool.map(c=>c.id)));
   const enemyPool=champions.filter(c=>!protectedIds.has(c.id));
   const enemyPicks=buildBalancedEnemyTeam(enemyPool);
@@ -1414,6 +1460,7 @@ augmentOpen:true,augmentStage:'start',augmentChoices:[],augments:[],augmentDone:
  if(party.some(c=>c.id==='siljeom')) battleState.chat.push(`<span class="all-tag">[전체]</span> <span class="ally-chat">실점:</span> 안녕하세요~ 매너게임이요 ^^`);
  mode='battle';
  render();
+ armBattleUiSync();
 }
 function formatBattleTime(t){const m=String(Math.floor(t/60)).padStart(2,"0"),s=String(Math.floor(t%60)).padStart(2,"0");return `${m}:${s}`}
 function unitV2Html(u){const p=screenPos(u.x,u.y);return `<div class="b2-token ${u.team==='enemy'?'enemy':''} ${u.alive?'':'dead'}" data-unit="${u.id}" style="left:${p.left}%;top:${p.top}%"><span class="token-portrait"><img src="assets/champions/${championImageId(u.champ.id)}_0.jpg" onerror="this.style.display='none';this.parentElement.textContent='${u.icon}'"></span><b>${u.nick}</b><span class="t-hp"><em style="width:${Math.max(0,u.hp/u.maxHp*100)}%"></em></span></div>`}
@@ -1485,10 +1532,11 @@ function killLog(attacker,target){
      bs.pushMomentumUntil[attacker.team]=Math.max(bs.pushMomentumUntil[attacker.team]||0,bs.time+bonus);
    }
  }
- syncBattleScoreboard();
- requestAnimationFrame(()=>{if(mode==='battle'&&battleState===bs)syncBattleScoreboard();});
+ syncLiveBattleHud();
+ queueMicrotask(()=>{if(mode==='battle'&&battleState===bs)syncLiveBattleHud();});
+ requestAnimationFrame(()=>{if(mode==='battle'&&battleState===bs)syncLiveBattleHud();});
 }
-function dealDamage(attacker,target,dmg){if(!target.alive)return;const out=attacker.kind==='champ'?combatPerformanceMultiplier(attacker)*roleDamageMultiplier(attacker):1;const guard=target.kind==='champ'?Math.sqrt(Math.max(.20,combatPerformanceMultiplier(target))):1;dmg=dmg*out/guard;if(attacker.kind==='champ')attacker.damageDealt=(attacker.damageDealt||0)+dmg*12;if(target.kind==='champ')target.damageTaken=(target.damageTaken||0)+dmg*12;target.hp-=dmg;if(target.hp<=0){target.hp=0;target.alive=false;if(target.kind==='minion'){if(attacker.kind==='champ'){attacker.cs=(attacker.cs||0)+1;syncBattleScoreboard();}grantMinionXp(target);}if(target.kind==='champ'){target.respawn=respawnSeconds(target);addFx(target.x,target.y,'KO',attacker.team);killLog(attacker,target)}}else if(Math.random()<.035&&attacker.kind==='champ'){addFx(target.x,target.y,`-${Math.max(1,Math.round(dmg*12))}`,attacker.team)}}
+function dealDamage(attacker,target,dmg){if(!target.alive)return;const out=attacker.kind==='champ'?combatPerformanceMultiplier(attacker)*roleDamageMultiplier(attacker):1;const guard=target.kind==='champ'?Math.sqrt(Math.max(.20,combatPerformanceMultiplier(target))):1;dmg=dmg*out/guard;if(attacker.kind==='champ')attacker.damageDealt=(attacker.damageDealt||0)+dmg*12;if(target.kind==='champ')target.damageTaken=(target.damageTaken||0)+dmg*12;target.hp-=dmg;if(target.hp<=0){target.hp=0;target.alive=false;if(target.kind==='minion'){if(attacker.kind==='champ'){attacker.cs=(attacker.cs||0)+1;syncLiveBattleHud();}grantMinionXp(target);}if(target.kind==='champ'){target.respawn=respawnSeconds(target);addFx(target.x,target.y,'KO',attacker.team);killLog(attacker,target)}}else if(Math.random()<.035&&attacker.kind==='champ'){addFx(target.x,target.y,`-${Math.max(1,Math.round(dmg*12))}`,attacker.team)}}
 function damageStructure(st,dmg,attacker){
  const bs=battleState;if(!st||!st.alive||!attacker||!isStructureTargetable(st,attacker.team))return;
  if(attacker.kind==='champ'&&Math.abs(attacker.x-st.x)>1.85)return;
@@ -1760,7 +1808,7 @@ function confirmMunchulResult(){
  bs.munchulOpen=false;bs.munchulDone=true;bs.paused=false;bs.status='경기 진행 중';bs.lastTs=performance.now();render();scheduleBattleFrame();
 }
 
-function finalizeBattleEnd(expectedState=battleState){const bs=expectedState;if(!bs||battleState!==bs||mode!=='battle'||bs.endFinalized||!bs.endPending)return false;bs.endFinalized=true;if(bs.endTimer){clearTimeout(bs.endTimer);bs.endTimer=null;}bs.engineStarted=false;const winner=bs.endPending.winner;bs.status=winner==='team'?'우리 팀 승리':'적 팀 승리';if(winner==='team'){if(party.some(c=>c.id==='siljeom'))bs.chat.push(`<span class="all-tag">[전체]</span> <span class="ally-chat">실점:</span> 죽어 그냥 ㅋㅋ`);if(party.some(c=>c.id==='nguyen'))bs.chat.push(`<span class="all-tag">[전체]</span> <span class="ally-chat">Nguyen Ngoc Tu:</span> 나1가`);if(party.some(c=>c.id==='3patourwan'))for(let i=0;i<4;i++)bs.chat.push(`<span class="all-tag">[전체]</span> <span class="ally-chat">쓰리빠뚜르완:</span> ㅋ`);if(party.some(c=>c.id==='joguk'))bs.chat.push(`<span class="all-tag">[전체]</span> <span class="ally-chat">조국:</span> 븅`);if(party.some(c=>c.id==='molcho'))bs.chat.push(`<span class="all-tag">[팀원]</span> <span class="ally-chat">몰초:</span> 쉽네 쉬워`);}else{if(bs.jaebinChatAttempted){const jaebinUnit=bs.team.find(u=>u.realName==='이재빈'||u.nick==='Nguyen Ngoc Tu');const champName=jaebinUnit?.champ?.name||'그 챔피언';const taunts=['이기고 자라 ㅋㅋㅋㅋㅋㅋㅋㅋㅋ',`${champName} 너는 진짜 접어라 ㅇㅇ`,'그 조합으로 쳐지네 ㅋㅋㅋㅋㅋㅋㅋㅋㅋㅋ','ez','븅신 ㅋㅋㅋㅋㅋㅋㅋㅋㅋㅋㅋㅋ'];bs.enemy.slice(0,5).forEach((u,i)=>bs.chat.push(`<span class="all-tag">[전체]</span> <span class="enemy-chat">${u.nick}:</span> ${taunts[i]}`));}}matchResult={winner,time:bs.time,teamKills:bs.teamKills,enemyKills:bs.enemyKills,team:bs.team.map(u=>({...u})),enemy:bs.enemy.map(u=>({...u})),chat:[...(bs.chat||[])]};mode='battleEnd';render();return true}
+function finalizeBattleEnd(expectedState=battleState){const bs=expectedState;if(!bs||battleState!==bs||mode!=='battle'||bs.endFinalized||!bs.endPending)return false;bs.endFinalized=true;if(bs.endTimer){clearTimeout(bs.endTimer);bs.endTimer=null;}bs.engineStarted=false;const winner=bs.endPending.winner;bs.status=winner==='team'?'우리 팀 승리':'적 팀 승리';if(winner==='team'){if(party.some(c=>c.id==='siljeom'))bs.chat.push(`<span class="all-tag">[전체]</span> <span class="ally-chat">실점:</span> 죽어 그냥 ㅋㅋ`);if(party.some(c=>c.id==='nguyen'))bs.chat.push(`<span class="all-tag">[전체]</span> <span class="ally-chat">Nguyen Ngoc Tu:</span> 나1가`);if(party.some(c=>c.id==='3patourwan'))for(let i=0;i<4;i++)bs.chat.push(`<span class="all-tag">[전체]</span> <span class="ally-chat">쓰리빠뚜르완:</span> ㅋ`);if(party.some(c=>c.id==='joguk'))bs.chat.push(`<span class="all-tag">[전체]</span> <span class="ally-chat">조국:</span> 븅`);if(party.some(c=>c.id==='molcho'))bs.chat.push(`<span class="all-tag">[팀원]</span> <span class="ally-chat">몰초:</span> 쉽네 쉬워`);}else{if(bs.jaebinChatAttempted){const jaebinUnit=bs.team.find(u=>u.realName==='이재빈'||u.nick==='Nguyen Ngoc Tu');const champName=jaebinUnit?.champ?.name||'그 챔피언';const taunts=['이기고 자라 ㅋㅋㅋㅋㅋㅋㅋㅋㅋ',`${champName} 너는 진짜 접어라 ㅇㅇ`,'그 조합으로 쳐지네 ㅋㅋㅋㅋㅋㅋㅋㅋㅋㅋ','ez','븅신 ㅋㅋㅋㅋㅋㅋㅋㅋㅋㅋㅋㅋ'];bs.enemy.slice(0,5).forEach((u,i)=>bs.chat.push(`<span class="all-tag">[전체]</span> <span class="enemy-chat">${u.nick}:</span> ${taunts[i]}`));}}matchResult={winner,time:bs.time,teamKills:bs.teamKills,enemyKills:bs.enemyKills,team:bs.team.map(u=>({...u})),enemy:bs.enemy.map(u=>({...u})),chat:[...(bs.chat||[])]};stopBattleUiSync();mode='battleEnd';render();return true}
 function checkEnd(){const bs=battleState;if(!bs||!bs.endPending)return false;if(performance.now()>=bs.endPending.realAt)return finalizeBattleEnd(bs);return false}
 function battleFrame(ts){
  if(mode!=='battle'||!battleState||!battleState.engineStarted)return;
@@ -1812,7 +1860,7 @@ function syncStaticBattlePositions(){
  for(const st of battleState.structures){const el=document.querySelector(`[data-structure="${st.id}"]`);if(el){const p=screenPos(st.x,st.y||50);el.style.left=p.left+'%';el.style.top=p.top+'%'}}
  const rs=[...document.querySelectorAll('.b2-relic')];battleState.relics.forEach((r,i)=>{if(rs[i]){const p=screenPos(r.x,50);rs[i].style.left=p.left+'%';rs[i].style.top=p.top+'%'}})
 }
-function syncBattleDom(){const bs=battleState;syncBattleScoreboard();const clock=document.querySelector('.b2-clock');if(clock)clock.textContent=formatBattleTime(bs.time);const right=document.querySelector('.b2-right');if(right)right.innerHTML=`<span>${bs.status}</span>`;
+function syncBattleDom(){const bs=battleState;try{syncBattleScoreboard()}catch(err){console.error('[battle-ui-score]',err)}const clock=document.querySelector('.b2-clock');if(clock)clock.textContent=formatBattleTime(bs.time);const right=document.querySelector('.b2-right');if(right)right.innerHTML=`<span>${bs.status}</span>`;
  for(const u of bs.team.concat(bs.enemy)){const el=document.querySelector(`[data-unit="${u.id}"]`);if(!el)continue;const p=screenPos(u.x,u.y);el.style.left=p.left+'%';el.style.top=p.top+'%';el.classList.toggle('dead',!u.alive);const hp=el.querySelector('.t-hp em');if(hp)hp.style.width=Math.max(0,u.hp/u.maxHp*100)+'%'}
  for(const u of bs.team.concat(bs.enemy)){const hud=document.querySelector(`[data-hud-unit="${u.id}"]`);if(!hud)continue;hud.classList.toggle('dead',!u.alive);const hp=hud.querySelector('.b2-hp i');if(hp)hp.style.width=Math.max(0,Math.min(100,u.hp/u.maxHp*100))+'%';const info=hud.querySelector('.unit-info small');if(info)info.textContent=`${u.champ.name} · Lv.${u.level}`;const gold=hud.querySelector('.b2-gold');if(gold)gold.textContent=Math.floor(u.gold).toLocaleString()+' G'}
  for(const st of bs.structures){const el=document.querySelector(`[data-structure="${st.id}"]`);if(el){el.classList.toggle('dead',!st.alive);const n=el.querySelector('.sname');if(n)n.textContent=`${st.name} · ${Math.max(0,Math.round(st.hp))}%`}}
@@ -2000,9 +2048,9 @@ function dropSwap(e,targetType,targetIndex){e.preventDefault();e.stopPropagation
   dragSource=null;render();
 }
 function openResults(){mode='results';render()}
-function playAgain(){battleState=null;matchResult=null;teamPicks=[];chosenChamp=null;finalPool=[];enemyTeam=[];signatureRequests=[];signatureRequest=null;signatureChatDone=new Set();signatureChatLog=[];molchoDealerChatDone=false;pickSpecialChatDone=new Set();goQueue()}
-function reselectTeam(){battleState=null;matchResult=null;selected=[];party=[];mode='method';render()}
-function reset(){clearInterval(queueTimer);clearInterval(loadingTimer);clearTimeout(loadingTransitionTimer);clearInterval(battleTimer);clearInterval(battleWatchdogTimer);battleRafPending=false;cancelAnimationFrame(window.__battleRAF);dragSource=null;mode="select";me=null;selected=[];party=[];chatMembers=[];replies=0;privateIndex=0;privateAnswered=false;searching=false;queueSeconds=0;found=false;champOptions=[];teamPicks=[];chosenChamp=null;finalPool=[];molchoDealerChatDone=false;pickSpecialChatDone=new Set();render()}
+function playAgain(){stopBattleUiSync();battleState=null;matchResult=null;teamPicks=[];chosenChamp=null;finalPool=[];enemyTeam=[];signatureRequests=[];signatureRequest=null;signatureChatDone=new Set();signatureChatLog=[];molchoDealerChatDone=false;pickSpecialChatDone=new Set();goQueue()}
+function reselectTeam(){stopBattleUiSync();battleState=null;matchResult=null;selected=[];party=[];mode='method';render()}
+function reset(){clearInterval(queueTimer);clearInterval(loadingTimer);clearTimeout(loadingTransitionTimer);clearInterval(battleTimer);clearInterval(battleWatchdogTimer);stopBattleUiSync();battleRafPending=false;cancelAnimationFrame(window.__battleRAF);dragSource=null;mode="select";me=null;selected=[];party=[];chatMembers=[];replies=0;privateIndex=0;privateAnswered=false;searching=false;queueSeconds=0;found=false;champOptions=[];teamPicks=[];chosenChamp=null;finalPool=[];molchoDealerChatDone=false;pickSpecialChatDone=new Set();render()}
 render();
 </script>
 
