@@ -585,6 +585,15 @@ button{font:inherit}.app{min-height:100vh;width:100%;max-width:1240px;margin:0 a
 .augment-db-note{margin-top:8px;font-size:12px;color:#91a6b5}.augment-db-note b{color:#d7b85b}.augment-rank-badge{display:inline-flex;align-items:center;justify-content:center;min-width:46px;height:22px;padding:0 7px;border:1px solid #6d5b2f;border-radius:999px;background:#1b170d;color:#f0d878;font-size:11px;font-weight:900;letter-spacing:.04em;margin-bottom:7px}.augment-rank-badge.rank-S{border-color:#d6ae3d;box-shadow:0 0 12px #d6ae3d44}.augment-rank-badge.rank-A{border-color:#8aa9c8;color:#bad9f7}.augment-rank-badge.rank-B{border-color:#7f8a92;color:#c8d0d5}.augment-rank-badge.rank-C{border-color:#67574c;color:#bda79b}.augment-db-source{opacity:.82}
 @media(max-width:700px){.augment-db-note{font-size:10px;margin-top:6px}.augment-rank-badge{height:19px;min-width:40px;font-size:9px;padding:0 5px;margin-bottom:4px}}
 </style>
+
+<style id="v64-polish">
+.champ-card .cc-bottom strong,.final-team .pick-meta strong,.final-center .hero-champ h2{font-family:ui-serif,"Noto Serif KR","Nanum Myeongjo","Apple SD Gothic Neo",serif;font-weight:900;letter-spacing:-.02em;text-shadow:0 1px 8px rgba(199,171,104,.18)}
+.champ-card .cc-bottom strong{font-size:21px;letter-spacing:-.035em}
+.composition-tip{margin:18px 2px 0;padding:13px 14px;border:1px solid rgba(224,188,82,.55);background:linear-gradient(135deg,rgba(73,57,13,.32),rgba(17,21,21,.72));color:#e7cd71;font-size:12px;line-height:1.65}.composition-tip b{display:block;font-size:10px;letter-spacing:2px;margin-bottom:5px;color:#ffdf69}.composition-tip span{color:#d9c77f}
+@media(min-width:801px){.final-chat{height:230px!important;margin-top:20px!important}.final-chat-head{height:38px!important;font-size:11px!important;padding:0 14px!important}.final-chat-body{height:calc(100% - 38px)!important;font-size:15px!important;line-height:1.62!important;padding:10px 13px!important;overflow-y:auto!important}.final-chat-body .chat-line{margin-bottom:7px!important}}
+@media(max-width:800px){.composition-tip{display:none}.champ-card .cc-bottom strong{font-size:15px}}
+</style>
+
 </head>
 <body>
 <div class="app" id="app"></div>
@@ -620,6 +629,14 @@ const CHAMPION_IMAGE_IDS={reksai:"RekSai",leesin:"LeeSin",masteryi:"MasterYi",dr
 function championImageId(id){return id ? (CHAMPION_IMAGE_IDS[id]||id.charAt(0).toUpperCase()+id.slice(1)) : id;}
 function signatureChampionName(charId){const id=SIGNATURE_CHAMPS[charId];const c=(typeof champions!=="undefined")?champions.find(x=>x.id===id):null;return c?c.name:id;}
 function isSignaturePick(member,champ){return !!(member&&champ&&SIGNATURE_CHAMPS[member.id]===champ.id);}
+function hasBatchim(text){
+ const str=String(text||'').trim();if(!str)return false;
+ const code=str.charCodeAt(str.length-1);
+ if(code<0xAC00||code>0xD7A3)return false;
+ return ((code-0xAC00)%28)!==0;
+}
+function josa(text,withBatchim,withoutBatchim){return hasBatchim(text)?withBatchim:withoutBatchim}
+
 function render(){
 let body="";
 if(mode==="select"){
@@ -670,11 +687,11 @@ finalChatLine("dwaemesa","원딜 ㅈㅂㅈㅂㅈㅂㅈㅂ");
 finalChatLine("mundolmaeng","블루윙 수원 블루윙");
 if(party.some(c=>c.id==="molcho") && party.some(c=>c.id==="dwaemesa")) finalChatLine("dwaemesa","병욱아 진짜 그거 골랐으면 캐리해야된다");
 signatureChatLog.forEach(x=>special.push(`<div class="chat-line"><strong>${x.name}:</strong> ${x.msg}</div>`));
-const sigPopup=signatureRequest?`<div class="chat-event-overlay"><div class="chat-event-card"><div class="event-mark">!</div><h2>${signatureRequest.member.name}가 ${signatureRequest.champ.name}를 원하고 있습니다.</h2><p>챔피언을 주시겠습니까?</p><div class="chat-event-actions"><button onclick="answerSignatureRequest(true)">예</button><button class="deny" onclick="answerSignatureRequest(false)">아니오</button></div></div></div>`:"";
+const sigPopup=signatureRequest?`<div class="chat-event-overlay"><div class="chat-event-card"><div class="event-mark">!</div><h2>${signatureRequest.member.name}${josa(signatureRequest.member.name,'이','가')} ${signatureRequest.champ.name}${josa(signatureRequest.champ.name,'을','를')} 원하고 있습니다.</h2><p>챔피언을 주시겠습니까?</p><div class="chat-event-actions"><button onclick="answerSignatureRequest(true)">예</button><button class="deny" onclick="answerSignatureRequest(false)">아니오</button></div></div></div>`:"";
 body=`<div class="final-screen"><div class="final-top"><div class="unused-pool" aria-label="남은 챔피언">${finalPool.map((c,i)=>`<div class="unused swap-zone ${isSignaturePick(me,c)?'my-signature':''}" draggable="true" data-swap-type="pool" data-swap-index="${i}" onclick="mobileSwapTap(event,'pool',${i})" ondragstart="dragStart(event,'pool',${i})" ondragover="allowDrop(event)" ondragenter="dragEnter(event)" ondragleave="dragLeave(event)" ondrop="dropSwap(event,'pool',${i})" ondragend="dragEnd(event)"><img src="assets/champions/${championImageId(c.id)}_0.jpg" onerror="this.remove();this.parentElement.textContent='${c.icon}'"></div>`).join("")}</div><div class="swap-hint">DRAG TO SWAP</div></div>
 <div class="final-main"><div class="final-team"><div class="side-title">우리 팀 · 선택한 챔피언</div>${party.map((c,i)=>`<div class="player-row swap-zone ${i===0?"you":""}" draggable="true" data-swap-type="team" data-swap-index="${i}" onclick="mobileSwapTap(event,'team',${i})" ondragstart="dragStart(event,'team',${i})" ondragover="allowDrop(event)" ondragenter="dragEnter(event)" ondragleave="dragLeave(event)" ondrop="dropSwap(event,'team',${i})" ondragend="dragEnd(event)"><div class="avatar"><img src="assets/champions/${championImageId(teamPicks[i].id)}_0.jpg" onerror="this.remove();this.parentElement.textContent='${teamPicks[i].icon}'"></div><div class="pick-meta"><strong>${teamPicks[i].name}</strong><small>${c.nickname}</small></div>${i===0?"<em>YOU</em>":""}</div>`).join("")}</div>
 <div class="final-center"><div class="final-label">YOUR CHAMPION</div><div class="hero-champ"><div class="hero-art"><img src="assets/champions/${championImageId(chosenChamp.id)}_0.jpg" onerror="this.remove();this.parentElement.textContent='${chosenChamp.icon}'"></div><h2>${chosenChamp.name}</h2></div><button class="game-start-btn desktop-ready" onclick="startGame()">준비 완료</button></div>
-<div class="final-enemy"><div class="enemy-list"><div class="side-title">상대 팀 · 챔피언 비공개</div>${[1,2,3,4,5].map(i=>`<div class="enemy-row"><div class="enemy-hidden">?</div><div class="pick-meta"><strong>적${i}</strong><small>챔피언 비공개</small></div></div>`).join("")}</div></div></div><div class="final-chat final-chat-left"><div class="final-chat-head">CHAT</div><div class="final-chat-body">${tip}${special.join("")}</div></div><button class="game-start-btn mobile-ready" onclick="startGame()">준비 완료</button>${sigPopup}</div>`;
+<div class="final-enemy"><div class="enemy-list"><div class="side-title">상대 팀 · 챔피언 비공개</div>${[1,2,3,4,5].map(i=>`<div class="enemy-row"><div class="enemy-hidden">?</div><div class="pick-meta"><strong>적${i}</strong><small>챔피언 비공개</small></div></div>`).join("")}</div><div class="composition-tip"><b>TIP</b><span>조합과 숙련도가 승패를 좌우합니다.<br>전방·원거리 딜러·마법 피해·지원 역할을 고르게 구성하고, 각 플레이어가 잘 다루는 포지션과 시그니처 챔피언을 활용하세요.</span></div></div></div><div class="final-chat final-chat-left"><div class="final-chat-head">CHAT</div><div class="final-chat-body">${tip}${special.join("")}</div></div><button class="game-start-btn mobile-ready" onclick="startGame()">준비 완료</button>${sigPopup}</div>`;
 }
 if(mode==="loading"){
 body=`<div class="loading-screen"><div class="loading-inner"><div class="loading-kicker">무작위 총력전 · 아수라장</div><h2>게임을 불러오는 중</h2><div class="loading-vs"><div class="loading-team"><div class="loading-title">우리 팀</div>${teamPicks.map((c,i)=>`<div class="loading-card blue-card"><div class="loading-art"><img src="assets/champions/${championImageId(c.id)}_0.jpg" onerror="this.style.display='none';this.parentElement.innerHTML='<span>${c.icon}</span>'"></div><div class="loading-champ">${c.name}</div><div class="loading-nick">${party[i].nickname}</div></div>`).join("")}</div><div class="vs-mark">VS</div><div class="loading-team enemy-loading"><div class="loading-title">적 팀</div>${enemyTeam.map((e,i)=>`<div class="loading-card red-card"><div class="loading-art"><img src="assets/champions/${championImageId(e.champ.id)}_0.jpg" onerror="this.style.display='none';this.parentElement.innerHTML='<span>${e.champ.icon}</span>'"></div><div class="loading-champ">${e.champ.name}</div><div class="loading-nick">${e.nick}</div></div>`).join("")}</div></div><div class="loading-count">${loadingSeconds}</div><div class="loading-bar"><div style="width:${((10-loadingSeconds)/10)*100}%"></div></div><p>전장이 준비되고 있습니다...</p></div></div>`;
@@ -1011,6 +1028,34 @@ function championFormation(champ){
  const primary=(champ.roles&&champ.roles[0])||'Fighter';
  return ['Tank','Fighter','Assassin'].includes(primary)?'front':'back';
 }
+
+const AP_ASSASSINS=new Set(['akali','fizz','evelynn','katarina','ekko','leblanc','diana','kassadin']);
+const MIXED_DAMAGE=new Set(['kayle','kogmaw','kaisa','corki','teemo','varus','ezreal','kennen','shyvana']);
+function champDamageProfile(champ){
+ if(!champ)return 'mixed';
+ if(MIXED_DAMAGE.has(champ.id))return 'mixed';
+ if(AP_ASSASSINS.has(champ.id))return 'ap';
+ const roles=champ.roles||[];
+ if(roles.includes('Mage'))return 'ap';
+ if(roles.includes('Marksman')||roles.includes('Assassin')||roles.includes('Fighter'))return 'ad';
+ return 'mixed';
+}
+function compositionMultiplier(champs,opponents){
+ const profiles=champs.map(champDamageProfile), pure=profiles.filter(x=>x!=='mixed');
+ const allAd=pure.length>=4&&pure.every(x=>x==='ad')&&!profiles.includes('ap');
+ const allAp=pure.length>=4&&pure.every(x=>x==='ap')&&!profiles.includes('ad');
+ const enemyHasTank=(opponents||[]).some(c=>(c.roles||[]).includes('Tank'));
+ if(allAd||allAp)return enemyHasTank?.20:.80;
+ const front=champs.filter(c=>(c.roles||[]).some(r=>r==='Tank'||r==='Fighter')).length;
+ const marksman=champs.filter(c=>(c.roles||[]).includes('Marksman')).length;
+ const mage=champs.filter(c=>(c.roles||[]).includes('Mage')).length;
+ const support=champs.filter(c=>(c.roles||[]).includes('Support')).length;
+ if(front>=2&&marksman>=1&&mage>=1&&support>=1)return 1.20;
+ if(front===0)return .72;if(marksman===0&&mage===0)return .78;if(support===0)return .92;if(front===1)return .95;
+ return 1;
+}
+function combatPerformanceMultiplier(u){return augmentPerformanceMultiplier(u)*(u?.compositionMultiplier||1)}
+
 function createChampionUnit(team,index,champ,nick,realName=null){
  const roleStats=team==='team'?(playerRoleStats[realName]||Object.fromEntries(["Fighter","Tank","Mage","Assassin","Marksman","Support"].map(r=>[r,60]))):enemyRoleStats();
  const member=team==='team'?chars.find(c=>c.name===realName):null;
@@ -1029,10 +1074,13 @@ function startBattle(){
  clearInterval(loadingTimer); clearTimeout(loadingTransitionTimer); loadingTimer=null; loadingTransitionTimer=null;
  const team=teamPicks.map((c,i)=>createChampionUnit('team',i,c,party[i].nickname,party[i].name));
  const enemy=enemyTeam.map((e,i)=>createChampionUnit('enemy',i,e.champ,e.nick));
+ const teamComp=compositionMultiplier(teamPicks,enemyTeam.map(e=>e.champ));
+ const enemyComp=compositionMultiplier(enemyTeam.map(e=>e.champ),teamPicks);
+ team.forEach(u=>u.compositionMultiplier=teamComp);enemy.forEach(u=>u.compositionMultiplier=enemyComp);
  const structures=[
  {id:'tn1',team:'team',type:'nexus',name:'넥서스',x:5,y:50,hp:100,alive:true},{id:'tt1',team:'team',type:'tower',name:'쌍둥이 포탑',x:9,y:50,hp:100,alive:true},{id:'tt2',team:'team',type:'tower',name:'쌍둥이 포탑',x:12,y:50,hp:100,alive:true},{id:'ti',team:'team',type:'inhib',name:'억제기',x:17,y:50,hp:100,alive:true},{id:'t2',team:'team',type:'tower',name:'2차 포탑',x:28,y:50,hp:100,alive:true},{id:'t1',team:'team',type:'tower',name:'1차 포탑',x:40,y:50,hp:100,alive:true},
  {id:'e1',team:'enemy',type:'tower',name:'1차 포탑',x:60,y:50,hp:100,alive:true},{id:'e2',team:'enemy',type:'tower',name:'2차 포탑',x:72,y:50,hp:100,alive:true},{id:'ei',team:'enemy',type:'inhib',name:'억제기',x:83,y:50,hp:100,alive:true},{id:'et1',team:'enemy',type:'tower',name:'쌍둥이 포탑',x:88,y:50,hp:100,alive:true},{id:'et2',team:'enemy',type:'tower',name:'쌍둥이 포탑',x:91,y:50,hp:100,alive:true},{id:'en1',team:'enemy',type:'nexus',name:'넥서스',x:95,y:50,hp:100,alive:true}];
- battleState={time:0,lastTs:performance.now(),lastUiSync:0,status:'경기 진행 중',speed:1,team,enemy,units:[...team,...enemy],structures,relics:[],fx:[],fxSeq:0,log:[],chat:[],teamKills:0,enemyKills:0,nextWaveAt:45,waveCount:0,superTeam:false,superEnemy:false,paused:false,jaebinEventAt:180+Math.random()*300,jaebinEventDone:false,jaebinEventOpen:false,jaebinEventResult:null,augmentOpen:false,augmentStage:null,augmentChoices:[],augments:[],augmentDone:{start:false,7:false,11:false,15:false},augmentTierByStage:{},endPending:null};
+ battleState={time:0,lastTs:performance.now(),lastUiSync:0,status:'경기 진행 중',speed:1,team,enemy,units:[...team,...enemy],structures,relics:[],fx:[],fxSeq:0,log:[],chat:[],teamKills:0,enemyKills:0,nextWaveAt:45,waveCount:0,superTeam:false,superEnemy:false,paused:false,jaebinEventAt:180+Math.random()*300,jaebinEventDone:false,jaebinEventOpen:false,jaebinEventResult:null,augmentOpen:false,augmentStage:null,augmentChoices:[],augments:[],augmentDone:{start:false,7:false,11:false,15:false},augmentTierByStage:{},endPending:null,akaliChatAt:420+Math.random()*60,akaliChatDone:false,teamCompMultiplier:teamComp,enemyCompMultiplier:enemyComp};
  if(party.some(c=>c.id==='siljeom')) battleState.chat.push(`<span class="all-tag">[전체]</span> <span class="ally-chat">실점:</span> 안녕하세요~ 매너게임이요 ^^`);
  mode='battle';render();setTimeout(()=>{if(mode==='battle'&&battleState&&!battleState.augmentDone.start)openAugment('start')},120);window.__battleRAF=requestAnimationFrame(battleFrame);
 }
@@ -1056,7 +1104,7 @@ function moveOrganic(u,target,dt){
  const dx=target.x-u.x, dy=target.y-u.y, dist=Math.max(.001,Math.hypot(dx,dy));
  const desiredX=dx/dist, desiredY=dy/dist;
  const sway=Math.sin(bsTime()*1.7+u.phase)*.18;
- const movePerf=u.kind==='champ'?Math.sqrt(Math.max(.35,augmentPerformanceMultiplier(u))):1;
+ const movePerf=u.kind==='champ'?Math.sqrt(Math.max(.20,combatPerformanceMultiplier(u))):1;
  u.x+=desiredX*u.speed*movePerf*dt; u.y+=desiredY*u.speed*movePerf*dt + sway*dt;
  // soft lane bounds and light separation so units don't march in a single file
  const same=battleState.units.filter(v=>v.alive&&v!==u&&v.team===u.team&&Math.abs(v.x-u.x)<2.8&&Math.abs(v.y-u.y)<5).slice(0,3);
@@ -1088,12 +1136,12 @@ function killLog(attacker,target){
  const allies=bs.units.filter(u=>u.kind==='champ'&&u.team===attacker.team&&u!==attacker&&u.alive&&Math.hypot(u.x-target.x,u.y-target.y)<14); allies.forEach(u=>u.assists=(u.assists||0)+1);
  bs.log.push(`[${formatBattleTime(bs.time)}] <span class="${at}">${attacker.nick||attacker.name||'포탑'}</span> → <span class="${tt}">${target.nick}</span> 처치`);
 }
-function dealDamage(attacker,target,dmg){if(!target.alive)return;const out=attacker.kind==='champ'?augmentPerformanceMultiplier(attacker):1;const guard=target.kind==='champ'?Math.sqrt(Math.max(.35,augmentPerformanceMultiplier(target))):1;dmg=dmg*out/guard;if(attacker.kind==='champ')attacker.damageDealt=(attacker.damageDealt||0)+dmg*12;if(target.kind==='champ')target.damageTaken=(target.damageTaken||0)+dmg*12;target.hp-=dmg;if(target.hp<=0){target.hp=0;target.alive=false;if(target.kind==='minion')grantMinionXp(target);if(target.kind==='champ'){target.respawn=respawnSeconds(target);addFx(target.x,target.y,'KO',attacker.team);killLog(attacker,target)}}else if(Math.random()<.035&&attacker.kind==='champ'){addFx(target.x,target.y,`-${Math.max(1,Math.round(dmg*12))}`,attacker.team)}}
+function dealDamage(attacker,target,dmg){if(!target.alive)return;const out=attacker.kind==='champ'?combatPerformanceMultiplier(attacker):1;const guard=target.kind==='champ'?Math.sqrt(Math.max(.20,combatPerformanceMultiplier(target))):1;dmg=dmg*out/guard;if(attacker.kind==='champ')attacker.damageDealt=(attacker.damageDealt||0)+dmg*12;if(target.kind==='champ')target.damageTaken=(target.damageTaken||0)+dmg*12;target.hp-=dmg;if(target.hp<=0){target.hp=0;target.alive=false;if(target.kind==='minion')grantMinionXp(target);if(target.kind==='champ'){target.respawn=respawnSeconds(target);addFx(target.x,target.y,'KO',attacker.team);killLog(attacker,target)}}else if(Math.random()<.035&&attacker.kind==='champ'){addFx(target.x,target.y,`-${Math.max(1,Math.round(dmg*12))}`,attacker.team)}}
 function damageStructure(st,dmg,attacker){
  const bs=battleState;if(!st||!st.alive||!attacker||!isStructureTargetable(st,attacker.team))return;
  const tempo=bs.time>15*60?2.15:bs.time>10*60?1.45:1;
  const nexusMod=st.type==='nexus'?.72:1;
- const perf=attacker.kind==='champ'?augmentPerformanceMultiplier(attacker):1;
+ const perf=attacker.kind==='champ'?combatPerformanceMultiplier(attacker):1;
  st.hp-=dmg*tempo*nexusMod*perf;
  if(st.hp<=0){
   st.hp=0;st.alive=false;
@@ -1208,10 +1256,11 @@ function allowJaebinChat(){
  bs.jaebinEventDone=true;bs.jaebinEventOpen=false;bs.paused=false;bs.status='경기 진행 중';bs.lastTs=performance.now();render();window.__battleRAF=requestAnimationFrame(battleFrame);
 }
 function denyJaebinChat(){const bs=battleState;if(!bs)return;bs.chat.push(`<span class="all-tag">[SYSTEM]</span> 이재빈의 전체 채팅을 막았습니다.`);bs.jaebinEventDone=true;bs.jaebinEventOpen=false;bs.paused=false;bs.status='경기 진행 중';bs.lastTs=performance.now();render();window.__battleRAF=requestAnimationFrame(battleFrame)}
-function checkEnd(){const bs=battleState;if(bs.endPending&&performance.now()>=bs.endPending.realAt){const winner=bs.endPending.winner;bs.status=winner==='team'?'우리 팀 승리':'적 팀 승리';if(winner==='team'){if(party.some(c=>c.id==='siljeom'))bs.chat.push(`<span class="all-tag">[전체]</span> <span class="ally-chat">실점:</span> 죽어 그냥 ㅋㅋ`);if(party.some(c=>c.id==='nguyen'))bs.chat.push(`<span class="all-tag">[전체]</span> <span class="ally-chat">Nguyen Ngoc Tu:</span> 나1가`);if(party.some(c=>c.id==='3patourwan'))for(let i=0;i<4;i++)bs.chat.push(`<span class="all-tag">[전체]</span> <span class="ally-chat">쓰리빠뚜르완:</span> ㅋ`);if(party.some(c=>c.id==='joguk'))bs.chat.push(`<span class="all-tag">[전체]</span> <span class="ally-chat">조국:</span> 븅`);if(party.some(c=>c.id==='molcho'))bs.chat.push(`<span class="all-tag">[팀원]</span> <span class="ally-chat">몰초:</span> 쉽네 쉬워`);}else{if(party.some(c=>c.id==='nguyen'))bs.chat.push(`<span class="all-tag">[전체]</span> <span class="ally-chat">Nguyen Ngoc Tu:</span> 수고하셨습니다 GG`);}matchResult={winner,time:bs.time,teamKills:bs.teamKills,enemyKills:bs.enemyKills,team:bs.team.map(u=>({...u})),enemy:bs.enemy.map(u=>({...u})),chat:[...(bs.chat||[])]};mode='battleEnd';render();return true}return false}
+function checkEnd(){const bs=battleState;if(bs.endPending&&performance.now()>=bs.endPending.realAt){const winner=bs.endPending.winner;bs.status=winner==='team'?'우리 팀 승리':'적 팀 승리';if(winner==='team'){if(party.some(c=>c.id==='siljeom'))bs.chat.push(`<span class="all-tag">[전체]</span> <span class="ally-chat">실점:</span> 죽어 그냥 ㅋㅋ`);if(party.some(c=>c.id==='nguyen'))bs.chat.push(`<span class="all-tag">[전체]</span> <span class="ally-chat">Nguyen Ngoc Tu:</span> 나1가`);if(party.some(c=>c.id==='3patourwan'))for(let i=0;i<4;i++)bs.chat.push(`<span class="all-tag">[전체]</span> <span class="ally-chat">쓰리빠뚜르완:</span> ㅋ`);if(party.some(c=>c.id==='joguk'))bs.chat.push(`<span class="all-tag">[전체]</span> <span class="ally-chat">조국:</span> 븅`);if(party.some(c=>c.id==='molcho'))bs.chat.push(`<span class="all-tag">[팀원]</span> <span class="ally-chat">몰초:</span> 쉽네 쉬워`);}else{if(party.some(c=>c.id==='nguyen'))bs.chat.push(`<span class="all-tag">[전체]</span> <span class="ally-chat">Nguyen Ngoc Tu:</span> 근데 지고 자..?`);if(party.some(c=>c.id==='siljeom'))bs.chat.push(`<span class="all-tag">[전체]</span> <span class="ally-chat">실점:</span> 지고 자는 건 에바긴 해`);if(party.some(c=>c.id==='3patourwan'))bs.chat.push(`<span class="all-tag">[전체]</span> <span class="ally-chat">쓰리빠뚜르완:</span> 찐막?`);if(party.some(c=>c.id==='joguk'))bs.chat.push(`<span class="all-tag">[전체]</span> <span class="ally-chat">조국:</span> 고조할배찐막?`);}matchResult={winner,time:bs.time,teamKills:bs.teamKills,enemyKills:bs.enemyKills,team:bs.team.map(u=>({...u})),enemy:bs.enemy.map(u=>({...u})),chat:[...(bs.chat||[])]};mode='battleEnd';render();return true}return false}
 function battleFrame(ts){if(mode!=='battle'||!battleState)return;
  const bs=battleState;if(bs.paused){bs.lastTs=ts;return;}
  if(bs.endPending){bs.lastTs=ts;syncBattleDom();if(checkEnd())return;window.__battleRAF=requestAnimationFrame(battleFrame);return;}let raw=Math.min(.05,(ts-bs.lastTs)/1000);bs.lastTs=ts;let dt=Math.min(.8,raw*bs.speed);bs.time+=dt;
+ if(!bs.akaliChatDone&&party.some(c=>c.id==='nguyen')&&bs.enemy.some(u=>u.champ?.id==='akali')&&bs.time>=bs.akaliChatAt){bs.chat.push(`<span class="all-tag">[전체]</span> <span class="ally-chat">Nguyen Ngoc Tu:</span> 아칼리 사기 챔피언 하면 재미있음?`);bs.akaliChatDone=true;}
  if(!bs.jaebinEventDone&&!bs.jaebinEventOpen&&party.some(c=>c.id==='nguyen')&&bs.time>=bs.jaebinEventAt){triggerJaebinEvent();return;}
  while(bs.time>=bs.nextWaveAt){spawnWave();bs.nextWaveAt+=waveIntervalAt(bs.nextWaveAt)}
  updateUnits(dt);updateStructures(dt);updateRelics(dt);applyOvercharge();
@@ -1294,7 +1343,7 @@ const AUGMENT_DB_FALLBACK={source:"OP.GG ARAM: Mayhem",updated:"2026-09-24",rank
 let championAugmentDb=AUGMENT_DB_FALLBACK;
 async function loadChampionAugmentDb(){
  try{
-  const res=await fetch('assets/data/augment-tiers.json?v=63',{cache:'no-store'});
+  const res=await fetch('assets/data/augment-tiers.json?v=64',{cache:'no-store'});
   if(!res.ok)throw new Error('HTTP '+res.status);
   const data=await res.json();
   if(data&&data.champions)championAugmentDb=data;
@@ -1341,13 +1390,19 @@ const augmentNames={
  gold:["감쇠 광선", "극악무도", "급속 성장", "너만을 위해", "넘을 수 없는 벽", "노련한 저격수", "능력치 더하기 능력치!", "되풀이", "마법 명사수", "마법 미사일", "무법자의 투지", "바늘에 실 끼우기", "범람", "부메랑 투척", "빛의 인도자 결의", "빵과 버터", "빵과 잼", "빵과 치즈", "상급 조준경 부착", "소환술사", "속행", "시작부터 끝까지", "신난다!", "신성한 중재", "영혼 흡수", "전술적 대비", "전환: 프리즘", "점멸 난사", "처형 시간", "천상의 신체", "최첨단 발명가", "치명적 미사일", "치명적 치유", "치명적인 공격", "취약", "퀘스트: 강철 같은 심장", "타오르는 새벽", "핀볼", "화염 낙인", "환영 무기", "후원", "광휘의 검 업그레이드", "무한의 대검 업그레이드", "밤의 추적", "소나타", "영혼의 정화", "영혼의 포식자", "축소 엔진", "치명적 리듬", "탱크 엔진", "타오르는 이자", "끝없는 학살", "로켓 배송", "Hide on bush", "자연의 회복", "우리의 치유", "무리한 진입", "격려하기", "고슴도치", "압력솥", "상어 미끼", "상어 폭풍", "눈 폭발", "이빨 요정", "마도사의 주스 상자", "삐뽀삐뽀", "으악, 내 동전!", "꽁!", "작은 도움", "자비의 일격", "위력 추구", "가속 추구", "굶주린 속박", "원기 회복", "지형 생성됨", "날쌘걸음", "공포", "연쇄 반응", "갈라진 하늘 업그레이드", "굶주린 히드라 업그레이드"],
  prismatic:["거석상의 용기", "거인", "거인 학살자", "검무", "검을 뽑아라", "결투의 대가", "광대 대학", "궁극기 대변혁", "기본으로 돌아가기", "난공불락", "능력치 더하기 능력치 더하기 능력치!", "대지의 각성", "도망갈 수 없어", "돌진", "미친 과학자", "보석 건틀릿", "불길한 서약", "신비한 주먹", "양손잡이", "요정 마법", "유레카", "유리 대포", "전능의 영혼", "전장의 교향곡", "전환: 혼돈", "죽음의 순환", "지옥의 전도체", "최상급 조준경 부착", "최종 형태", "퀘스트: 우글렛의 마녀 모자", "퀘스트: 이케시아의 몰락", "탄환 세례", "탭 댄서", "판도라의 상자", "프로틴 음료", "골드 강탈", "궁극의 각성", "꽃피는 새벽의 검 업그레이드", "나는 왕이다", "남작의 도움", "데굴데굴 눈덩이!", "드롭킥", "무한 반복", "바람전달자의 축복", "신념을 통한 강화", "신성한 눈덩이", "잔혹 행위", "지옥불 난사 발동", "창공의 서약", "퀘스트: 우르프의 챔피언", "퀸카", "차원 이동", "곰 투하", "앙파상", "열의", "도박꾼", "궁극기 봇", "대마법사", "포로 쇄도", "초월 의식", "영혼 폭탄", "말랑 찰싹 손", "방출 역장", "거인의 결의", "메아리 시전", "다중 공격", "과충전", "바늘꽂이", "주문 분산", "3연발", "한 발에 두 놈", "퀘스트: 궁극의 히드라"]
 };
+
+const AUGMENT_DESCRIPTIONS={
+ "전환: 프리즘":"무작위 프리즘 증강 하나를 추가로 얻습니다.","되풀이":"스킬 가속이 크게 증가합니다.","보석 건틀릿":"스킬 피해에도 치명타가 적용될 수 있고 치명타 확률이 증가합니다.","축소 엔진":"처치 관여로 몸집이 작아지며 스킬 가속과 이동 속도를 쌓습니다. 사망하면 중첩 일부를 잃습니다.","마도사의 주스 상자":"모든 피해 흡혈을 얻어 가한 피해 일부를 회복합니다.","마법 미사일":"스킬 피해를 입히면 추가 투사체를 발사해 거리에 비례한 최대 체력 기반 고정 피해를 줍니다.","치명적 미사일":"치명타 적중 시 추가 미사일이 발사되며 치명타 확률도 증가합니다.","극악무도":"스킬로 적 챔피언에게 피해를 줄 때마다 주문력을 영구적으로 쌓습니다.","상급 조준경 부착":"기본 공격 사거리가 크게 증가합니다.","조준경 부착":"기본 공격 사거리가 증가합니다.","최상급 조준경 부착":"기본 공격 사거리가 매우 크게 증가합니다.","유레카":"주문력에 비례해 추가 스킬 가속을 얻습니다.","탱크 엔진":"처치 관여로 최대 체력과 크기가 증가하는 중첩을 쌓습니다. 사망 시 일부를 잃습니다.","영혼 흡수":"치명타 피해 일부만큼 체력을 회복하고 치명타 확률을 얻습니다.","무한의 대검 업그레이드":"골드를 얻고 무한의 대검을 강화해 기본 공격의 치명타 피해 변동 폭을 키웁니다.","쌍둥이 불꽃":"스킬 피해 시 추가 투사체를 발사하며 치명타 확률을 얻습니다.","바늘에 실 끼우기":"방어구 관통력과 마법 관통력을 함께 얻습니다.","환영 무기":"스킬이 적중 시 효과를 적용하도록 만들어 공격 효과 연계를 강화합니다.","육중한 힘":"공격력이 크게 증가합니다.","드롭킥":"체력이 낮은 적을 공격하면 처형과 넉백이 발동하고 자신은 회복합니다.","이빨 요정":"폭발적인 피해를 줄 때 이빨이 떨어지며, 주워서 물리·마법 관통력을 영구적으로 올립니다.","노련한 저격수":"먼 거리에서 기본 스킬을 적중시키면 해당 스킬의 재사용 대기시간을 크게 돌려받습니다.","도주 계획":"체력이 위험 수준으로 떨어지면 큰 보호막과 이동 속도, 축소 효과를 얻습니다.","타오르는 이자":"챔피언에게 준 화상·지속 피해가 추가 골드를 만들어냅니다.","굶주린 속박":"이동 방해 효과를 적중시키면 추가 피해를 주고 체력을 회복합니다.","민병대":"비전투 상태에서 이동 속도가 크게 증가하며 피해를 받으면 잠시 비활성화됩니다.","치명적 리듬":"치명타 기본 공격으로 공격 속도 중첩을 쌓고 치명타 확률을 얻습니다.","순수주의자 - 마법사":"공격 속도를 스킬 가속으로 전환하고 재사용 대기시간 감소 능력을 강화합니다.","무한 반복":"큰 스킬 가속을 얻고 처치 관여할수록 추가 스킬 가속을 쌓습니다.","처형 시간":"궁극기 사용 후 적에게 표식을 남겨 이후 가한 피해를 저장했다가 폭발시킵니다.","선혈포식":"모든 피해 흡혈을 크게 얻습니다.","양손잡이":"기본 공격 시 추가 투사체로 적중 효과를 일부 적용하고 공격 속도를 얻습니다.","천상의 신체":"최대 체력이 크게 증가하지만 가하는 피해량이 일부 감소합니다.","거인":"몸집과 최대 체력이 크게 늘고 적응형 능력치도 증가합니다.","강타자":"기본 공격에 자신의 최대 체력 비례 추가 물리 피해가 붙습니다.","취약":"아이템과 지속 피해에도 치명타가 적용될 수 있으며 치명타 확률이 증가합니다.","거인 학살자":"몸집이 작아지고 이동 속도를 얻으며 자신보다 큰 적에게 추가 피해를 줍니다.","능수능란":"공격 속도가 크게 증가합니다.","적응형 능력치":"추가 공격력을 주문력으로 전환하고 주문력을 추가로 증가시킵니다.","마법 명사수":"기본 공격에 주문력 비례 추가 물리 피해가 붙습니다.","전환: 혼돈":"무작위 증강 두 개를 추가로 얻습니다.","하체 운동의 날":"이동 속도와 둔화 저항을 크게 얻습니다.","데굴데굴 눈덩이!":"눈덩이를 강화해 더 자주 사용하고, 관통·둔화·에어본·추가 피해 효과를 얻습니다.","지옥의 전도체":"스킬 사용 시 화상을 중첩하고, 화상이 기본 스킬 재사용 대기시간을 줄여줍니다.","미친 과학자":"부활할 때마다 거대화 또는 축소 계열의 무작위 강화 효과를 얻습니다.","신비한 주먹":"적중 시 스킬 재사용 대기시간을 줄입니다.","최종 형태":"궁극기 사용 후 잠시 보호막, 피해 흡혈, 이동 속도를 크게 얻습니다.","신난다!":"처치 관여 후 잠시 이동 속도와 공격 속도가 증가합니다.","장인의 솜씨":"아이템과 증강이 가하는 피해량이 증가합니다.","치명적인 공격":"치명타 확률이 크게 증가합니다.","압력솥":"주변 적에게 최대 체력 비례 화상을 누적시키며 퀘스트 진행에 따라 효과가 강해집니다.","전술적 대비":"주문력에 비례한 큰 보호막을 주기적으로 얻습니다.","정신 변환":"보유 마나에 비례해 최대 체력이 증가합니다.","빠르고 안전하게":"돌진이나 점멸 후 보호막을 얻습니다.","무법자의 투지":"돌진·점멸·순간이동 후 방어력과 마법 저항력을 중첩해서 얻습니다.","승리를 위한 회전":"회전형 스킬의 스킬 가속과 피해량이 증가합니다.","확률적 방어":"치명타 확률에 비례해 받는 피해를 크게 줄이는 방어가 발동할 수 있습니다.","검을 뽑아라":"근접 판정으로 바뀌며 잃은 사거리에 비례해 공격력·체력·공격 속도·흡혈·이동 속도를 얻습니다.","우당탕탕":"적을 이동 불가 상태로 만들 때 적응형 능력치를 쌓고 사망 시 일부를 잃습니다.","전장의 교향곡":"치명적 속도와 정복자 핵심 룬 효과를 함께 얻습니다.","죽음의 무도 업그레이드":"받는 피해 일부를 지연시키고 처치 관여 시 회복하는 효과를 강화합니다.","돌진":"돌진·도약·점멸·순간이동 계열 스킬의 스킬 가속이 매우 크게 증가합니다.","날쌘걸음":"사용 시 커서 방향으로 빠르게 돌진합니다.","요정 마법":"궁극기로 피해를 준 적을 잠시 변이시킵니다.","바다의 영혼":"적에게 피해를 준 뒤 체력과 마나 재생이 크게 증가합니다.","거인의 결의":"피해를 주거나 받을 때 중첩을 쌓아 공격·방어·강인함과 크기를 함께 키웁니다.","소환술사":"소환물의 크기, 체력, 피해량이 증가합니다.","소나타":"주기적으로 회복·보호막 오라와 이동 속도 오라를 번갈아 자동 사용합니다.","전능의 영혼":"무작위 드래곤 영혼 세 개를 얻습니다.","초월 의식":"처치 관여로 생긴 정수를 공격하면 이동 속도가 오르고 기본 스킬이 초기화됩니다.","넘을 수 없는 벽":"여진과 빙결 강화 핵심 룬 효과를 얻습니다.","신성한 눈덩이":"눈덩이를 강화하고 눈덩이 돌진 중 잠시 무적 상태가 됩니다.","자연의 회복":"수풀에 들어가면 체력을 크게 회복합니다.","결투의 대가":"기본 공격으로 주문력을, 스킬 피해로 공격력을 쌓습니다.","도망갈 수 없어":"궁극기 사용 시 주변 적을 도발하고 피해 감소를 얻으며 궁극기 가속도 증가합니다.","치명적 치유":"회복과 보호막이 치명타처럼 증폭될 수 있고 치명타 확률을 얻습니다.","우리의 치유":"주변에서 발생하는 회복 일부를 자신도 회복하며 적의 회복은 더 크게 반영됩니다.","치명적 가속":"치명타 확률에 비례한 스킬 가속을 얻습니다.","음속 폭발":"아군에게 회복·보호막·버프를 주면 그 아군 주변 적에게 피해와 둔화를 줍니다.","열의":"적 챔피언을 공격해 중첩을 쌓고 최대 중첩 상태에서 사망하면 강화된 상태로 부활합니다.","유리 대포":"최대 체력을 희생하는 대신 가하는 피해에 추가 고정 피해가 붙습니다.","골드 강탈":"챔피언에게 피해를 주면 추가 마법 피해와 골드, 이동 속도를 얻습니다.","대지의 영혼":"비전투 상태가 되면 잠시 보호막을 얻습니다.","공포":"특정 스킬 사용 시 주변 적에게 공포를 겁니다.","창공의 서약":"회복·보호막 효과가 증가하고 아군에게 순간이동해 보호막을 주는 주문을 얻습니다.","강력한 방패":"보호막을 얻으면 잠시 적응형 능력치가 증가합니다.","차원 이동":"영역 안의 대상을 잠시 다른 차원으로 보내는 소환사 주문을 얻습니다.","Hide on bush":"수풀에 들어간 뒤 잠시 가하는 피해량이 증가합니다."
+};
+function augmentDescription(name){return AUGMENT_DESCRIPTIONS[name]||'고유 효과를 지닌 증강체입니다. 챔피언과 조합에 따라 효율이 달라집니다.'}
+
 function augmentEffectFor(tier,name){
  const mult=tier==='silver'?1.035:tier==='gold'?1.065:1.10;
  const hp=tier==='silver'?1.045:tier==='gold'?1.08:1.13;
  const speed=tier==='silver'?1.018:tier==='gold'?1.032:1.05;
  let h=0;for(const ch of name)h=(h*31+ch.charCodeAt(0))>>>0;
  const kind=h%4;
- return {name,desc:'효과 데이터 입력 예정 · 현재는 임시 전투 보정이 적용됩니다.',icon:tier==='silver'?'◇':tier==='gold'?'✦':'◆',apply:u=>{if(kind===0)u.atk*=mult;else if(kind===1){u.maxHp*=hp;u.hp*=hp}else if(kind===2)u.speed*=speed;else{u.atk*=1+(mult-1)*.6;u.maxHp*=1+(hp-1)*.6;u.hp*=1+(hp-1)*.6}}};
+ return {name,desc:augmentDescription(name),icon:tier==='silver'?'◇':tier==='gold'?'✦':'◆',apply:u=>{if(kind===0)u.atk*=mult;else if(kind===1){u.maxHp*=hp;u.hp*=hp}else if(kind===2)u.speed*=speed;else{u.atk*=1+(mult-1)*.6;u.maxHp*=1+(hp-1)*.6;u.hp*=1+(hp-1)*.6}}};
 }
 const augmentTemplates={silver:augmentNames.silver.map(n=>augmentEffectFor('silver',n)),gold:augmentNames.gold.map(n=>augmentEffectFor('gold',n)),prismatic:augmentNames.prismatic.map(n=>augmentEffectFor('prismatic',n))};
 function rollAugmentTier(){const r=Math.random()*100;return r<30?'silver':r<80?'gold':'prismatic'}
