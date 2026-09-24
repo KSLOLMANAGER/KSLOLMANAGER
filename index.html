@@ -664,7 +664,7 @@ const playerRoleStats={
   "조시원":{Fighter:50,Tank:40,Mage:60,Assassin:50,Marksman:80,Support:30}
 };
 function roleSkillFor(stats,champ){const rs=(champ.roles&&champ.roles.length?champ.roles:["Fighter"]);return rs.reduce((a,r)=>a+(stats[r]??60),0)/rs.length}
-function enemyRoleStats(){const o={};["Fighter","Tank","Mage","Assassin","Marksman","Support"].forEach(r=>o[r]=64+Math.floor(Math.random()*13));return o}
+function enemyRoleStats(){const o={};["Fighter","Tank","Mage","Assassin","Marksman","Support"].forEach(r=>o[r]=68+Math.floor(Math.random()*13));return o}
 const SIGNATURE_CHAMPS={siljeom:"pyke",molcho:"swain",dwaemesa:"samira",joguk:"singed",nguyen:"kayle","3patourwan":"hwei",mundolmaeng:"teemo",galio:"galio",dage:"irelia"};
 const SIGNATURE_CHAT={siljeom:"돈 드리겠습니다~",molcho:"보여줄게",dwaemesa:"월월 감사합니다 월월",joguk:"왔다 내 사랑",nguyen:"케권이 횽이야","3patourwan":"흐에!!",mundolmaeng:"티모횽이야",galio:"야 든든하게 막아줄게",dage:"야 게임 끝났어"};
 let signatureRequests=[],signatureRequest=null,signatureChatDone=new Set(),signatureChatLog=[];
@@ -836,7 +836,7 @@ body=`<div class="battle-v2"><div class="b2-head"><div></div><div><div class="b2
 <div class="structure-track">${bs.structures.map(st=>`<div class="b2-structure ${st.team==='enemy'?'red':''} ${st.type} ${st.alive?'':'dead'}" data-structure="${st.id}" style="left:${st.x}%"><div class="sicon">${st.type==='nexus'?'◆':st.type==='inhib'?'✦':'▥'}</div><div class="sname">${st.name} · ${Math.max(0,Math.round(st.hp))}%</div></div>`).join("")}</div>
 ${bs.units.filter(u=>u.kind==='champ').map(u=>unitV2Html(u)).join("")}
 ${battleScoreboardHtml(bs)}
-<div class="b2-speed-dock">${[.5,1,2,4,8,16,32].map(v=>`<button class="${bs.speed===v?'active':''}" onclick="setBattleSpeed(${v})">${v}×</button>`).join('')}</div><div class="b2-panel"><div class="b2-panel-head"><span>LIVE MATCH LOG</span><span>${formatBattleTime(bs.time)}</span></div><div class="b2-log">${bs.log.slice(-9).map(x=>`<div>${x}</div>`).join("")}</div><div class="b2-controls"><button class="${bs.speed===.5?'active':''}" onclick="setBattleSpeed(.5)">0.5×</button><button class="${bs.speed===1?'active':''}" onclick="setBattleSpeed(1)">1×</button><button class="${bs.speed===2?'active':''}" onclick="setBattleSpeed(2)">2×</button><button class="${bs.speed===4?'active':''}" onclick="setBattleSpeed(4)">4×</button><button class="${bs.speed===8?'active':''}" onclick="setBattleSpeed(8)">8×</button><button class="${bs.speed===16?'active':''}" onclick="setBattleSpeed(16)">16×</button><button class="${bs.speed===32?'active':''}" onclick="setBattleSpeed(32)">32×</button></div></div><div class="match-all-chat"><div class="match-all-chat-head">전체 채팅</div><div class="match-all-chat-body">${(bs.chat||[]).slice(-7).map(x=>`<div>${x}</div>`).join("")}</div></div>${bs.jaebinEventOpen?`<div class="chat-event-overlay"><div class="chat-event-card"><div class="event-mark">!</div><h2>이재빈이 전체 채팅을 시도하려고 합니다</h2><p>허락하시겠습니까?</p><div class="warn">‼️ 상대방의 멘탈이 흔들리거나 오히려 각성할 수 있습니다.</div><div class="chat-event-actions"><button onclick="allowJaebinChat()">허락하기</button><button class="deny" onclick="denyJaebinChat()">반대하기</button></div></div></div>`:""}${augmentOverlayHtml(bs)}</div><aside class="b2-side right"><div class="b2-side-title">적 팀</div>${bs.enemy.map(u=>row(u,true)).join("")}</aside></div></div>`;
+<div class="b2-speed-dock">${[.5,1,2,4,8,16,32].map(v=>`<button class="${bs.speed===v?'active':''}" onclick="setBattleSpeed(${v})">${v}×</button>`).join('')}</div><div class="b2-panel"><div class="b2-panel-head"><span>LIVE MATCH LOG</span><span>${formatBattleTime(bs.time)}</span></div><div class="b2-log">${bs.log.slice(-9).map(x=>`<div>${x}</div>`).join("")}</div><div class="b2-controls"><button class="${bs.speed===.5?'active':''}" onclick="setBattleSpeed(.5)">0.5×</button><button class="${bs.speed===1?'active':''}" onclick="setBattleSpeed(1)">1×</button><button class="${bs.speed===2?'active':''}" onclick="setBattleSpeed(2)">2×</button><button class="${bs.speed===4?'active':''}" onclick="setBattleSpeed(4)">4×</button><button class="${bs.speed===8?'active':''}" onclick="setBattleSpeed(8)">8×</button><button class="${bs.speed===16?'active':''}" onclick="setBattleSpeed(16)">16×</button><button class="${bs.speed===32?'active':''}" onclick="setBattleSpeed(32)">32×</button></div></div><div class="match-all-chat"><div class="match-all-chat-head">전체 채팅</div><div class="match-all-chat-body">${(bs.chat||[]).slice(-7).map(x=>`<div>${x}</div>`).join("")}</div></div>${bs.jaebinEventOpen?`<div class="chat-event-overlay"><div class="chat-event-card"><div class="event-mark">!</div><h2>이재빈이 전체 채팅을 시도하려고 합니다</h2><p>허락하시겠습니까?</p><div class="warn">‼️ 상대방의 멘탈이 흔들리거나 오히려 각성할 수 있습니다.</div><div class="chat-event-actions"><button onclick="allowJaebinChat()">허락하기</button><button class="deny" onclick="denyJaebinChat()">반대하기</button></div></div></div>`:""}${bs.molchoPhoneOpen?`<div class="chat-event-overlay"><div class="chat-event-card"><div class="event-mark">☎</div><h2>김병욱이 전화를 하러 갔습니다</h2><p>갑자기 여자친구에게 전화가 왔습니다.</p><div class="warn">10분간 소통이 안되어 플레이에 영향이 갑니다.<br>몰초의 경기력이 0.8배로 감소합니다.</div><div class="chat-event-actions"><button onclick="confirmMolchoPhone()">확인</button></div></div></div>`:""}${augmentOverlayHtml(bs)}</div><aside class="b2-side right"><div class="b2-side-title">적 팀</div>${bs.enemy.map(u=>row(u,true)).join("")}</aside></div></div>`;
 }
 if(mode==="battleEnd"){
  const win=matchResult?.winner==='team';
@@ -1128,13 +1128,56 @@ function answerSignatureRequest(yes){
   }
   signatureRequest=signatureRequests.shift()||null;render();
 }
+function enemyCompositionScore(champs){
+  if(!champs||champs.length!==5)return -999;
+  const roles=champs.map(c=>c.roles||[]);
+  const front=roles.filter(rs=>rs.includes('Tank')||rs.includes('Fighter')).length;
+  const tanks=roles.filter(rs=>rs.includes('Tank')).length;
+  const marksmen=roles.filter(rs=>rs.includes('Marksman')).length;
+  const mages=roles.filter(rs=>rs.includes('Mage')).length;
+  const supports=roles.filter(rs=>rs.includes('Support')).length;
+  const assassins=roles.filter(rs=>rs.includes('Assassin')).length;
+  const profiles=champs.map(champDamageProfile);
+  const ad=profiles.filter(x=>x==='ad').length;
+  const ap=profiles.filter(x=>x==='ap').length;
+  const mixed=profiles.filter(x=>x==='mixed').length;
+  let score=0;
+  if(front>=2)score+=26; else if(front===1)score+=7; else score-=34;
+  if(tanks>=1)score+=11;
+  if(marksmen>=1)score+=17; else score-=13;
+  if(mages>=1)score+=17; else score-=12;
+  if(supports>=1)score+=15; else score-=8;
+  if(marksmen>2)score-=10*(marksmen-2);
+  if(mages>2)score-=7*(mages-2);
+  if(assassins>2)score-=9*(assassins-2);
+  if(front>3)score-=5*(front-3);
+  if((ad>=1||mixed>=2)&&(ap>=1||mixed>=2))score+=16;
+  if(ad>=4&&ap===0&&mixed===0)score-=25;
+  if(ap>=4&&ad===0&&mixed===0)score-=25;
+  if(front>=2&&marksmen>=1&&mages>=1&&supports>=1)score+=24;
+  return score+Math.random()*5;
+}
+function buildBalancedEnemyTeam(pool){
+  const source=pool.slice();
+  if(source.length<=5)return source.slice(0,5);
+  if(Math.random()>=.82)return shuffle(source).slice(0,5);
+  let best=null,bestScore=-Infinity;
+  for(let i=0;i<90;i++){
+    const candidate=shuffle(source).slice(0,5);
+    const score=enemyCompositionScore(candidate);
+    if(score>bestScore){bestScore=score;best=candidate;}
+  }
+  return best||shuffle(source).slice(0,5);
+}
+
 function startGame(){
   if(!chosenChamp)return;
   clearInterval(loadingTimer); clearTimeout(loadingTransitionTimer); clearInterval(battleTimer);
   const protectedIds=new Set(teamPicks.map(c=>c.id).concat(finalPool.map(c=>c.id)));
-  const enemyPool=shuffle(champions.filter(c=>!protectedIds.has(c.id)));
+  const enemyPool=champions.filter(c=>!protectedIds.has(c.id));
+  const enemyPicks=buildBalancedEnemyTeam(enemyPool);
   const enemyNames=shuffle(["원종나기","똥카게","회주잖아","발전병","Inkubus","Eternal Alomi","축구고트메시","한국기","돼지궁뎅이","아벌"]).slice(0,5);
-  enemyTeam=enemyNames.map((nick,i)=>({nick,champ:enemyPool[i]}));
+  enemyTeam=enemyNames.map((nick,i)=>({nick,champ:enemyPicks[i]}));
   // 로딩 카운트다운과 실제 화면 전환 타이머를 분리한다.
   // 기존에는 마지막 interval 콜백 안에서 startBattle()까지 처리해 일부 브라우저/Pages 환경에서
   // 1초 화면이 남는 경우가 있었다. 전환은 독립 setTimeout으로 보장한다.
@@ -1186,7 +1229,9 @@ function compositionMultiplier(champs,opponents){
  if(front===0)return .72;if(marksman===0&&mage===0)return .78;if(support===0)return .92;if(front===1)return .95;
  return 1;
 }
-function combatPerformanceMultiplier(u){return augmentPerformanceMultiplier(u)*(u?.compositionMultiplier||1)}
+function molchoPhoneMultiplier(u){const bs=battleState;if(!bs||!u||u.team!=='team'||u.realName!=='김병욱')return 1;return (bs.molchoPhoneUntil||0)>bs.time?.8:1}
+function enemyBaseDifficultyMultiplier(u){return u?.team==='enemy'?1.10:1}
+function combatPerformanceMultiplier(u){return augmentPerformanceMultiplier(u)*(u?.compositionMultiplier||1)*molchoPhoneMultiplier(u)*enemyBaseDifficultyMultiplier(u)}
 
 function createChampionUnit(team,index,champ,nick,realName=null){
  const roleStats=team==='team'?(playerRoleStats[realName]||Object.fromEntries(["Fighter","Tank","Mage","Assassin","Marksman","Support"].map(r=>[r,60]))):enemyRoleStats();
@@ -1212,7 +1257,7 @@ function startBattle(){
  const structures=[
  {id:'tn1',team:'team',type:'nexus',name:'넥서스',x:5,y:50,hp:100,alive:true},{id:'tt1',team:'team',type:'tower',name:'쌍둥이 포탑',x:9,y:50,hp:82,alive:true},{id:'tt2',team:'team',type:'tower',name:'쌍둥이 포탑',x:12,y:50,hp:82,alive:true},{id:'ti',team:'team',type:'inhib',name:'억제기',x:17,y:50,hp:86,alive:true},{id:'t2',team:'team',type:'tower',name:'2차 포탑',x:28,y:50,hp:92,alive:true},{id:'t1',team:'team',type:'tower',name:'1차 포탑',x:40,y:50,hp:96,alive:true},
  {id:'e1',team:'enemy',type:'tower',name:'1차 포탑',x:60,y:50,hp:96,alive:true},{id:'e2',team:'enemy',type:'tower',name:'2차 포탑',x:72,y:50,hp:92,alive:true},{id:'ei',team:'enemy',type:'inhib',name:'억제기',x:83,y:50,hp:86,alive:true},{id:'et1',team:'enemy',type:'tower',name:'쌍둥이 포탑',x:88,y:50,hp:82,alive:true},{id:'et2',team:'enemy',type:'tower',name:'쌍둥이 포탑',x:91,y:50,hp:82,alive:true},{id:'en1',team:'enemy',type:'nexus',name:'넥서스',x:95,y:50,hp:100,alive:true}];
- battleState={time:0,lastTs:performance.now(),lastUiSync:0,status:'시작 증강체 선택 중',speed:1,team,enemy,units:[...team,...enemy],structures,relics:[],fx:[],fxSeq:0,log:[],chat:[],teamKills:0,enemyKills:0,nextWaveAt:45,waveCount:0,superTeam:false,superEnemy:false,paused:true,engineStarted:false,jaebinEventAt:180+Math.random()*300,jaebinEventDone:false,jaebinEventOpen:false,jaebinEventResult:null,jaebinChatAttempted:false,augmentOpen:true,augmentStage:'start',augmentChoices:[],augments:[],augmentDone:{start:false,7:false,11:false,15:false},augmentTierByStage:{},endPending:null,endTimer:null,endFinalized:false,akaliChatAt:420+Math.random()*60,akaliChatDone:false,teamCompMultiplier:teamComp,enemyCompMultiplier:enemyComp};
+ battleState={time:0,lastTs:performance.now(),lastUiSync:0,status:'시작 증강체 선택 중',speed:1,team,enemy,units:[...team,...enemy],structures,relics:[],fx:[],fxSeq:0,log:[],logVersion:0,chat:[],teamKills:0,enemyKills:0,nextWaveAt:45,pushMomentumUntil:{team:0,enemy:0},waveCount:0,superTeam:false,superEnemy:false,paused:true,engineStarted:false,jaebinEventAt:180+Math.random()*300,jaebinEventDone:false,jaebinEventOpen:false,jaebinEventResult:null,jaebinChatAttempted:false,molchoPhoneAt:300+Math.random()*600,molchoPhoneDone:false,molchoPhoneOpen:false,molchoPhoneUntil:0,augmentOpen:true,augmentStage:'start',augmentChoices:[],augments:[],augmentDone:{start:false,7:false,11:false,15:false},augmentTierByStage:{},endPending:null,endTimer:null,endFinalized:false,akaliChatAt:420+Math.random()*60,akaliChatDone:false,teamCompMultiplier:teamComp,enemyCompMultiplier:enemyComp};
  // 시작 증강은 전투 루프를 돌리기 전에 먼저 확정한다.
  // 이전처럼 RAF를 먼저 시작한 뒤 0.7초 후 paused=true를 거는 순서를 없애서 00:00 정지 상태를 방지한다.
  battleState.augmentTier=getAugmentTierForStage('start');
@@ -1265,8 +1310,15 @@ function grantMinionXp(minion){const bs=battleState;if(!bs)return;const nearby=b
 function respawnSeconds(u){
  const lv=(u.level||1);
  const base=lv*2+4;
- const late=lv>=11?(lv-10)*1.7:0;
- return Math.max(1,Math.round(base+late));
+ const lateLevel=lv>=11?(lv-10)*1.7:0;
+ const t=battleState?.time||0;
+ const lateGame=t>=35*60?28:t>=30*60?20:t>=25*60?14:t>=20*60?8:t>=15*60?4:0;
+ return Math.max(1,Math.round(base+lateLevel+lateGame));
+}
+function addBattleLog(msg){
+ const bs=battleState;if(!bs)return;
+ bs.log.push(msg);
+ bs.logVersion=(bs.logVersion||0)+1;
 }
 function killLog(attacker,target){
  const bs=battleState, at=attacker.team==='team'?'blue-name':'red-name', tt=target.team==='team'?'blue-name':'red-name';
@@ -1276,18 +1328,28 @@ function killLog(attacker,target){
  }
  target.deaths=(target.deaths||0)+1;
  const allies=bs.units.filter(u=>u.kind==='champ'&&u.team===attacker.team&&u!==attacker&&u.alive&&Math.hypot(u.x-target.x,u.y-target.y)<14); allies.forEach(u=>u.assists=(u.assists||0)+1);
- bs.log.push(`[${formatBattleTime(bs.time)}] <span class="${at}">${attacker.nick||attacker.name||'포탑'}</span> → <span class="${tt}">${target.nick}</span> 처치`);
+ addBattleLog(`[${formatBattleTime(bs.time)}] <span class="${at}">${attacker.nick||attacker.name||'포탑'}</span> → <span class="${tt}">${target.nick}</span> 처치`);
+ if(attacker.kind==='champ'){
+   const deadOpp=bs.units.filter(u=>u.kind==='champ'&&u.team!==attacker.team&&!u.alive).length;
+   if(deadOpp>=3){
+     const bonus=deadOpp>=5?42:deadOpp===4?34:28;
+     bs.pushMomentumUntil[attacker.team]=Math.max(bs.pushMomentumUntil[attacker.team]||0,bs.time+bonus);
+   }
+ }
+ syncBattleScoreboard();
 }
-function dealDamage(attacker,target,dmg){if(!target.alive)return;const out=attacker.kind==='champ'?combatPerformanceMultiplier(attacker):1;const guard=target.kind==='champ'?Math.sqrt(Math.max(.20,combatPerformanceMultiplier(target))):1;dmg=dmg*out/guard;if(attacker.kind==='champ')attacker.damageDealt=(attacker.damageDealt||0)+dmg*12;if(target.kind==='champ')target.damageTaken=(target.damageTaken||0)+dmg*12;target.hp-=dmg;if(target.hp<=0){target.hp=0;target.alive=false;if(target.kind==='minion'){if(attacker.kind==='champ')attacker.cs=(attacker.cs||0)+1;grantMinionXp(target);}if(target.kind==='champ'){target.respawn=respawnSeconds(target);addFx(target.x,target.y,'KO',attacker.team);killLog(attacker,target)}}else if(Math.random()<.035&&attacker.kind==='champ'){addFx(target.x,target.y,`-${Math.max(1,Math.round(dmg*12))}`,attacker.team)}}
+function dealDamage(attacker,target,dmg){if(!target.alive)return;const out=attacker.kind==='champ'?combatPerformanceMultiplier(attacker):1;const guard=target.kind==='champ'?Math.sqrt(Math.max(.20,combatPerformanceMultiplier(target))):1;dmg=dmg*out/guard;if(attacker.kind==='champ')attacker.damageDealt=(attacker.damageDealt||0)+dmg*12;if(target.kind==='champ')target.damageTaken=(target.damageTaken||0)+dmg*12;target.hp-=dmg;if(target.hp<=0){target.hp=0;target.alive=false;if(target.kind==='minion'){if(attacker.kind==='champ'){attacker.cs=(attacker.cs||0)+1;syncBattleScoreboard();}grantMinionXp(target);}if(target.kind==='champ'){target.respawn=respawnSeconds(target);addFx(target.x,target.y,'KO',attacker.team);killLog(attacker,target)}}else if(Math.random()<.035&&attacker.kind==='champ'){addFx(target.x,target.y,`-${Math.max(1,Math.round(dmg*12))}`,attacker.team)}}
 function damageStructure(st,dmg,attacker){
  const bs=battleState;if(!st||!st.alive||!attacker||!isStructureTargetable(st,attacker.team))return;
+ if(attacker.kind==='champ'&&Math.abs(attacker.x-st.x)>1.85)return;
+ if(attacker.kind==='minion'&&Math.abs(attacker.x-st.x)>2.45)return;
  const tempo=1.34;
  const nexusMod=st.type==='nexus'?.72:1;
  const perf=attacker.kind==='champ'?combatPerformanceMultiplier(attacker):1;
  st.hp-=dmg*tempo*nexusMod*perf;
  if(st.hp<=0){
   st.hp=0;st.alive=false;
-  bs.log.push(`[${formatBattleTime(bs.time)}] ${st.team==='enemy'?'적':'우리'} ${st.name} 파괴`);
+  addBattleLog(`[${formatBattleTime(bs.time)}] ${st.team==='enemy'?'적':'우리'} ${st.name} 파괴`);
   if(st.type==='inhib'){if(st.team==='team')bs.superEnemy=true;else bs.superTeam=true}
   if(st.type==='nexus'&&!bs.endPending){
    // 넥서스 파괴는 RAF 상태와 무관하게 결과 화면으로 확실히 넘어가도록 별도 타이머로 마감한다.
@@ -1300,7 +1362,8 @@ function damageStructure(st,dmg,attacker){
  }
 }
 function waveIntervalAt(t){
- if(t>=28*60)return 14;
+ if(t>=35*60)return 10;
+ if(t>=28*60)return 13;
  if(t>=20*60)return 17;
  if(t>=10*60)return 21;
  return 25;
@@ -1315,6 +1378,11 @@ function spawnWave(){
  }
  if(cannon||bs.superTeam)bs.units.push(createMinion('team','cannon'));
  if(cannon||bs.superEnemy)bs.units.push(createMinion('enemy','cannon'));
+ // 한타를 크게 이긴 팀은 다음 웨이브에 공성력이 붙어 실제 구조물 철거 기회를 얻는다.
+ if((bs.pushMomentumUntil.team||0)>bs.time)bs.units.push(createMinion('team','cannon'));
+ if((bs.pushMomentumUntil.enemy||0)>bs.time)bs.units.push(createMinion('enemy','cannon'));
+ // 35분 이후에는 양쪽 모두 웨이브를 더 두껍게 해 초장기전을 방지한다.
+ if(bs.time>=35*60){bs.units.push(createMinion('team','cannon'));bs.units.push(createMinion('enemy','cannon'));}
 
 }
 function updateRelics(dt){const bs=battleState;for(const r of bs.relics){if(r.cooldown>0){r.cooldown-=dt;continue}const nearby=bs.units.filter(u=>u.alive&&Math.abs(u.x-r.x)<2.4&&u.kind==='champ');if(nearby.length){const u=nearby.sort((a,b)=>a.hp/b.maxHp-b.hp/b.maxHp)[0];if(u.hp<u.maxHp*.92){u.hp=Math.min(u.maxHp,u.hp+u.maxHp*.08);r.cooldown=35}}}}
@@ -1328,7 +1396,7 @@ function updateStructures(dt){const bs=battleState;for(const st of bs.structures
 function updateUnits(dt){const bs=battleState;syncNpcAugments();const all=bs.units;for(const u of all){
  if(!u.alive){if(u.kind==='champ'&&u.respawn>0){u.respawn-=dt;if(u.respawn<=0){u.alive=true;u.hp=u.maxHp*.72;u.x=u.team==='team'?8:92;u.y=50+u.laneBias;u.gold=Math.max(u.gold,1400);u.phase=Math.random()*6.28}}continue}
  u.gold+=6*dt;if(u.kind==='champ')u.xp+=5*teamXpCatchup(u.team)*dt;u.level=u.kind==='champ'?levelFromXp(u.xp):u.level;u.attackCd=Math.max(0,(u.attackCd||0)-dt);
- if(u===bs.team[0]&&!bs.augmentOpen&&!bs.jaebinEventOpen){for(const lv of [7,11,15]){if(u.level>=lv&&!bs.augmentDone[lv]){openAugment(lv);return}}}
+ if(u===bs.team[0]&&!bs.augmentOpen&&!bs.jaebinEventOpen&&!bs.molchoPhoneOpen){for(const lv of [7,11,15]){if(u.level>=lv&&!bs.augmentDone[lv]){openAugment(lv);return}}}
  const enemyChamps=bs.units.filter(e=>e.alive&&e.kind==='champ'&&e.team!==u.team);
  const enemyMinions=bs.units.filter(e=>e.alive&&e.kind==='minion'&&e.team!==u.team);
  const targetChamp=enemyChamps.reduce((best,e)=>!best||Math.hypot(e.x-u.x,e.y-u.y)<Math.hypot(best.x-u.x,best.y-u.y)?e:best,null);
@@ -1349,20 +1417,25 @@ function updateUnits(dt){const bs=battleState;syncNpcAugments();const all=bs.uni
      }
    }else if(st){
      const enemyTower=st.type==='tower';
-     // 적 포탑 앞에 아군 미니언이 없으면 챔피언은 뒤로 빠진다.
-     if(enemyTower && Math.abs(u.x-st.x)<9 && alliedMinions.length===0){
-       const retreatX=u.team==='team'?st.x-11:st.x+11;
-       moveOrganic(u,{x:retreatX,y:50+u.laneBias},dt*.85);
+     const deadOpp=bs.units.filter(v=>v.kind==='champ'&&v.team!==u.team&&!v.alive).length;
+     const siegeMomentum=(bs.pushMomentumUntil[u.team]||0)>bs.time || deadOpp>=3;
+     // 미니언이 잠깐 끊겨도 한타를 크게 이긴 팀은 포탑 앞을 완전히 포기하지 않는다.
+     if(enemyTower && Math.abs(u.x-st.x)<9 && alliedMinions.length===0 && !siegeMomentum){
+       const retreatX=u.team==='team'?st.x-7:st.x+7;
+       moveOrganic(u,{x:retreatX,y:50+u.laneBias*.55},dt*.72);
      }else{
        // 구조물 공격은 챔피언 사거리와 무관하게 구조물 바로 앞까지 접근해야 가능하다.
-       // 원거리 챔피언도 화면 밖/장거리에서 포탑을 때리지 않는다.
-       const structureAttackRange=3.0;
-       const approachGap=2.35;
-       const targetX=st.x+(u.team==='team'?-approachGap:approachGap);
-       const targetY=50+u.laneBias*.28;
-       const structureDist=Math.hypot(u.x-st.x,(u.y-(st.y||50))*.45);
-       if(structureDist<=structureAttackRange && alliedMinions.length>0 && u.attackCd<=0){damageStructure(st,u.atk*.50,u);u.attackCd=1.45+Math.random()*.5}
-       else moveOrganic(u,{x:targetX,y:targetY},dt*.68);
+       const structureAttackRange=1.85;
+       const approachGap=1.35;
+       const waitGap=4.2;
+       const targetX=st.x+(u.team==='team'?-(alliedMinions.length||siegeMomentum?approachGap:waitGap):(alliedMinions.length||siegeMomentum?approachGap:waitGap));
+       const targetY=50+u.laneBias*.10;
+       const structureDist=Math.abs(u.x-st.x);
+       if(structureDist<=structureAttackRange && u.attackCd<=0 && (alliedMinions.length>0||siegeMomentum)){
+         // 미니언 없이 공성할 때는 백도어 보호처럼 피해량을 크게 낮춘다.
+         const siegeDmg=alliedMinions.length>0?u.atk*.50:u.atk*.18;
+         damageStructure(st,siegeDmg,u);u.attackCd=1.45+Math.random()*.5;
+       }else moveOrganic(u,{x:targetX,y:targetY},dt*.68);
      }
    }
  }else{
@@ -1370,8 +1443,8 @@ function updateUnits(dt){const bs=battleState;syncNpcAugments();const all=bs.uni
    const mt=enemyMinions.reduce((best,e)=>!best||Math.abs(e.x-u.x)<Math.abs(best.x-u.x)?e:best,null);
    const md=mt?Math.hypot(mt.x-u.x,mt.y-u.y):999;
    if(mt&&md<=u.range&&u.attackCd<=0){dealDamage(u,mt,u.atk);u.attackCd=1.15}
-   else if(st&&Math.abs(u.x-st.x)<3.4){if(u.attackCd<=0){damageStructure(st,u.atk*.33,u);u.attackCd=1.2}}
-   else if(st)moveOrganic(u,{x:st.x+(u.team==='team'?-1.6:1.6),y:50+u.laneBias*.2},dt);
+   else if(st&&Math.abs(u.x-st.x)<2.45){if(u.attackCd<=0){damageStructure(st,u.atk*.33,u);u.attackCd=1.2}}
+   else if(st)moveOrganic(u,{x:st.x+(u.team==='team'?-1.25:1.25),y:50+u.laneBias*.2},dt);
  }
  // 후방군은 살아있는 아군 전방군보다 과하게 앞으로 튀어나가지 않는다.
  if(u.kind==='champ'&&u.formation==='back'){
@@ -1407,6 +1480,9 @@ function allowJaebinChat(){
  bs.jaebinEventDone=true;bs.jaebinEventOpen=false;bs.paused=false;bs.status='경기 진행 중';bs.lastTs=performance.now();render();scheduleBattleFrame();
 }
 function denyJaebinChat(){const bs=battleState;if(!bs)return;bs.chat.push(`<span class="all-tag">[SYSTEM]</span> 이재빈의 전체 채팅을 막았습니다.`);bs.jaebinEventDone=true;bs.jaebinEventOpen=false;bs.paused=false;bs.status='경기 진행 중';bs.lastTs=performance.now();render();scheduleBattleFrame()}
+function triggerMolchoPhone(){const bs=battleState;if(!bs||bs.molchoPhoneDone||bs.molchoPhoneOpen||!party.some(c=>c.id==='molcho'))return;bs.molchoPhoneOpen=true;bs.paused=true;bs.status='이벤트 일시정지';render()}
+function confirmMolchoPhone(){const bs=battleState;if(!bs||!bs.molchoPhoneOpen)return;bs.molchoPhoneOpen=false;bs.molchoPhoneDone=true;bs.molchoPhoneUntil=bs.time+600;bs.chat.push(`<span class="all-tag">[SYSTEM]</span> 몰초가 여자친구 전화를 받으러 갔습니다. 10분간 경기력 0.8배.`);bs.paused=false;bs.status='경기 진행 중';bs.lastTs=performance.now();render();scheduleBattleFrame()}
+
 function finalizeBattleEnd(expectedState=battleState){const bs=expectedState;if(!bs||battleState!==bs||mode!=='battle'||bs.endFinalized||!bs.endPending)return false;bs.endFinalized=true;if(bs.endTimer){clearTimeout(bs.endTimer);bs.endTimer=null;}bs.engineStarted=false;const winner=bs.endPending.winner;bs.status=winner==='team'?'우리 팀 승리':'적 팀 승리';if(winner==='team'){if(party.some(c=>c.id==='siljeom'))bs.chat.push(`<span class="all-tag">[전체]</span> <span class="ally-chat">실점:</span> 죽어 그냥 ㅋㅋ`);if(party.some(c=>c.id==='nguyen'))bs.chat.push(`<span class="all-tag">[전체]</span> <span class="ally-chat">Nguyen Ngoc Tu:</span> 나1가`);if(party.some(c=>c.id==='3patourwan'))for(let i=0;i<4;i++)bs.chat.push(`<span class="all-tag">[전체]</span> <span class="ally-chat">쓰리빠뚜르완:</span> ㅋ`);if(party.some(c=>c.id==='joguk'))bs.chat.push(`<span class="all-tag">[전체]</span> <span class="ally-chat">조국:</span> 븅`);if(party.some(c=>c.id==='molcho'))bs.chat.push(`<span class="all-tag">[팀원]</span> <span class="ally-chat">몰초:</span> 쉽네 쉬워`);}else{if(party.some(c=>c.id==='nguyen'))bs.chat.push(`<span class="all-tag">[전체]</span> <span class="ally-chat">Nguyen Ngoc Tu:</span> 근데 지고 자..?`);if(party.some(c=>c.id==='siljeom'))bs.chat.push(`<span class="all-tag">[전체]</span> <span class="ally-chat">실점:</span> 지고 자는 건 에바긴 해`);if(party.some(c=>c.id==='3patourwan'))bs.chat.push(`<span class="all-tag">[전체]</span> <span class="ally-chat">쓰리빠뚜르완:</span> 찐막?`);if(party.some(c=>c.id==='joguk'))bs.chat.push(`<span class="all-tag">[전체]</span> <span class="ally-chat">조국:</span> 고조할배찐막?`);if(bs.jaebinChatAttempted){const jaebinUnit=bs.team.find(u=>u.realName==='이재빈'||u.nick==='Nguyen Ngoc Tu');const champName=jaebinUnit?.champ?.name||'그 챔피언';const taunts=['이기고 자라 ㅋㅋㅋㅋㅋㅋㅋㅋㅋ',`${champName} 너는 진짜 접어라 ㅇㅇ`,'그 조합으로 쳐지네 ㅋㅋㅋㅋㅋㅋㅋㅋㅋㅋ','ez','븅신 ㅋㅋㅋㅋㅋㅋㅋㅋㅋㅋㅋㅋ'];bs.enemy.slice(0,5).forEach((u,i)=>bs.chat.push(`<span class="all-tag">[전체]</span> <span class="enemy-chat">${u.nick}:</span> ${taunts[i]}`));}}matchResult={winner,time:bs.time,teamKills:bs.teamKills,enemyKills:bs.enemyKills,team:bs.team.map(u=>({...u})),enemy:bs.enemy.map(u=>({...u})),chat:[...(bs.chat||[])]};mode='battleEnd';render();return true}
 function checkEnd(){const bs=battleState;if(!bs||!bs.endPending)return false;if(performance.now()>=bs.endPending.realAt)return finalizeBattleEnd(bs);return false}
 function battleFrame(ts){
@@ -1417,7 +1493,8 @@ function battleFrame(ts){
    if(bs.endPending){bs.lastTs=ts;syncBattleDom();if(checkEnd())return;scheduleBattleFrame();return;}
    let raw=Math.min(.05,(ts-bs.lastTs)/1000);bs.lastTs=ts;let dt=Math.min(.8,raw*bs.speed);bs.time+=dt;
    if(!bs.akaliChatDone&&party.some(c=>c.id==='nguyen')&&bs.enemy.some(u=>u.champ?.id==='akali')&&bs.time>=bs.akaliChatAt){bs.chat.push(`<span class="all-tag">[전체]</span> <span class="ally-chat">Nguyen Ngoc Tu:</span> 아칼리 사기 챔피언 하면 재미있음?`);bs.akaliChatDone=true;}
-   if(!bs.jaebinEventDone&&!bs.jaebinEventOpen&&party.some(c=>c.id==='nguyen')&&bs.time>=bs.jaebinEventAt){triggerJaebinEvent();scheduleBattleFrame();return;}
+   if(!bs.jaebinEventDone&&!bs.jaebinEventOpen&&!bs.molchoPhoneOpen&&party.some(c=>c.id==='nguyen')&&bs.time>=bs.jaebinEventAt){triggerJaebinEvent();scheduleBattleFrame();return;}
+   if(!bs.molchoPhoneDone&&!bs.molchoPhoneOpen&&!bs.jaebinEventOpen&&!bs.augmentOpen&&party.some(c=>c.id==='molcho')&&bs.time>=bs.molchoPhoneAt){triggerMolchoPhone();scheduleBattleFrame();return;}
    while(bs.time>=bs.nextWaveAt){spawnWave();bs.nextWaveAt+=waveIntervalAt(bs.nextWaveAt)}
    updateUnits(dt);updateStructures(dt);updateRelics(dt);applyOvercharge(dt);
    if(bs.units.length>70)bs.units=bs.units.filter(u=>u.kind==='champ'||u.alive);
@@ -1450,10 +1527,10 @@ function syncBattleDom(){const bs=battleState;const clock=document.querySelector
  if(bs.log.length>120)bs.log.splice(0,bs.log.length-120);
  const log=document.querySelector('.b2-log');
  if(log){
-   const logCount=bs.log.length;
-   if(Number(log.dataset.count||-1)!==logCount){
+   const logVersion=bs.logVersion||0;
+   if(Number(log.dataset.version||-1)!==logVersion){
      log.innerHTML=bs.log.slice(-40).map(x=>`<div>${x}</div>`).join('');
-     log.dataset.count=String(logCount);
+     log.dataset.version=String(logVersion);
      requestAnimationFrame(()=>{const l=document.querySelector('.b2-log');if(l)l.scrollTop=l.scrollHeight});
    }
  }
@@ -2045,4 +2122,13 @@ render();
     box-sizing:border-box!important;
   }
 }
+</style>
+
+<style>
+@media (max-width:800px){
+.end-chat{height:72dvh!important;min-height:420px!important;max-height:78dvh!important;}
+.end-chat .match-all-chat-body{height:calc(100% - 30px)!important;min-height:0!important;max-height:none!important;overflow-y:auto!important;-webkit-overflow-scrolling:touch!important;}
+.result-chat-body{min-height:360px!important;max-height:68dvh!important;}
+}
+@media (max-width:390px){.end-chat{height:68dvh!important;min-height:390px!important;}}
 </style>
