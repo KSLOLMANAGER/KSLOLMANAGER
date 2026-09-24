@@ -1,14 +1,1 @@
-증강체 칼바람 매니저 v11
-
-index.html을 더블클릭하거나 GitHub Pages로 올려 실행하세요.
-게임 흐름: 캐릭터 선택 → 파티 호출 → 대기열 → 매치 발견 → 챔피언 선택 → 스왑 → 10초 로딩 → FM 스타일 칼바람 매치 엔진.
-
-이번 버전 매치 엔진:
-- 넥서스 파괴 시 종료
-- 부활은 각 넥서스 뒤
-- 유닛의 진격/추적/교전/처치/부활을 부드럽게 시뮬레이션
-- 미니언 웨이브와 강화 미니언
-- 포탑/억제기/넥서스 체력
-- 중앙 하단 대형 라이브 로그
-- 적/아군 사이드 로스터
-- 칼바람 맵 이미지를 배경으로 사용
+V13: diagonal ARAM match view, kill-only colored log, 8x/16x/32x speed, reduced fight frequency, faster late-game objective pressure.

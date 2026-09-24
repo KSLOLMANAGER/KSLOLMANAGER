@@ -57,7 +57,7 @@ button{font:inherit}.app{min-height:100vh;width:100%;max-width:1240px;margin:0 a
 .b2-lane{position:absolute;left:4%;right:4%;top:38%;height:24%;border-top:1px solid rgba(205,224,225,.13);border-bottom:1px solid rgba(205,224,225,.10);background:linear-gradient(180deg,rgba(196,219,220,.035),rgba(44,70,77,.10),rgba(196,219,220,.035));z-index:2;pointer-events:none}.b2-centerline{display:none}
 .b2-structure{position:absolute;top:50%;transform:translate(-50%,-50%);z-index:5;text-align:center;pointer-events:none}.b2-structure .sicon{width:35px;height:35px;border-radius:8px;display:grid;place-items:center;border:1px solid #b69b5e;background:linear-gradient(145deg,#233842,#0a151a);box-shadow:0 0 18px rgba(184,153,78,.24);font-size:16px}.b2-structure .sname{font-size:7px;color:#d8d7c9;margin-top:4px;white-space:nowrap}.b2-structure.tower .sicon{width:27px;height:43px;border-radius:6px}.b2-structure.inhib .sicon{border-color:#76b3c4}.b2-structure.nexus .sicon{width:46px;height:46px;border-radius:50%;border-color:#72a7b9;box-shadow:0 0 26px rgba(70,160,190,.25)}.b2-structure.dead{opacity:.12;filter:grayscale(1)}.b2-structure.red .sicon{border-color:#b66a67;box-shadow:0 0 18px rgba(180,83,83,.22)}
 .b2-relic{position:absolute;top:50%;transform:translate(-50%,-50%);z-index:4;width:22px;height:22px;border-radius:50%;border:2px solid #83c8d4;background:#12333b;box-shadow:0 0 20px #56c2d855;display:grid;place-items:center;font-size:10px;color:#d8f7fb}.b2-relic.cool{filter:grayscale(.8);opacity:.3;box-shadow:none}
-.b2-token{position:absolute;z-index:8;transform:translate(-50%,-50%);width:40px;height:40px;border-radius:50%;display:grid;place-items:center;border:2px solid #a4c5cc;background:radial-gradient(circle at 30% 25%,#a9c5ca,#0e252d 67%);box-shadow:0 5px 18px #000a;will-change:left,top;transition:left .08s linear,top .08s linear}.b2-token.enemy{border-color:#c77b7d;background:radial-gradient(circle at 30% 25%,#b67878,#281417 67%)}.b2-token.minion{width:22px;height:22px;font-size:9px;border-width:1px}.b2-token.super{width:29px;height:29px;border-color:#d5af5d;box-shadow:0 0 16px #d5af5d55}.b2-token.dead{opacity:0;pointer-events:none}.b2-token b{position:absolute;top:43px;white-space:nowrap;font-size:8px;color:#e0e7e8;text-shadow:0 1px 4px #000;font-weight:800}.b2-token.minion b{display:none}.b2-token .t-hp{position:absolute;left:50%;transform:translateX(-50%);bottom:-8px;width:38px;height:3px;background:#14242a;border:1px solid rgba(0,0,0,.4);overflow:hidden}.b2-token .t-hp em{display:block;height:100%;background:#76b281;transition:width .08s linear}.b2-token.enemy .t-hp em{background:#c86b6d}.b2-token.hit{animation:unitHit .18s ease-out}.b2-fx{position:absolute;z-index:9;transform:translate(-50%,-50%);pointer-events:none;font-weight:1000;font-size:13px;text-shadow:0 1px 5px #000;animation:floatFx .65s ease-out forwards}.b2-fx.blue{color:#9fd9ff}.b2-fx.red{color:#ff9c9c}
+.b2-token{position:absolute;z-index:8;transform:translate(-50%,-50%);width:40px;height:40px;border-radius:50%;display:grid;place-items:center;border:2px solid #a4c5cc;background:radial-gradient(circle at 30% 25%,#a9c5ca,#0e252d 67%);box-shadow:0 5px 18px #000a;will-change:transform;transition:none}.b2-token.enemy{border-color:#c77b7d;background:radial-gradient(circle at 30% 25%,#b67878,#281417 67%)}.b2-token.minion{width:22px;height:22px;font-size:9px;border-width:1px}.b2-token.super{width:29px;height:29px;border-color:#d5af5d;box-shadow:0 0 16px #d5af5d55}.b2-token.dead{opacity:0;pointer-events:none}.b2-token b{position:absolute;top:43px;white-space:nowrap;font-size:8px;color:#e0e7e8;text-shadow:0 1px 4px #000;font-weight:800}.b2-token.minion b{display:none}.b2-token .t-hp{position:absolute;left:50%;transform:translateX(-50%);bottom:-8px;width:38px;height:3px;background:#14242a;border:1px solid rgba(0,0,0,.4);overflow:hidden}.b2-token .t-hp em{display:block;height:100%;background:#76b281;transition:width .08s linear}.b2-token.enemy .t-hp em{background:#c86b6d}.b2-token.hit{animation:unitHit .18s ease-out}.b2-fx{position:absolute;z-index:9;transform:translate(-50%,-50%);pointer-events:none;font-weight:1000;font-size:13px;text-shadow:0 1px 5px #000;animation:floatFx .65s ease-out forwards}.b2-fx.blue{color:#9fd9ff}.b2-fx.red{color:#ff9c9c}
 @keyframes unitHit{0%{filter:brightness(2)}100%{filter:brightness(1)}}@keyframes floatFx{0%{opacity:1;transform:translate(-50%,-30%)}100%{opacity:0;transform:translate(-50%,-140%)}}
 .b2-panel{position:absolute;left:50%;bottom:18px;transform:translateX(-50%);width:min(700px,64%);z-index:12;background:rgba(3,11,16,.93);border:1px solid #35505b;box-shadow:0 12px 36px #000a}.b2-panel-head{padding:9px 12px;border-bottom:1px solid #263e48;font-size:10px;letter-spacing:1.4px;color:#b9c8cb;display:flex;justify-content:space-between}.b2-log{height:132px;overflow:hidden;padding:8px 12px;font-size:11px;line-height:1.7;color:#b8c5c7;text-align:left}.b2-log div{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.b2-controls{display:flex;justify-content:center;gap:6px;padding:7px;border-top:1px solid #233b44}.b2-controls button{border:1px solid #425860;background:#0c2028;color:#c6d0d1;padding:5px 10px;font-size:9px;cursor:pointer}.b2-controls button.active{border-color:#b79b5e;color:#e4d49f;background:#2a271c}
 .b2-topbar,.b2-tip,.b2-purchase{display:none}
@@ -198,6 +198,15 @@ button{font:inherit}.app{min-height:100vh;width:100%;max-width:1240px;margin:0 a
   .champ-options{grid-template-columns:repeat(3,1fr);gap:7px}
   .champ-card{height:240px}.champ-art{height:160px;font-size:60px}
 }
+
+/* ===== MATCH ENGINE V13 ===== */
+.b2-head{height:56px;flex-basis:56px;background:#03070b;grid-template-columns:1fr auto 1fr}
+.b2-head h2,.b2-kicker{display:none}.b2-clock{font-size:15px;background:#101b28;border:1px solid #273a4a;padding:5px 18px;border-radius:3px}.b2-right{font-size:12px}.b2-right b:first-child{color:#45a0ff}.b2-right b:nth-child(2){color:#ff565d}
+.b2-main{grid-template-columns:190px minmax(0,1fr) 190px}.b2-side{background:#0b1526;padding:12px 7px}.b2-side-title{display:none}.b2-unit{height:92px;margin:0 -7px;border:0;border-bottom:1px solid #1b2a3b;background:#0b1526;padding:12px 8px;grid-template-columns:48px 1fr}.b2-orb{width:43px;height:43px;border-radius:4px;border-color:#368eea;background:#10263d;font-size:21px}.b2-orb.red{border-color:#e84e59;background:#32171d}.b2-unit strong{font-size:12px}.b2-unit small{font-size:8px}.b2-hp{height:5px;margin-top:7px}.b2-side:not(.right) .b2-hp i{background:#3d9eff}.b2-side.right .b2-hp i{background:#f04b55}
+.b2-stage{background:#05090d}.b2-map{filter:saturate(.92) contrast(1.08) brightness(.82);background-size:cover;background-position:center;transform:scale(1.02)}
+.b2-lane{left:7%;right:7%;top:47%;height:12%;transform:rotate(-28deg);transform-origin:center;border:0;background:linear-gradient(180deg,transparent,rgba(160,210,235,.06),transparent)}
+.b2-structure,.b2-relic{top:auto}.b2-token{width:36px;height:36px;border-radius:4px;border-width:1px;box-shadow:0 4px 12px #000b}.b2-token b{top:-16px;background:#07131ccc;border:1px solid #284655;padding:2px 5px;border-radius:2px;font-size:8px}.b2-token.enemy b{border-color:#713a42}.b2-token .t-hp{bottom:-7px;width:42px;height:4px}.b2-panel{bottom:10px;width:min(760px,68%);background:rgba(3,11,18,.96);border-color:#2e5269}.b2-panel-head{font-size:12px;font-weight:900;color:#bcd7e7;padding:8px 12px}.b2-log{height:105px;font-size:12px;line-height:1.8;padding:8px 13px}.b2-log .blue-name{color:#4da3ff;font-weight:900}.b2-log .red-name{color:#ff5b64;font-weight:900}.b2-controls button{font-size:10px;padding:6px 11px}.b2-gold{font-size:8px}
+@media(max-width:900px){.b2-main{grid-template-columns:145px minmax(0,1fr) 145px}.b2-unit{grid-template-columns:38px 1fr;height:82px}.b2-orb{width:34px;height:34px}.b2-panel{width:76%}}
 </style>
 </head>
 <body>
@@ -269,12 +278,12 @@ body=`<div class="loading-screen"><div class="loading-inner"><div class="loading
 }
 if(mode==="battle"){
 const bs=battleState || {time:0,status:"전투 준비 중",team:[],enemy:[],log:[],speed:1,structures:[],relics:[],fx:[]};
-body=`<div class="battle-v2"><div class="b2-head"><div><div class="b2-kicker">AUGMENT ARENA · MATCH ENGINE</div><h2>무작위 총력전 · 아수라장</h2></div><div class="b2-clock">${formatBattleTime(bs.time)}</div><div class="b2-right"><b>${bs.team.filter(u=>u.alive).length}</b> VS <b>${bs.enemy.filter(u=>u.alive).length}</b><br><span>${bs.status}</span></div></div><div class="b2-main"><aside class="b2-side"><div class="b2-side-title">우리 팀</div>${bs.team.map(u=>`<div class="b2-unit ${u.alive?"":"dead"}"><span class="b2-orb">${u.icon}</span><div><strong>${u.nick}</strong><small>${u.champ.name} · Lv.${u.level}</small><div class="b2-hp"><i style="width:${Math.max(0,u.hp/u.maxHp*100)}%"></i></div><div class="b2-gold">${Math.floor(u.gold).toLocaleString()} G</div></div></div>`).join("")}</aside><div class="b2-stage"><div class="b2-map"></div><div class="b2-lane"></div>
-${bs.structures.map(st=>`<div class="b2-structure ${st.team==='enemy'?'red':''} ${st.type} ${st.alive?'':'dead'}" data-structure="${st.id}" style="left:${st.x}%"><div class="sicon">${st.type==='nexus'?'◆':st.type==='inhib'?'✦':'▥'}</div><div class="sname">${st.name} · ${Math.max(0,Math.round(st.hp))}%</div></div>`).join("")}
-${bs.relics.map(r=>`<div class="b2-relic ${r.cooldown>0?'cool':''}" style="left:${r.x}%">✦</div>`).join("")}
+body=`<div class="battle-v2"><div class="b2-head"><div><div class="b2-kicker">AUGMENT ARENA · MATCH ENGINE</div><h2>무작위 총력전 · 아수라장</h2></div><div class="b2-clock">${formatBattleTime(bs.time)}</div><div class="b2-right"><b>${bs.teamKills||0}</b> &nbsp; ⚔ &nbsp; <b>${bs.enemyKills||0}</b><br><span>${bs.status}</span></div></div><div class="b2-main"><aside class="b2-side"><div class="b2-side-title">우리 팀</div>${bs.team.map(u=>`<div class="b2-unit ${u.alive?"":"dead"}"><span class="b2-orb">${u.icon}</span><div><strong>${u.nick}</strong><small>${u.champ.name} · Lv.${u.level}</small><div class="b2-hp"><i style="width:${Math.max(0,u.hp/u.maxHp*100)}%"></i></div><div class="b2-gold">${Math.floor(u.gold).toLocaleString()} G</div></div></div>`).join("")}</aside><div class="b2-stage"><div class="b2-map"></div><div class="b2-lane"></div>
+${bs.structures.map(st=>`<div class="b2-structure ${st.team==='enemy'?'red':''} ${st.type} ${st.alive?'':'dead'}" data-structure="${st.id}" style="left:${st.x}%;top:${78-st.x*.56}%"><div class="sicon">${st.type==='nexus'?'◆':st.type==='inhib'?'✦':'▥'}</div><div class="sname">${st.name} · ${Math.max(0,Math.round(st.hp))}%</div></div>`).join("")}
+${bs.relics.map(r=>`<div class="b2-relic ${r.cooldown>0?'cool':''}" style="left:${r.x}%;top:${78-r.x*.56}%">✦</div>`).join("")}
 <div class="b2-spawn" style="left:7%;top:50%"></div><div class="b2-spawn enemy" style="left:93%;top:50%"></div>
-${bs.units.map(u=>unitV2Html(u)).join("")}${(bs.fx||[]).map(f=>`<div class="b2-fx ${f.team==='enemy'?'red':'blue'}" data-fx="${f.id}" style="left:${f.x}%;top:${f.y}%">${f.text}</div>`).join("")}
-<div class="b2-panel"><div class="b2-panel-head"><span>LIVE MATCH LOG</span><span>${formatBattleTime(bs.time)}</span></div><div class="b2-log">${bs.log.slice(-8).map(x=>`<div>${x}</div>`).join("")}</div><div class="b2-controls"><button class="${bs.speed===.5?'active':''}" onclick="setBattleSpeed(.5)">0.5×</button><button class="${bs.speed===1?'active':''}" onclick="setBattleSpeed(1)">1×</button><button class="${bs.speed===2?'active':''}" onclick="setBattleSpeed(2)">2×</button><button class="${bs.speed===4?'active':''}" onclick="setBattleSpeed(4)">4×</button></div></div></div><aside class="b2-side right"><div class="b2-side-title">적 팀</div>${bs.enemy.map(u=>`<div class="b2-unit ${u.alive?"":"dead"}"><span class="b2-orb red">?</span><div><strong>${u.nick}</strong><small>${u.champ.name} · Lv.${u.level}</small><div class="b2-hp"><i style="width:${Math.max(0,u.hp/u.maxHp*100)}%"></i></div><div class="b2-gold">${Math.floor(u.gold).toLocaleString()} G</div></div></div>`).join("")}</aside></div></div>`;
+${bs.units.filter(u=>u.kind==='champ').map(u=>unitV2Html(u)).join("")}${(bs.fx||[]).map(f=>`<div class="b2-fx ${f.team==='enemy'?'red':'blue'}" data-fx="${f.id}" style="left:${f.x}%;top:${f.y}%">${f.text}</div>`).join("")}
+<div class="b2-panel"><div class="b2-panel-head"><span>LIVE MATCH LOG</span><span>${formatBattleTime(bs.time)}</span></div><div class="b2-log">${bs.log.slice(-6).map(x=>`<div>${x}</div>`).join("")}</div><div class="b2-controls"><button class="${bs.speed===.5?'active':''}" onclick="setBattleSpeed(.5)">0.5×</button><button class="${bs.speed===1?'active':''}" onclick="setBattleSpeed(1)">1×</button><button class="${bs.speed===2?'active':''}" onclick="setBattleSpeed(2)">2×</button><button class="${bs.speed===4?'active':''}" onclick="setBattleSpeed(4)">4×</button><button class="${bs.speed===8?'active':''}" onclick="setBattleSpeed(8)">8×</button><button class="${bs.speed===16?'active':''}" onclick="setBattleSpeed(16)">16×</button><button class="${bs.speed===32?'active':''}" onclick="setBattleSpeed(32)">32×</button></div></div></div><aside class="b2-side right"><div class="b2-side-title">적 팀</div>${bs.enemy.map(u=>`<div class="b2-unit ${u.alive?"":"dead"}"><span class="b2-orb red">?</span><div><strong>${u.nick}</strong><small>${u.champ.name} · Lv.${u.level}</small><div class="b2-hp"><i style="width:${Math.max(0,u.hp/u.maxHp*100)}%"></i></div><div class="b2-gold">${Math.floor(u.gold).toLocaleString()} G</div></div></div>`).join("")}</aside></div></div>`;
 }
 if(mode==="party"){
 body=`<div class="ready"><div class="mark">✓</div><div><div class="eyebrow">PARTY READY</div><h2>파티가 구성되었습니다.</h2><p>5명이 게임에 참가합니다.</p></div></div>
@@ -345,13 +354,13 @@ makeStructure('tn1','team','nexus','넥서스',7),makeStructure('tt1','team','to
 makeStructure('e1','enemy','tower','1차 포탑',61),makeStructure('e2','enemy','tower','2차 포탑',71),makeStructure('ei','enemy','inhib','억제기',81),makeStructure('et1','enemy','tower','쌍둥이 포탑 1',87),makeStructure('et2','enemy','tower','쌍둥이 포탑 2',89),makeStructure('en1','enemy','nexus','넥서스',93)
 ]}
 function initRelics(){return [{id:'r1',x:34,cooldown:0},{id:'r2',x:44,cooldown:0},{id:'r3',x:56,cooldown:0},{id:'r4',x:66,cooldown:0}]}
-function createChampUnit(c,i,team){return {id:`${team}-c${i}`,team,kind:'champ',nick:team==='team'?party[i].nickname:enemyTeam[i].nick,icon:c.icon,champ:c,x:team==='team'?8+i*1.3:92-i*1.3,y:team==='team'?47+i*2:53-i*2,hp:100,maxHp:100,level:3,gold:1400,xp:0,alive:true,atk:7.5+Math.random()*2.5,range:7.5,speed:2.1+Math.random()*.45,atBase:true,respawn:0,attackCd:Math.random()*.7,think:0,phase:Math.random()*Math.PI*2,laneBias:(Math.random()-.5)*9}}
+function createChampUnit(c,i,team){return {id:`${team}-c${i}`,team,kind:'champ',nick:team==='team'?party[i].nickname:enemyTeam[i].nick,icon:c.icon,champ:c,x:team==='team'?8+i*1.3:92-i*1.3,y:team==='team'?47+i*2:53-i*2,hp:100,maxHp:100,level:3,gold:1400,xp:0,alive:true,atk:7.5+Math.random()*2.5,range:5.8,speed:2.1+Math.random()*.45,atBase:true,respawn:0,attackCd:Math.random()*.7,think:0,phase:Math.random()*Math.PI*2,laneBias:(Math.random()-.5)*9}}
 function createMinion(team,superMinion=false){return {id:`${team}-m-${Math.random().toString(36).slice(2)}`,team,kind:'minion',nick:'',icon:superMinion?'⬟':'●',super:superMinion,x:team==='team'?12:88,y:48+(Math.random()*10-5),hp:superMinion?180:75,maxHp:superMinion?180:75,level:1,gold:0,xp:0,alive:true,atk:superMinion?6.5:3.2,range:3.2,speed:superMinion?1.8:2.45,attackCd:Math.random()*.5,phase:Math.random()*Math.PI*2,laneBias:(Math.random()-.5)*12}}
 function startBattle(){
  clearInterval(battleTimer); cancelAnimationFrame(window.__battleRAF);
  const team=teamPicks.map((c,i)=>createChampUnit(c,i,'team')), enemy=enemyTeam.map((e,i)=>createChampUnit(e.champ,i,'enemy'));
- battleState={time:0,status:'전투 진행 중',team,enemy,units:[...team,...enemy],structures:initStructures(),relics:initRelics(),log:['전투 시작 · 5 VS 5 매치가 시작되었습니다.','양 팀이 넥서스를 향해 진격합니다.'],speed:1,lastTs:performance.now(),spawnClock:0,superTeam:false,superEnemy:false,lastLogTime:-1,fx:[],fxSeq:0};
- mode='battle';render(); window.__battleRAF=requestAnimationFrame(battleFrame);
+ battleState={time:0,status:'전투 진행 중',team,enemy,units:[...team,...enemy],structures:initStructures(),relics:initRelics(),log:[],speed:1,teamKills:0,enemyKills:0,lastTs:performance.now(),nextWaveAt:45,waveCount:0,lastUiSync:0,superTeam:false,superEnemy:false,lastLogTime:-1,fx:[],fxSeq:0};
+ mode='battle';render();setTimeout(syncStaticBattlePositions,0); window.__battleRAF=requestAnimationFrame(battleFrame);
 }
 function setBattleSpeed(v){if(battleState){battleState.speed=v;render()}}
 function living(arr){return arr.filter(u=>u.alive)}
@@ -369,36 +378,75 @@ function moveOrganic(u,target,dt){
  u.y=Math.max(34,Math.min(66,u.y));
 }
 function bsTime(){return battleState?battleState.time:0}
-function dealDamage(attacker,target,dmg){if(!target.alive)return;target.hp-=dmg;if(target.hp<=0){target.hp=0;target.alive=false;if(target.kind==='champ'){target.respawn=8.5;addFx(target.x,target.y,'KO',attacker.team);battleState.log.push(`${attacker.nick}이(가) ${target.nick}을(를) 쓰러뜨렸습니다.`)}else if(Math.random()<.35){battleState.log.push(`${attacker.nick||'미니언'}이(가) 미니언을 처치했습니다.`)}}else if(Math.random()<.08&&attacker.kind==='champ'){addFx(target.x,target.y,`-${Math.max(1,Math.round(dmg*12))}`,attacker.team)}}
-function damageStructure(st,dmg,attacker){st.hp-=dmg;if(Math.random()<.018&&attacker&&attacker.kind==='champ')battleState.log.push(`${attacker.nick}이(가) ${st.name}을 공격합니다.`);if(st.hp<=0){st.hp=0;st.alive=false;battleState.log.push(`${st.name}이(가) 파괴되었습니다.`);if(st.type==='inhib'){if(st.team==='team')battleState.superEnemy=true;else battleState.superTeam=true; battleState.log.push('억제기가 파괴되어 다음 웨이브에 강화 미니언이 합류합니다.')}}}
-function spawnWave(){const bs=battleState;for(let i=0;i<5;i++){bs.units.push(createMinion('team',bs.superTeam&&i===0));bs.units.push(createMinion('enemy',bs.superEnemy&&i===0));}bs.log.push(`${formatBattleTime(bs.time)} · 새로운 미니언 웨이브`)}
-function updateRelics(dt){const bs=battleState;for(const r of bs.relics){if(r.cooldown>0){r.cooldown-=dt;continue}const nearby=bs.units.filter(u=>u.alive&&Math.abs(u.x-r.x)<2.4&&u.kind==='champ');if(nearby.length){const u=nearby.sort((a,b)=>a.hp/b.maxHp-b.hp/b.maxHp)[0];if(u.hp<u.maxHp*.92){u.hp=Math.min(u.maxHp,u.hp+u.maxHp*.08);r.cooldown=35;bs.log.push(`${u.nick}이(가) 유물로 체력을 회복했습니다.`)}}}}
-function updateStructures(dt){const bs=battleState;for(const st of bs.structures){if(!st.alive)continue;const attackers=bs.units.filter(u=>u.alive&&u.team!==st.team&&Math.abs(u.x-st.x)<5.5);if(!attackers.length)continue;const target=attackers.find(u=>u.kind==='champ')||attackers[0];target.attackCd=Math.max(target.attackCd,0);dealDamage({kind:'structure',nick:st.name,team:st.team},target,10*dt);if(target.kind==='champ'&&target.hp<=0){target.respawn=8.5;target.alive=false;bs.log.push(`${st.name}이(가) ${target.nick}을(를) 처치했습니다.`)}}}
-function updateUnits(dt){const bs=battleState;const all=[...bs.team,...bs.enemy];for(const u of all){
- if(!u.alive){if(u.kind==='champ'&&u.respawn>0){u.respawn-=dt;if(u.respawn<=0){u.alive=true;u.hp=u.maxHp*.62;u.x=u.team==='team'?8:92;u.y=50;u.gold=Math.max(u.gold,1400);u.phase=Math.random()*6.28;bs.log.push(`${u.nick}이(가) 본진에서 부활했습니다.`)}}continue}
+function respawnSeconds(u){return Math.max(1,(u.level||1)*2+4)}
+function killLog(attacker,target){
+ const bs=battleState, at=attacker.team==='team'?'blue-name':'red-name', tt=target.team==='team'?'blue-name':'red-name';
+ if(attacker.team==='team')bs.teamKills++; else if(attacker.team==='enemy')bs.enemyKills++;
+ bs.log.push(`[${formatBattleTime(bs.time)}] <span class="${at}">${attacker.nick||attacker.name||'포탑'}</span> → <span class="${tt}">${target.nick}</span> 처치`);
+}
+function dealDamage(attacker,target,dmg){if(!target.alive)return;target.hp-=dmg;if(target.hp<=0){target.hp=0;target.alive=false;if(target.kind==='champ'){target.respawn=respawnSeconds(target);addFx(target.x,target.y,'KO',attacker.team);killLog(attacker,target)}}else if(Math.random()<.035&&attacker.kind==='champ'){addFx(target.x,target.y,`-${Math.max(1,Math.round(dmg*12))}`,attacker.team)}}
+function damageStructure(st,dmg,attacker){
+ const tempo=battleState.time>15*60?2.4:battleState.time>10*60?1.55:1;
+ st.hp-=dmg*tempo;
+ if(st.hp<=0){st.hp=0;st.alive=false;if(st.type==='inhib'){if(st.team==='team')battleState.superEnemy=true;else battleState.superTeam=true}}
+}
+function waveIntervalAt(t){
+ if(t>=25*60)return 15;
+ if(t>=15*60)return 20;
+ return 25;
+}
+function spawnWave(){
+ const bs=battleState;bs.waveCount++;
+ const cannon=(bs.waveCount%2===1); // 첫 웨이브부터 한 웨이브 건너 대포
+ for(let i=0;i<6;i++){
+   bs.units.push(createMinion('team',(cannon||bs.superTeam)&&i===0));
+   bs.units.push(createMinion('enemy',(cannon||bs.superEnemy)&&i===0));
+ }
+
+}
+function updateRelics(dt){const bs=battleState;for(const r of bs.relics){if(r.cooldown>0){r.cooldown-=dt;continue}const nearby=bs.units.filter(u=>u.alive&&Math.abs(u.x-r.x)<2.4&&u.kind==='champ');if(nearby.length){const u=nearby.sort((a,b)=>a.hp/b.maxHp-b.hp/b.maxHp)[0];if(u.hp<u.maxHp*.92){u.hp=Math.min(u.maxHp,u.hp+u.maxHp*.08);r.cooldown=35}}}}
+function updateStructures(dt){const bs=battleState;for(const st of bs.structures){if(!st.alive)continue;const attackers=bs.units.filter(u=>u.alive&&u.team!==st.team&&Math.abs(u.x-st.x)<5.5);if(!attackers.length)continue;const target=attackers.find(u=>u.kind==='champ')||attackers[0];target.attackCd=Math.max(target.attackCd,0);dealDamage({kind:'structure',nick:st.name,team:st.team},target,10*dt);if(target.kind==='champ'&&target.hp<=0){target.respawn=respawnSeconds(target);target.alive=false}}}
+function updateUnits(dt){const bs=battleState;const all=bs.units;for(const u of all){
+ if(!u.alive){if(u.kind==='champ'&&u.respawn>0){u.respawn-=dt;if(u.respawn<=0){u.alive=true;u.hp=u.maxHp*.62;u.x=u.team==='team'?8:92;u.y=50;u.gold=Math.max(u.gold,1400);u.phase=Math.random()*6.28}}continue}
  u.gold+=6*dt;u.xp+=12*dt;u.level=Math.min(18,3+Math.floor(u.xp/100));u.attackCd=Math.max(0,(u.attackCd||0)-dt);u.think=(u.think||0)-dt;
  const target=nearestEnemy(u); const dist=target?Math.hypot(target.x-u.x,target.y-u.y):999;
  if(target && dist<=u.range){
    u.y += Math.sin(bs.time*2.2+u.phase)*0.35*dt;
-   if(u.attackCd<=0){const dmg=u.kind==='champ'?u.atk*(.75+Math.random()*.5):u.atk;dealDamage(u,target,dmg);u.attackCd=u.kind==='champ'?0.75+Math.random()*.35:1.05; if(u.kind==='champ'&&Math.random()<.12)addFx(target.x,target.y,'✦',u.team)}
- } else if(target && dist<22){moveOrganic(u,{x:target.x,y:target.y},dt)}
- else {const st=nearestStructure(u);if(st){const targetX=st.x+(u.team==='team'?-2:2);const targetY=50+u.laneBias*.18;if(Math.abs(u.x-targetX)<3.2){if(u.attackCd<=0){damageStructure(st,u.atk*(u.kind==='champ'?.45:.22),u);u.attackCd=u.kind==='champ'?.85:1.1}}else moveOrganic(u,{x:targetX,y:targetY},dt)}else{u.x+=(u.team==='team'?1:-1)*u.speed*.5*dt}}
+   if(u.attackCd<=0){const dmg=u.kind==='champ'?u.atk*(.75+Math.random()*.5):u.atk;dealDamage(u,target,dmg);u.attackCd=u.kind==='champ'?1.35+Math.random()*.65:1.05; if(u.kind==='champ'&&Math.random()<.12)addFx(target.x,target.y,'✦',u.team)}
+ } else if(target && dist<(u.kind==='champ'?13:22)){moveOrganic(u,{x:target.x,y:target.y},dt)}
+ else {const st=nearestStructure(u);if(st){const targetX=st.x+(u.team==='team'?-2:2);const targetY=50+u.laneBias*.18;if(Math.abs(u.x-targetX)<3.2){if(u.attackCd<=0){damageStructure(st,u.atk*(u.kind==='champ'?.72:.26),u);u.attackCd=u.kind==='champ'?.85:1.1}}else moveOrganic(u,{x:targetX,y:targetY},dt)}else{u.x+=(u.team==='team'?1:-1)*u.speed*.5*dt}}
  u.y=Math.max(31,Math.min(69,u.y));
 }}
-function applyOvercharge(){const bs=battleState;if(bs.time>=35*60&&bs.time<35*60+.4)bs.log.push('35:00 · 포탑 과충전이 해제되기 시작합니다.');if(bs.time>=40*60){for(const st of bs.structures.filter(s=>s.alive&&s.type==='tower')){st.hp-=1.2;if(st.hp<=0){st.hp=0;st.alive=false;bs.log.push(`${st.name}이(가) 과충전으로 붕괴했습니다.`)}}}}
-function checkEnd(){const bs=battleState;const tn=bs.structures.find(s=>s.id==='tn1'),en=bs.structures.find(s=>s.id==='en1');if(!tn.alive||!en.alive){bs.status=!en.alive?'우리 팀 승리':'적 팀 승리';bs.log.push(bs.status+' · 넥서스가 파괴되었습니다.');return true}return false}
-function battleFrame(ts){if(mode!=='battle'||!battleState)return;const bs=battleState;let dt=Math.min(.045,(ts-bs.lastTs)/1000)*bs.speed;bs.lastTs=ts;bs.time+=dt;bs.spawnClock+=dt;
- if(bs.spawnClock>=22){bs.spawnClock-=22;spawnWave()}
+function applyOvercharge(){const bs=battleState;if(bs.time>=40*60){for(const st of bs.structures.filter(s=>s.alive&&s.type==='tower')){st.hp-=1.2;if(st.hp<=0){st.hp=0;st.alive=false}}}}
+function checkEnd(){const bs=battleState;const tn=bs.structures.find(s=>s.id==='tn1'),en=bs.structures.find(s=>s.id==='en1');if(!tn.alive||!en.alive){bs.status=!en.alive?'우리 팀 승리':'적 팀 승리';return true}return false}
+function battleFrame(ts){if(mode!=='battle'||!battleState)return;
+ const bs=battleState;let raw=Math.min(.05,(ts-bs.lastTs)/1000);bs.lastTs=ts;let dt=Math.min(.8,raw*bs.speed);bs.time+=dt;
+ while(bs.time>=bs.nextWaveAt){spawnWave();bs.nextWaveAt+=waveIntervalAt(bs.nextWaveAt)}
  updateUnits(dt);updateStructures(dt);updateRelics(dt);applyOvercharge();
- if(Math.floor(bs.time)!==bs.lastLogTime&&Math.floor(bs.time)%8===0){bs.lastLogTime=Math.floor(bs.time);bs.log.push(`${formatBattleTime(bs.time)} · 교전이 계속되고 있습니다.`)}
+ // 화면에 보이지 않는 사망 미니언은 즉시 정리해 메모리/연산량을 억제
+ if(bs.units.length>70)bs.units=bs.units.filter(u=>u.kind==='champ'||u.alive);
  for(const f of bs.fx)f.ttl-=dt;bs.fx=bs.fx.filter(f=>f.ttl>0);
- if(checkEnd()){render();return} syncBattleDom();window.__battleRAF=requestAnimationFrame(battleFrame)}
-function syncBattleDom(){const bs=battleState;const clock=document.querySelector('.b2-clock');if(clock)clock.textContent=formatBattleTime(bs.time);const right=document.querySelector('.b2-right');if(right)right.innerHTML=`<b>${bs.team.filter(u=>u.alive).length}</b> VS <b>${bs.enemy.filter(u=>u.alive).length}</b><br><span>${bs.status}</span>`;
- for(const u of bs.units){const el=document.querySelector(`[data-unit="${u.id}"]`);if(!el)continue;el.style.left=Math.max(1,Math.min(99,u.x))+'%';el.style.top=Math.max(8,Math.min(92,u.y||50))+'%';el.classList.toggle('dead',!u.alive);const hp=el.querySelector('.t-hp em');if(hp)hp.style.width=Math.max(0,u.hp/u.maxHp*100)+'%'}
+ if(checkEnd()){render();return}
+ // DOM 갱신은 20fps로 제한하고 엔진 물리는 RAF로 계속 계산
+ if(ts-bs.lastUiSync>=66){bs.lastUiSync=ts;syncBattleDom()}
+ window.__battleRAF=requestAnimationFrame(battleFrame)
+}
+function screenPos(x,y){
+ const centerY=78-x*.56; // blue bottom-left -> red top-right
+ const lateral=((y||50)-50)*.58;
+ return {left:Math.max(3,Math.min(97,x)),top:Math.max(8,Math.min(91,centerY+lateral))};
+}
+function syncStaticBattlePositions(){
+ if(!battleState)return;
+ for(const st of battleState.structures){const el=document.querySelector(`[data-structure="${st.id}"]`);if(el){const p=screenPos(st.x,50);el.style.left=p.left+'%';el.style.top=p.top+'%'}}
+ const rs=[...document.querySelectorAll('.b2-relic')];battleState.relics.forEach((r,i)=>{if(rs[i]){const p=screenPos(r.x,50);rs[i].style.left=p.left+'%';rs[i].style.top=p.top+'%'}})
+}
+function syncBattleDom(){const bs=battleState;const clock=document.querySelector('.b2-clock');if(clock)clock.textContent=formatBattleTime(bs.time);const right=document.querySelector('.b2-right');if(right)right.innerHTML=`<b>${bs.teamKills||0}</b> &nbsp; ⚔ &nbsp; <b>${bs.enemyKills||0}</b><br><span>${bs.status}</span>`;
+ for(const u of bs.team.concat(bs.enemy)){const el=document.querySelector(`[data-unit="${u.id}"]`);if(!el)continue;const p=screenPos(u.x,u.y);el.style.left=p.left+'%';el.style.top=p.top+'%';el.classList.toggle('dead',!u.alive);const hp=el.querySelector('.t-hp em');if(hp)hp.style.width=Math.max(0,u.hp/u.maxHp*100)+'%'}
  for(const st of bs.structures){const el=document.querySelector(`[data-structure="${st.id}"]`);if(el){el.classList.toggle('dead',!st.alive);const n=el.querySelector('.sname');if(n)n.textContent=`${st.name} · ${Math.max(0,Math.round(st.hp))}%`}}
  for(const r of bs.relics){const els=[...document.querySelectorAll('.b2-relic')];const idx=bs.relics.indexOf(r);if(els[idx])els[idx].classList.toggle('cool',r.cooldown>0)}
- const log=document.querySelector('.b2-log');if(log){const atBottom=log.scrollTop+log.clientHeight>=log.scrollHeight-8;log.innerHTML=bs.log.slice(-8).map(x=>`<div>${x}</div>`).join('');if(atBottom)log.scrollTop=log.scrollHeight}
- const fxWrap=document.querySelector('.b2-stage');if(fxWrap){document.querySelectorAll('[data-fx]').forEach(el=>el.remove());for(const f of bs.fx){const d=document.createElement('div');d.className='b2-fx '+(f.team==='enemy'?'red':'blue');d.dataset.fx=f.id;d.style.left=f.x+'%';d.style.top=f.y+'%';d.textContent=f.text;fxWrap.appendChild(d)}}}
+ if(bs.log.length>120)bs.log.splice(0,bs.log.length-120);const log=document.querySelector('.b2-log');if(log){const atBottom=log.scrollTop+log.clientHeight>=log.scrollHeight-8;log.innerHTML=bs.log.slice(-6).map(x=>`<div>${x}</div>`).join('');if(atBottom)log.scrollTop=log.scrollHeight}
+ const fxWrap=document.querySelector('.b2-stage');if(fxWrap){document.querySelectorAll('[data-fx]').forEach(el=>el.remove());for(const f of bs.fx){const d=document.createElement('div');d.className='b2-fx '+(f.team==='enemy'?'red':'blue');d.dataset.fx=f.id;const p=screenPos(f.x,f.y);d.style.left=p.left+'%';d.style.top=p.top+'%';d.textContent=f.text;fxWrap.appendChild(d)}}}
 function choose(id){me=chars.find(c=>c.id===id);render()}
 function goMethod(){mode="method";render()}
 function startGroup(){party=[me,...shuffle(chars.filter(c=>c.id!==me.id)).slice(0,4)];chatMembers=shuffle(party.slice(1));replies=0;mode="group";render();tickGroup()}
