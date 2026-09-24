@@ -430,7 +430,11 @@ function startGame(){
     const elapsed=Math.floor((Date.now()-loadingStartedAt)/1000);
     loadingSeconds=Math.max(0,10-elapsed);
     if(mode!=="loading"){clearInterval(loadingTimer);return;}
-    render();
+    // 전체 로딩 DOM을 재생성하지 않는다. 이미지가 매번 다시 로드되며 깜빡이는 현상 방지.
+    const count=document.querySelector('.loading-count');
+    if(count) count.textContent=String(loadingSeconds);
+    const bar=document.querySelector('.loading-bar > div');
+    if(bar) bar.style.width=(((10-loadingSeconds)/10)*100)+'%';
   },250);
   loadingTransitionTimer=setTimeout(()=>{
     clearInterval(loadingTimer); loadingTimer=null; loadingSeconds=0;
@@ -438,7 +442,7 @@ function startGame(){
   },10000);
 }
 function createChampionUnit(team,index,champ,nick){
- return {id:`${team}-c${index}`,kind:'champ',team,champ,nick,icon:champ.icon,x:team==='team'?8:92,y:40+index*5,maxHp:115,hp:115,level:3,gold:1400,xp:0,atk:team==='team'?8.8:8.6,range:5.2,speed:2.1+Math.random()*.25,attackCd:0,alive:true,respawn:0,laneBias:(index-2)*3,phase:Math.random()*6.28,kills:0,deaths:0,assists:0,damageDealt:0,damageTaken:0};
+ return {id:`${team}-c${index}`,kind:'champ',team,champ,nick,icon:champ.icon,x:team==='team'?8:92,y:36+index*7,maxHp:115,hp:115,level:3,gold:1400,xp:0,atk:team==='team'?8.8:8.6,range:5.2,speed:2.1+Math.random()*.25,attackCd:0,alive:true,respawn:0,laneBias:(index-2)*5.2,phase:Math.random()*6.28,kills:0,deaths:0,assists:0,damageDealt:0,damageTaken:0};
 }
 function createMinion(team,cannon=false){return {id:`m-${team}-${Math.random()}`,kind:'minion',team,nick:'미니언',x:team==='team'?7:93,y:46+Math.random()*8,maxHp:cannon?45:25,hp:cannon?45:25,atk:cannon?3.2:1.8,range:cannon?4:2.4,speed:1.45,attackCd:0,alive:true,laneBias:(Math.random()-.5)*6,phase:Math.random()*6.28}}
 function startBattle(){
@@ -446,8 +450,8 @@ function startBattle(){
  const team=teamPicks.map((c,i)=>createChampionUnit('team',i,c,party[i].nickname));
  const enemy=enemyTeam.map((e,i)=>createChampionUnit('enemy',i,e.champ,e.nick));
  const structures=[
- {id:'tn1',team:'team',type:'nexus',name:'넥서스',x:5,y:50,hp:100,alive:true},{id:'tt1',team:'team',type:'tower',name:'쌍둥이 포탑',x:10,y:48.5,hp:100,alive:true},{id:'tt2',team:'team',type:'tower',name:'쌍둥이 포탑',x:10,y:51.5,hp:100,alive:true},{id:'ti',team:'team',type:'inhib',name:'억제기',x:17,y:50,hp:100,alive:true},{id:'t2',team:'team',type:'tower',name:'2차 포탑',x:28,y:50,hp:100,alive:true},{id:'t1',team:'team',type:'tower',name:'1차 포탑',x:40,y:50,hp:100,alive:true},
- {id:'e1',team:'enemy',type:'tower',name:'1차 포탑',x:60,y:50,hp:100,alive:true},{id:'e2',team:'enemy',type:'tower',name:'2차 포탑',x:72,y:50,hp:100,alive:true},{id:'ei',team:'enemy',type:'inhib',name:'억제기',x:83,y:50,hp:100,alive:true},{id:'et1',team:'enemy',type:'tower',name:'쌍둥이 포탑',x:90,y:48.5,hp:100,alive:true},{id:'et2',team:'enemy',type:'tower',name:'쌍둥이 포탑',x:90,y:51.5,hp:100,alive:true},{id:'en1',team:'enemy',type:'nexus',name:'넥서스',x:95,y:50,hp:100,alive:true}];
+ {id:'tn1',team:'team',type:'nexus',name:'넥서스',x:5,y:50,hp:100,alive:true},{id:'tt1',team:'team',type:'tower',name:'쌍둥이 포탑',x:9,y:50,hp:100,alive:true},{id:'tt2',team:'team',type:'tower',name:'쌍둥이 포탑',x:12,y:50,hp:100,alive:true},{id:'ti',team:'team',type:'inhib',name:'억제기',x:17,y:50,hp:100,alive:true},{id:'t2',team:'team',type:'tower',name:'2차 포탑',x:28,y:50,hp:100,alive:true},{id:'t1',team:'team',type:'tower',name:'1차 포탑',x:40,y:50,hp:100,alive:true},
+ {id:'e1',team:'enemy',type:'tower',name:'1차 포탑',x:60,y:50,hp:100,alive:true},{id:'e2',team:'enemy',type:'tower',name:'2차 포탑',x:72,y:50,hp:100,alive:true},{id:'ei',team:'enemy',type:'inhib',name:'억제기',x:83,y:50,hp:100,alive:true},{id:'et1',team:'enemy',type:'tower',name:'쌍둥이 포탑',x:88,y:50,hp:100,alive:true},{id:'et2',team:'enemy',type:'tower',name:'쌍둥이 포탑',x:91,y:50,hp:100,alive:true},{id:'en1',team:'enemy',type:'nexus',name:'넥서스',x:95,y:50,hp:100,alive:true}];
  battleState={time:0,lastTs:performance.now(),lastUiSync:0,status:'경기 진행 중',speed:1,team,enemy,units:[...team,...enemy],structures,relics:[],fx:[],fxSeq:0,log:[],teamKills:0,enemyKills:0,nextWaveAt:45,waveCount:0,superTeam:false,superEnemy:false};
  mode='battle';render();window.__battleRAF=requestAnimationFrame(battleFrame);
 }
@@ -472,8 +476,11 @@ function bsTime(){return battleState?battleState.time:0}
 function respawnSeconds(u){return Math.max(1,(u.level||1)*2+4)}
 function killLog(attacker,target){
  const bs=battleState, at=attacker.team==='team'?'blue-name':'red-name', tt=target.team==='team'?'blue-name':'red-name';
- if(attacker.team==='team')bs.teamKills++; else if(attacker.team==='enemy')bs.enemyKills++;
- if(attacker.kind==='champ'){attacker.kills=(attacker.kills||0)+1; attacker.gold+=300;} target.deaths=(target.deaths||0)+1;
+ if(attacker.kind==='champ'){
+   if(attacker.team==='team')bs.teamKills++; else if(attacker.team==='enemy')bs.enemyKills++;
+   attacker.kills=(attacker.kills||0)+1; attacker.gold+=300;
+ }
+ target.deaths=(target.deaths||0)+1;
  const allies=bs.units.filter(u=>u.kind==='champ'&&u.team===attacker.team&&u!==attacker&&u.alive&&Math.hypot(u.x-target.x,u.y-target.y)<14); allies.forEach(u=>u.assists=(u.assists||0)+1);
  bs.log.push(`[${formatBattleTime(bs.time)}] <span class="${at}">${attacker.nick||attacker.name||'포탑'}</span> → <span class="${tt}">${target.nick}</span> 처치`);
 }
@@ -498,17 +505,54 @@ function spawnWave(){
 
 }
 function updateRelics(dt){const bs=battleState;for(const r of bs.relics){if(r.cooldown>0){r.cooldown-=dt;continue}const nearby=bs.units.filter(u=>u.alive&&Math.abs(u.x-r.x)<2.4&&u.kind==='champ');if(nearby.length){const u=nearby.sort((a,b)=>a.hp/b.maxHp-b.hp/b.maxHp)[0];if(u.hp<u.maxHp*.92){u.hp=Math.min(u.maxHp,u.hp+u.maxHp*.08);r.cooldown=35}}}}
-function updateStructures(dt){const bs=battleState;for(const st of bs.structures){if(!st.alive)continue;const attackers=bs.units.filter(u=>u.alive&&u.team!==st.team&&Math.abs(u.x-st.x)<5.5);if(!attackers.length)continue;const target=attackers.find(u=>u.kind==='champ')||attackers[0];target.attackCd=Math.max(target.attackCd,0);dealDamage({kind:'structure',nick:st.name,team:st.team},target,10*dt);if(target.kind==='champ'&&target.hp<=0){target.respawn=respawnSeconds(target);target.alive=false}}}
+function updateStructures(dt){const bs=battleState;for(const st of bs.structures){if(!st.alive||st.type==='inhib'||st.type==='nexus')continue;const attackers=bs.units.filter(u=>u.alive&&u.team!==st.team&&Math.abs(u.x-st.x)<6);if(!attackers.length)continue;
+ // 롤처럼 포탑은 사거리 안의 적 미니언을 우선 공격하고, 미니언이 없을 때만 챔피언을 공격한다.
+ const minions=attackers.filter(u=>u.kind==='minion');
+ const target=minions[0]||attackers.find(u=>u.kind==='champ');
+ if(!target)continue;
+ dealDamage({kind:'structure',nick:st.name,team:st.team},target,(target.kind==='minion'?13:6.2)*dt);
+ }}
 function updateUnits(dt){const bs=battleState;const all=bs.units;for(const u of all){
- if(!u.alive){if(u.kind==='champ'&&u.respawn>0){u.respawn-=dt;if(u.respawn<=0){u.alive=true;u.hp=u.maxHp*.62;u.x=u.team==='team'?8:92;u.y=50;u.gold=Math.max(u.gold,1400);u.phase=Math.random()*6.28}}continue}
- u.gold+=6*dt;u.xp+=12*dt;u.level=Math.min(18,3+Math.floor(u.xp/100));u.attackCd=Math.max(0,(u.attackCd||0)-dt);u.think=(u.think||0)-dt;
- const target=nearestEnemy(u); const dist=target?Math.hypot(target.x-u.x,target.y-u.y):999;
- if(target && dist<=u.range){
-   u.y += Math.sin(bs.time*2.2+u.phase)*0.35*dt;
-   if(u.attackCd<=0){const dmg=u.kind==='champ'?u.atk*(.75+Math.random()*.5):u.atk;dealDamage(u,target,dmg);u.attackCd=u.kind==='champ'?1.35+Math.random()*.65:1.05; if(u.kind==='champ'&&Math.random()<.12)addFx(target.x,target.y,'✦',u.team)}
- } else if(target && dist<(u.kind==='champ'?13:22)){moveOrganic(u,{x:target.x,y:target.y},dt)}
- else {const st=nearestStructure(u);if(st){const targetX=st.x+(u.team==='team'?-2:2);const targetY=50+u.laneBias*.18;if(Math.abs(u.x-targetX)<3.2){if(u.attackCd<=0){damageStructure(st,u.atk*(u.kind==='champ'?.72:.26),u);u.attackCd=u.kind==='champ'?.85:1.1}}else moveOrganic(u,{x:targetX,y:targetY},dt)}else{u.x+=(u.team==='team'?1:-1)*u.speed*.5*dt}}
- u.y=Math.max(31,Math.min(69,u.y));
+ if(!u.alive){if(u.kind==='champ'&&u.respawn>0){u.respawn-=dt;if(u.respawn<=0){u.alive=true;u.hp=u.maxHp*.72;u.x=u.team==='team'?8:92;u.y=50+u.laneBias;u.gold=Math.max(u.gold,1400);u.phase=Math.random()*6.28}}continue}
+ u.gold+=6*dt;u.xp+=12*dt;u.level=Math.min(18,3+Math.floor(u.xp/100));u.attackCd=Math.max(0,(u.attackCd||0)-dt);
+ const enemyChamps=bs.units.filter(e=>e.alive&&e.kind==='champ'&&e.team!==u.team);
+ const enemyMinions=bs.units.filter(e=>e.alive&&e.kind==='minion'&&e.team!==u.team);
+ const targetChamp=enemyChamps.reduce((best,e)=>!best||Math.hypot(e.x-u.x,e.y-u.y)<Math.hypot(best.x-u.x,best.y-u.y)?e:best,null);
+ const champDist=targetChamp?Math.hypot(targetChamp.x-u.x,targetChamp.y-u.y):999;
+ const st=nearestStructure(u);
+ const alliedMinions=bs.units.filter(m=>m.alive&&m.kind==='minion'&&m.team===u.team&&(!st||Math.abs(m.x-st.x)<8));
+ if(u.kind==='champ'){
+   // 교전 빈도를 낮춘다: 가까워도 항상 싸우지 않고, 팀 라인 간격을 유지하며 전진/후퇴한다.
+   const engage=targetChamp && champDist<9.2 && (u.hp/u.maxHp>.32) && (Math.sin(bs.time*.22+u.phase)>.05);
+   if(engage){
+     if(champDist<=u.range && u.attackCd<=0){dealDamage(u,targetChamp,u.atk*(.48+Math.random()*.28));u.attackCd=2.25+Math.random()*1.15;}
+     else moveOrganic(u,{x:targetChamp.x,y:targetChamp.y+u.laneBias*.32},dt*.72);
+   }else if(st){
+     const enemyTower=st.type==='tower';
+     // 적 포탑 앞에 아군 미니언이 없으면 챔피언은 뒤로 빠진다.
+     if(enemyTower && Math.abs(u.x-st.x)<9 && alliedMinions.length===0){
+       const retreatX=u.team==='team'?st.x-11:st.x+11;
+       moveOrganic(u,{x:retreatX,y:50+u.laneBias},dt*.85);
+     }else{
+       const targetX=st.x+(u.team==='team'?-4.2:4.2);
+       const targetY=50+u.laneBias;
+       if(Math.abs(u.x-targetX)<3.5 && alliedMinions.length>0 && u.attackCd<=0){damageStructure(st,u.atk*.38,u);u.attackCd=1.45+Math.random()*.5}
+       else moveOrganic(u,{x:targetX,y:targetY},dt*.62);
+     }
+   }
+ }else{
+   // 미니언은 화면에 렌더링하지 않지만 실제 엔진에서는 계속 전진/교전/포탑 공격한다.
+   const mt=enemyMinions.reduce((best,e)=>!best||Math.abs(e.x-u.x)<Math.abs(best.x-u.x)?e:best,null);
+   const md=mt?Math.hypot(mt.x-u.x,mt.y-u.y):999;
+   if(mt&&md<=u.range&&u.attackCd<=0){dealDamage(u,mt,u.atk);u.attackCd=1.15}
+   else if(st&&Math.abs(u.x-st.x)<3.4){if(u.attackCd<=0){damageStructure(st,u.atk*.24,u);u.attackCd=1.2}}
+   else if(st)moveOrganic(u,{x:st.x+(u.team==='team'?-1.6:1.6),y:50+u.laneBias*.2},dt);
+ }
+ // 챔피언은 서로 겹치지 않도록 더 넓은 횡간격을 유지한다.
+ if(u.kind==='champ'){
+   for(const v of bs.units){if(v===u||!v.alive||v.kind!=='champ'||v.team!==u.team)continue;const dx=u.x-v.x,dy=u.y-v.y,d=Math.hypot(dx,dy);if(d<4.4&&d>.01){u.x+=dx/d*.38*dt;u.y+=dy/d*.9*dt}}
+ }
+ u.y=Math.max(30,Math.min(70,u.y));
 }}
 function applyOvercharge(){const bs=battleState;if(bs.time>=40*60){for(const st of bs.structures.filter(s=>s.alive&&s.type==='tower')){st.hp-=1.2;if(st.hp<=0){st.hp=0;st.alive=false}}}}
 function checkEnd(){const bs=battleState;const tn=bs.structures.find(s=>s.id==='tn1'),en=bs.structures.find(s=>s.id==='en1');if(!tn.alive||!en.alive){const winner=!en.alive?'team':'enemy';bs.status=winner==='team'?'우리 팀 승리':'적 팀 승리';matchResult={winner,time:bs.time,teamKills:bs.teamKills,enemyKills:bs.enemyKills,team:bs.team.map(u=>({...u})),enemy:bs.enemy.map(u=>({...u}))};mode='battleEnd';render();return true}return false}
@@ -534,7 +578,7 @@ function syncStaticBattlePositions(){
  for(const st of battleState.structures){const el=document.querySelector(`[data-structure="${st.id}"]`);if(el){const p=screenPos(st.x,st.y||50);el.style.left=p.left+'%';el.style.top=p.top+'%'}}
  const rs=[...document.querySelectorAll('.b2-relic')];battleState.relics.forEach((r,i)=>{if(rs[i]){const p=screenPos(r.x,50);rs[i].style.left=p.left+'%';rs[i].style.top=p.top+'%'}})
 }
-function syncBattleDom(){const bs=battleState;const clock=document.querySelector('.b2-clock');if(clock)clock.textContent=formatBattleTime(bs.time);const right=document.querySelector('.b2-right');if(right)right.innerHTML=`<b>${bs.teamKills||0}</b> &nbsp; ⚔ &nbsp; <b>${bs.enemyKills||0}</b><br><span>${bs.status}</span>`;
+function syncBattleDom(){const bs=battleState;const clock=document.querySelector('.b2-clock');if(clock)clock.textContent=formatBattleTime(bs.time);const right=document.querySelector('.b2-right');if(right)right.innerHTML=`<span>${bs.status}</span>`;
  for(const u of bs.team.concat(bs.enemy)){const el=document.querySelector(`[data-unit="${u.id}"]`);if(!el)continue;const p=screenPos(u.x,u.y);el.style.left=p.left+'%';el.style.top=p.top+'%';el.classList.toggle('dead',!u.alive);const hp=el.querySelector('.t-hp em');if(hp)hp.style.width=Math.max(0,u.hp/u.maxHp*100)+'%'}
  for(const st of bs.structures){const el=document.querySelector(`[data-structure="${st.id}"]`);if(el){el.classList.toggle('dead',!st.alive);const n=el.querySelector('.sname');if(n)n.textContent=`${st.name} · ${Math.max(0,Math.round(st.hp))}%`}}
  for(const r of bs.relics){const els=[...document.querySelectorAll('.b2-relic')];const idx=bs.relics.indexOf(r);if(els[idx])els[idx].classList.toggle('cool',r.cooldown>0)}
