@@ -1,1 +1,1 @@
-GitHub Pages 초간단 버전. index.html을 저장소 루트에 올린 뒤 Settings > Pages > Deploy from a branch > main > /(root)로 설정하세요.
+전체 화면 GitHub Pages 버전. index.html을 저장소 루트에 올리고 Settings > Pages > Deploy from a branch > main > /(root)로 설정하세요.
