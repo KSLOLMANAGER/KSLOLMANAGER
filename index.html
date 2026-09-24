@@ -669,6 +669,29 @@ const SIGNATURE_CHAMPS={siljeom:"pyke",molcho:"swain",dwaemesa:"samira",joguk:"s
 const SIGNATURE_CHAT={siljeom:"돈 드리겠습니다~",molcho:"보여줄게",dwaemesa:"월월 감사합니다 월월",joguk:"왔다 내 사랑",nguyen:"케권이 횽이야","3patourwan":"흐에!!",mundolmaeng:"티모횽이야",galio:"야 든든하게 막아줄게",dage:"야 게임 끝났어"};
 let signatureRequests=[],signatureRequest=null,signatureChatDone=new Set(),signatureChatLog=[];
 let mode="select", callMode=null, me=null, selected=[], party=[], chatMembers=[], declinedMembers=[], replies=0, privateIndex=0, privateAnswered=false, privateTargets=[], searching=false, queueSeconds=0, queueTimer=null, found=false, champOptions=[], teamPicks=[], chosenChamp=null, finalPool=[], enemyTeam=[], loadingSeconds=10, loadingTimer=null, loadingTransitionTimer=null, battleState=null, battleTimer=null, matchResult=null;
+let battleRafPending=false, battleWatchdogTimer=null;
+function scheduleBattleFrame(){
+  if(mode!=="battle"||!battleState||battleRafPending)return;
+  battleRafPending=true;
+  window.__battleRAF=requestAnimationFrame((ts)=>{battleRafPending=false;battleFrame(ts)});
+}
+function armBattleWatchdog(){
+  clearInterval(battleWatchdogTimer);
+  battleWatchdogTimer=setInterval(()=>{
+    const bs=battleState;if(mode!=="battle"||!bs)return;
+    const now=performance.now();
+    if(bs.paused){
+      if(bs.augmentOpen&&!document.querySelector(".augment-overlay"))render();
+      if(!bs.augmentOpen&&!bs.jaebinEventOpen&&now-(bs.lastEngineHeartbeat||now)>1200){bs.paused=false;bs.status="경기 진행 중";bs.lastTs=now;}
+      scheduleBattleFrame();return;
+    }
+    if(now-(bs.lastEngineHeartbeat||0)>1500){
+      try{cancelAnimationFrame(window.__battleRAF)}catch(e){}
+      battleRafPending=false;bs.lastTs=now;scheduleBattleFrame();
+    }
+  },700);
+}
+
 
 const app=document.getElementById("app");
 const shuffle=a=>[...a].sort(()=>Math.random()-.5);
@@ -1191,7 +1214,7 @@ function startBattle(){
  {id:'e1',team:'enemy',type:'tower',name:'1차 포탑',x:60,y:50,hp:100,alive:true},{id:'e2',team:'enemy',type:'tower',name:'2차 포탑',x:72,y:50,hp:100,alive:true},{id:'ei',team:'enemy',type:'inhib',name:'억제기',x:83,y:50,hp:100,alive:true},{id:'et1',team:'enemy',type:'tower',name:'쌍둥이 포탑',x:88,y:50,hp:100,alive:true},{id:'et2',team:'enemy',type:'tower',name:'쌍둥이 포탑',x:91,y:50,hp:100,alive:true},{id:'en1',team:'enemy',type:'nexus',name:'넥서스',x:95,y:50,hp:100,alive:true}];
  battleState={time:0,lastTs:performance.now(),lastUiSync:0,status:'경기 진행 중',speed:1,team,enemy,units:[...team,...enemy],structures,relics:[],fx:[],fxSeq:0,log:[],chat:[],teamKills:0,enemyKills:0,nextWaveAt:45,waveCount:0,superTeam:false,superEnemy:false,paused:false,jaebinEventAt:180+Math.random()*300,jaebinEventDone:false,jaebinEventOpen:false,jaebinEventResult:null,jaebinChatAttempted:false,augmentOpen:false,augmentStage:null,augmentChoices:[],augments:[],augmentDone:{start:false,7:false,11:false,15:false},augmentTierByStage:{},endPending:null,akaliChatAt:420+Math.random()*60,akaliChatDone:false,teamCompMultiplier:teamComp,enemyCompMultiplier:enemyComp};
  if(party.some(c=>c.id==='siljeom')) battleState.chat.push(`<span class="all-tag">[전체]</span> <span class="ally-chat">실점:</span> 안녕하세요~ 매너게임이요 ^^`);
- mode='battle';render();setTimeout(()=>{if(mode==='battle'&&battleState&&!battleState.augmentDone.start)openAugment('start')},120);window.__battleRAF=requestAnimationFrame(battleFrame);
+ mode='battle';render();armBattleWatchdog();scheduleBattleFrame();setTimeout(()=>{if(mode==='battle'&&battleState&&!battleState.augmentDone.start)openAugment('start')},700);
 }
 function formatBattleTime(t){const m=String(Math.floor(t/60)).padStart(2,"0"),s=String(Math.floor(t%60)).padStart(2,"0");return `${m}:${s}`}
 function unitV2Html(u){const p=screenPos(u.x,u.y);return `<div class="b2-token ${u.team==='enemy'?'enemy':''} ${u.alive?'':'dead'}" data-unit="${u.id}" style="left:${p.left}%;top:${p.top}%"><span class="token-portrait"><img src="assets/champions/${championImageId(u.champ.id)}_0.jpg" onerror="this.style.display='none';this.parentElement.textContent='${u.icon}'"></span><b>${u.nick}</b><span class="t-hp"><em style="width:${Math.max(0,u.hp/u.maxHp*100)}%"></em></span></div>`}
@@ -1363,25 +1386,33 @@ function allowJaebinChat(){
  else if(r<.60){target.mental='무반응';msg='적 팀이 반응이 없습니다.';}
  else{target.atk*=.78;target.speed*=.90;target.mental='흔들림';msg='적 팀이 채팅을 보고 멘탈이 흔들려 집중력을 잃었습니다';}
  bs.chat.push(`<span class="jaebin-result">⚠ ${msg}</span>`);
- bs.jaebinEventDone=true;bs.jaebinEventOpen=false;bs.paused=false;bs.status='경기 진행 중';bs.lastTs=performance.now();render();window.__battleRAF=requestAnimationFrame(battleFrame);
+ bs.jaebinEventDone=true;bs.jaebinEventOpen=false;bs.paused=false;bs.status='경기 진행 중';bs.lastTs=performance.now();render();scheduleBattleFrame();
 }
-function denyJaebinChat(){const bs=battleState;if(!bs)return;bs.chat.push(`<span class="all-tag">[SYSTEM]</span> 이재빈의 전체 채팅을 막았습니다.`);bs.jaebinEventDone=true;bs.jaebinEventOpen=false;bs.paused=false;bs.status='경기 진행 중';bs.lastTs=performance.now();render();window.__battleRAF=requestAnimationFrame(battleFrame)}
+function denyJaebinChat(){const bs=battleState;if(!bs)return;bs.chat.push(`<span class="all-tag">[SYSTEM]</span> 이재빈의 전체 채팅을 막았습니다.`);bs.jaebinEventDone=true;bs.jaebinEventOpen=false;bs.paused=false;bs.status='경기 진행 중';bs.lastTs=performance.now();render();scheduleBattleFrame()}
 function checkEnd(){const bs=battleState;if(bs.endPending&&performance.now()>=bs.endPending.realAt){const winner=bs.endPending.winner;bs.status=winner==='team'?'우리 팀 승리':'적 팀 승리';if(winner==='team'){if(party.some(c=>c.id==='siljeom'))bs.chat.push(`<span class="all-tag">[전체]</span> <span class="ally-chat">실점:</span> 죽어 그냥 ㅋㅋ`);if(party.some(c=>c.id==='nguyen'))bs.chat.push(`<span class="all-tag">[전체]</span> <span class="ally-chat">Nguyen Ngoc Tu:</span> 나1가`);if(party.some(c=>c.id==='3patourwan'))for(let i=0;i<4;i++)bs.chat.push(`<span class="all-tag">[전체]</span> <span class="ally-chat">쓰리빠뚜르완:</span> ㅋ`);if(party.some(c=>c.id==='joguk'))bs.chat.push(`<span class="all-tag">[전체]</span> <span class="ally-chat">조국:</span> 븅`);if(party.some(c=>c.id==='molcho'))bs.chat.push(`<span class="all-tag">[팀원]</span> <span class="ally-chat">몰초:</span> 쉽네 쉬워`);}else{if(party.some(c=>c.id==='nguyen'))bs.chat.push(`<span class="all-tag">[전체]</span> <span class="ally-chat">Nguyen Ngoc Tu:</span> 근데 지고 자..?`);if(party.some(c=>c.id==='siljeom'))bs.chat.push(`<span class="all-tag">[전체]</span> <span class="ally-chat">실점:</span> 지고 자는 건 에바긴 해`);if(party.some(c=>c.id==='3patourwan'))bs.chat.push(`<span class="all-tag">[전체]</span> <span class="ally-chat">쓰리빠뚜르완:</span> 찐막?`);if(party.some(c=>c.id==='joguk'))bs.chat.push(`<span class="all-tag">[전체]</span> <span class="ally-chat">조국:</span> 고조할배찐막?`);if(bs.jaebinChatAttempted){const jaebinUnit=bs.team.find(u=>u.realName==='이재빈'||u.nick==='Nguyen Ngoc Tu');const champName=jaebinUnit?.champ?.name||'그 챔피언';const taunts=['이기고 자라 ㅋㅋㅋㅋㅋㅋㅋㅋㅋ',`${champName} 너는 진짜 접어라 ㅇㅇ`,'그 조합으로 쳐지네 ㅋㅋㅋㅋㅋㅋㅋㅋㅋㅋ','ez','븅신 ㅋㅋㅋㅋㅋㅋㅋㅋㅋㅋㅋㅋ'];bs.enemy.slice(0,5).forEach((u,i)=>bs.chat.push(`<span class="all-tag">[전체]</span> <span class="enemy-chat">${u.nick}:</span> ${taunts[i]}`));}}matchResult={winner,time:bs.time,teamKills:bs.teamKills,enemyKills:bs.enemyKills,team:bs.team.map(u=>({...u})),enemy:bs.enemy.map(u=>({...u})),chat:[...(bs.chat||[])]};mode='battleEnd';render();return true}return false}
-function battleFrame(ts){if(mode!=='battle'||!battleState)return;
- const bs=battleState;if(bs.paused){bs.lastTs=ts;window.__battleRAF=requestAnimationFrame(battleFrame);return;}
- if(bs.endPending){bs.lastTs=ts;syncBattleDom();if(checkEnd())return;window.__battleRAF=requestAnimationFrame(battleFrame);return;}let raw=Math.min(.05,(ts-bs.lastTs)/1000);bs.lastTs=ts;let dt=Math.min(.8,raw*bs.speed);bs.time+=dt;
- if(!bs.akaliChatDone&&party.some(c=>c.id==='nguyen')&&bs.enemy.some(u=>u.champ?.id==='akali')&&bs.time>=bs.akaliChatAt){bs.chat.push(`<span class="all-tag">[전체]</span> <span class="ally-chat">Nguyen Ngoc Tu:</span> 아칼리 사기 챔피언 하면 재미있음?`);bs.akaliChatDone=true;}
- if(!bs.jaebinEventDone&&!bs.jaebinEventOpen&&party.some(c=>c.id==='nguyen')&&bs.time>=bs.jaebinEventAt){triggerJaebinEvent();return;}
- while(bs.time>=bs.nextWaveAt){spawnWave();bs.nextWaveAt+=waveIntervalAt(bs.nextWaveAt)}
- updateUnits(dt);updateStructures(dt);updateRelics(dt);applyOvercharge();
- // 화면에 보이지 않는 사망 미니언은 즉시 정리해 메모리/연산량을 억제
- if(bs.units.length>70)bs.units=bs.units.filter(u=>u.kind==='champ'||u.alive);
- for(const f of bs.fx)f.ttl-=dt;bs.fx=bs.fx.filter(f=>f.ttl>0);
- if(checkEnd()){render();return}
- // DOM 갱신은 20fps로 제한하고 엔진 물리는 RAF로 계속 계산
- if(ts-bs.lastUiSync>=66){bs.lastUiSync=ts;syncBattleDom()}
- window.__battleRAF=requestAnimationFrame(battleFrame)
+function battleFrame(ts){
+ if(mode!=='battle'||!battleState)return;
+ const bs=battleState;bs.lastEngineHeartbeat=performance.now();
+ try{
+   if(bs.paused){bs.lastTs=ts;scheduleBattleFrame();return;}
+   if(bs.endPending){bs.lastTs=ts;syncBattleDom();if(checkEnd())return;scheduleBattleFrame();return;}
+   let raw=Math.min(.05,(ts-bs.lastTs)/1000);bs.lastTs=ts;let dt=Math.min(.8,raw*bs.speed);bs.time+=dt;
+   if(!bs.akaliChatDone&&party.some(c=>c.id==='nguyen')&&bs.enemy.some(u=>u.champ?.id==='akali')&&bs.time>=bs.akaliChatAt){bs.chat.push(`<span class="all-tag">[전체]</span> <span class="ally-chat">Nguyen Ngoc Tu:</span> 아칼리 사기 챔피언 하면 재미있음?`);bs.akaliChatDone=true;}
+   if(!bs.jaebinEventDone&&!bs.jaebinEventOpen&&party.some(c=>c.id==='nguyen')&&bs.time>=bs.jaebinEventAt){triggerJaebinEvent();scheduleBattleFrame();return;}
+   while(bs.time>=bs.nextWaveAt){spawnWave();bs.nextWaveAt+=waveIntervalAt(bs.nextWaveAt)}
+   updateUnits(dt);updateStructures(dt);updateRelics(dt);applyOvercharge();
+   if(bs.units.length>70)bs.units=bs.units.filter(u=>u.kind==='champ'||u.alive);
+   for(const f of bs.fx)f.ttl-=dt;bs.fx=bs.fx.filter(f=>f.ttl>0);
+   if(checkEnd()){render();return}
+   if(ts-bs.lastUiSync>=66){bs.lastUiSync=ts;syncBattleDom()}
+ }catch(err){
+   console.error('[battle-engine]',err);
+   bs.status='경기 진행 중';
+   bs.lastTs=ts;
+ }
+ scheduleBattleFrame();
 }
+
 function screenPos(x,y){
  const centerY=78-x*.56; // blue bottom-left -> red top-right
  const lateral=((y||50)-50)*.58;
@@ -1532,7 +1563,7 @@ function autoPickAugmentFor(u,stage){if(!u||u.kind!=='champ')return;u.augments=u
 function syncNpcAugments(){const bs=battleState;if(!bs)return;for(const u of [...bs.team,...bs.enemy]){if(u===bs.team[0])continue;if(!(u.augments||[]).length)autoPickAugmentFor(u,'start');for(const lv of [7,11,15])if(u.level>=lv)autoPickAugmentFor(u,lv)}}
 function openAugment(stage){const bs=battleState;if(!bs||bs.augmentOpen)return;bs.augmentStage=stage;bs.augmentTier=getAugmentTierForStage(stage);bs.augmentChoices=makeAugmentChoices(bs.augmentTier);bs.augmentOpen=true;bs.paused=true;bs.status='증강체 선택 중';render()}
 function rerollAugment(i,e){if(e)e.stopPropagation();const bs=battleState;if(!bs||!bs.augmentOpen||bs.augmentChoices[i].rerolled)return;const old=bs.augmentChoices[i],shown=new Set(bs.augmentChoices.map(a=>a.name)),pool=augmentTemplates[bs.augmentTier].filter(a=>!shown.has(a.name));const a=pool[Math.floor(Math.random()*pool.length)]||augmentTemplates[bs.augmentTier][0];bs.augmentChoices[i]={...a,tier:bs.augmentTier,rerolled:true,key:bs.augmentTier+'-'+Math.random()};render()}
-function chooseAugment(i){const bs=battleState;if(!bs||!bs.augmentOpen)return;const a=bs.augmentChoices[i],me=bs.team[0];a.apply(me);const ri=augmentRankInfo(me.champ?.id,a.name);const picked={name:a.name,tier:a.tier,desc:a.desc,stage:bs.augmentStage,opggGrade:ri.grade,opggRank:ri.rank};bs.augments.push(picked);me.augments=me.augments||[];const ai=bs.augmentStage==='start'?0:bs.augmentStage===7?1:bs.augmentStage===11?2:3;me.augments[ai]=picked;maybeJungDaunAugmentChat(me,picked);bs.augmentDone[bs.augmentStage]=true;bs.augmentOpen=false;bs.paused=false;bs.status='경기 진행 중';bs.lastTs=performance.now();render();window.__battleRAF=requestAnimationFrame(battleFrame)}
+function chooseAugment(i){const bs=battleState;if(!bs||!bs.augmentOpen)return;const a=bs.augmentChoices[i],me=bs.team[0];a.apply(me);const ri=augmentRankInfo(me.champ?.id,a.name);const picked={name:a.name,tier:a.tier,desc:a.desc,stage:bs.augmentStage,opggGrade:ri.grade,opggRank:ri.rank};bs.augments.push(picked);me.augments=me.augments||[];const ai=bs.augmentStage==='start'?0:bs.augmentStage===7?1:bs.augmentStage===11?2:3;me.augments[ai]=picked;maybeJungDaunAugmentChat(me,picked);bs.augmentDone[bs.augmentStage]=true;bs.augmentOpen=false;bs.paused=false;bs.status='경기 진행 중';bs.lastTs=performance.now();render();scheduleBattleFrame()}
 function augmentOverlayHtml(bs){if(!bs||!bs.augmentOpen)return '';const tierName={silver:'실버',gold:'골드',prismatic:'프리즘'},stage=bs.augmentStage==='start'?'게임 시작':`레벨 ${bs.augmentStage}`,champId=bs.team?.[0]?.champ?.id;return `<div class="augment-overlay"><div class="augment-modal"><div class="augment-kicker">AUGMENT · ${stage}</div><h2>${tierName[bs.augmentTier]} 증강체를 선택하세요</h2><p>이번 선택은 <b>${tierName[bs.augmentTier]}</b> 등급입니다. 세 선택지와 리롤 모두 같은 등급만 등장합니다.</p><div class="augment-cards">${bs.augmentChoices.map((a,i)=>`<div class="augment-card ${a.tier}" onclick="chooseAugment(${i})"><div class="augment-tier">${tierName[a.tier]}</div><div class="augment-gem"><span>${a.icon}</span></div><h3>${a.name}</h3><p>${a.desc}</p><button class="augment-reroll" ${a.rerolled?'disabled':''} onclick="rerollAugment(${i},event)">${a.rerolled?'리롤 사용 완료':'↻ 리롤 1회'}</button></div>`).join('')}</div><div class="augment-picked">현재 선택: ${(bs.augments||[]).length?bs.augments.map(a=>`<b>${a.name}</b>`).join(' · '):'없음'}</div></div></div>`}
 
 let dragSource=null;
@@ -1566,7 +1597,7 @@ function dropSwap(e,targetType,targetIndex){e.preventDefault();e.stopPropagation
 function openResults(){mode='results';render()}
 function playAgain(){battleState=null;matchResult=null;teamPicks=[];chosenChamp=null;finalPool=[];enemyTeam=[];signatureRequests=[];signatureRequest=null;signatureChatDone=new Set();signatureChatLog=[];goQueue()}
 function reselectTeam(){battleState=null;matchResult=null;selected=[];party=[];mode='method';render()}
-function reset(){clearInterval(queueTimer);clearInterval(loadingTimer);clearTimeout(loadingTransitionTimer);clearInterval(battleTimer);cancelAnimationFrame(window.__battleRAF);dragSource=null;mode="select";me=null;selected=[];party=[];chatMembers=[];replies=0;privateIndex=0;privateAnswered=false;searching=false;queueSeconds=0;found=false;champOptions=[];teamPicks=[];chosenChamp=null;finalPool=[];render()}
+function reset(){clearInterval(queueTimer);clearInterval(loadingTimer);clearTimeout(loadingTransitionTimer);clearInterval(battleTimer);clearInterval(battleWatchdogTimer);battleRafPending=false;cancelAnimationFrame(window.__battleRAF);dragSource=null;mode="select";me=null;selected=[];party=[];chatMembers=[];replies=0;privateIndex=0;privateAnswered=false;searching=false;queueSeconds=0;found=false;champOptions=[];teamPicks=[];chosenChamp=null;finalPool=[];render()}
 render();
 </script>
 
@@ -1631,6 +1662,17 @@ render();
 }
 </style>
 
+
+<style id="v70-battle-hud-fix">
+/* V70 — keep desktop HUD augment slots inside each roster card */
+@media (min-width:801px){
+  .b2-side .b2-unit,.b2-side.right .b2-unit{overflow:hidden!important;}
+  .b2-side .unit-info{min-width:0!important;width:100%!important;overflow:hidden!important;}
+  .b2-side .unit-augments{display:grid!important;grid-template-columns:repeat(4,minmax(0,1fr))!important;gap:3px!important;width:100%!important;max-width:100%!important;margin-top:5px!important;}
+  .b2-side .unit-augment{width:auto!important;min-width:0!important;height:22px!important;box-sizing:border-box!important;}
+  .b2-side .unit-augment img{width:100%!important;height:100%!important;object-fit:cover!important;}
+}
+</style>
 </body>
 </html><style>
 /* ===== V33 PICK SCREEN SCALE-UP ===== */
