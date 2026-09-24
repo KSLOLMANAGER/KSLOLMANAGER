@@ -594,6 +594,19 @@ button{font:inherit}.app{min-height:100vh;width:100%;max-width:1240px;margin:0 a
 @media(max-width:800px){.composition-tip{display:none}.champ-card .cc-bottom strong{font-size:15px}}
 </style>
 
+
+<style>
+/* ===== V67 BATTLE SCOREBOARD ===== */
+.battle-scoreboard{position:absolute;left:24px;bottom:18px;width:min(390px,34%);height:224px;z-index:34;background:linear-gradient(180deg,rgba(4,18,29,.97),rgba(2,9,15,.97));border:1px solid #355c73;box-shadow:0 12px 34px #000b;box-sizing:border-box;overflow:hidden;font-family:Arial,"Noto Sans KR",sans-serif}
+.battle-scoreboard-head{height:30px;display:flex;align-items:center;justify-content:space-between;padding:0 10px;border-bottom:1px solid #28485d;color:#c8dae4;font-size:11px;font-weight:900;letter-spacing:1px}.score-close{display:none;border:0;background:transparent;color:#d7e2e7;font-size:20px;line-height:1;padding:0 4px}
+.battle-scoreboard-teams{display:grid;grid-template-columns:1fr 1fr;height:calc(100% - 30px)}.battle-scoreboard-teams section{min-width:0;padding:5px 6px}.battle-scoreboard-teams section+section{border-left:1px solid #20394b}.battle-scoreboard h4{margin:0 0 4px;font-size:8px;letter-spacing:1px;color:#7898aa}.score-mini-row{height:33px;display:grid;grid-template-columns:28px 1fr;gap:5px;align-items:center;padding:2px 3px;margin-bottom:2px;background:rgba(11,30,45,.72);border-left:2px solid #3199ff;box-sizing:border-box}.score-mini-row.enemy{border-left-color:#e94b58;background:rgba(39,17,25,.68)}.score-mini-portrait{width:26px;height:26px;border:1px solid #3f88cf;overflow:hidden;display:grid;place-items:center;font-size:10px}.score-mini-row.enemy .score-mini-portrait{border-color:#b84a55}.score-mini-portrait img{width:100%;height:100%;object-fit:cover}.score-mini-main{min-width:0}.score-mini-top{display:flex;align-items:center;gap:4px;white-space:nowrap;min-width:0;line-height:11px}.score-mini-top b{max-width:62px;overflow:hidden;text-overflow:ellipsis;font-size:7px;color:#e4ecf0}.score-mini-kda{margin-left:auto;font-size:7px;color:#d2dde3;font-weight:900}.score-mini-cs{font-size:6px;color:#91a4ae}.score-mini-items{display:flex;gap:2px;margin-top:2px}.score-item{width:13px;height:13px;display:grid;place-items:center;border:1px solid #314654;background:#07131c;color:#334954;font-style:normal;font-size:7px;line-height:1;box-sizing:border-box}.score-item.filled{border-color:#9b7c37;background:radial-gradient(circle at 35% 30%,#806f3c,#1a1b17 70%);color:#f0d579;box-shadow:inset 0 0 4px #c79a3455}.mobile-score-toggle{display:none}
+@media (min-width:801px){.battle-scoreboard{display:block!important}}
+@media (max-width:800px){
+ .battle-scoreboard{display:none;position:absolute;left:64px;right:64px;bottom:74px;width:auto;height:min(54dvh,390px);z-index:90;border-color:#4b7590;box-shadow:0 14px 42px #000e}.battle-scoreboard.open{display:block}.battle-scoreboard-head{height:34px;font-size:10px}.score-close{display:block}.battle-scoreboard-teams{height:calc(100% - 34px);grid-template-columns:1fr;overflow-y:auto;-webkit-overflow-scrolling:touch}.battle-scoreboard-teams section{padding:6px 7px}.battle-scoreboard-teams section+section{border-left:0;border-top:1px solid #20394b}.score-mini-row{height:35px;grid-template-columns:30px 1fr}.score-mini-portrait{width:28px;height:28px}.score-mini-top b{max-width:110px;font-size:8px}.score-mini-kda{font-size:8px}.score-mini-cs{font-size:7px}.score-item{width:14px;height:14px;font-size:7px}
+ .mobile-score-toggle{display:block;position:absolute;right:68px;top:48px;z-index:89;border:1px solid #b99b55;background:#102230e8;color:#e7cf8e;padding:6px 9px;font-size:8px;font-weight:900;border-radius:3px}
+}
+@media (max-width:430px){.battle-scoreboard{left:58px;right:58px;bottom:68px;height:min(58dvh,390px)}.mobile-score-toggle{right:60px;top:43px;padding:5px 8px;font-size:7px}}
+</style>
 </head>
 <body>
 <div class="app" id="app"></div>
@@ -696,6 +709,41 @@ body=`<div class="final-screen"><div class="final-top"><div class="unused-pool" 
 if(mode==="loading"){
 body=`<div class="loading-screen"><div class="loading-inner"><div class="loading-kicker">무작위 총력전 · 아수라장</div><h2>게임을 불러오는 중</h2><div class="loading-vs"><div class="loading-team"><div class="loading-title">우리 팀</div>${teamPicks.map((c,i)=>`<div class="loading-card blue-card"><div class="loading-art"><img src="assets/champions/${championImageId(c.id)}_0.jpg" onerror="this.style.display='none';this.parentElement.innerHTML='<span>${c.icon}</span>'"></div><div class="loading-champ">${c.name}</div><div class="loading-nick">${party[i].nickname}</div></div>`).join("")}</div><div class="vs-mark">VS</div><div class="loading-team enemy-loading"><div class="loading-title">적 팀</div>${enemyTeam.map((e,i)=>`<div class="loading-card red-card"><div class="loading-art"><img src="assets/champions/${championImageId(e.champ.id)}_0.jpg" onerror="this.style.display='none';this.parentElement.innerHTML='<span>${e.champ.icon}</span>'"></div><div class="loading-champ">${e.champ.name}</div><div class="loading-nick">${e.nick}</div></div>`).join("")}</div></div><div class="loading-count">${loadingSeconds}</div><div class="loading-bar"><div style="width:${((10-loadingSeconds)/10)*100}%"></div></div><p>전장이 준비되고 있습니다...</p></div></div>`;
 }
+function battleItemSymbol(u,i){
+ const pool=['⚔','◆','✦','◈','⬟','✧'];
+ const role=(u?.champ?.roles||[])[0]||'Fighter';
+ const off={Tank:1,Mage:2,Assassin:0,Marksman:3,Support:4,Fighter:0}[role]||0;
+ return pool[(i+off)%pool.length];
+}
+function battleItemCount(u){
+ const g=Math.max(0,u?.gold||0);
+ return Math.max(1,Math.min(6,1+Math.floor(Math.max(0,g-1400)/2200)));
+}
+function scoreboardRowHtml(u,enemy=false){
+ const itemCount=battleItemCount(u);
+ return `<div class="score-mini-row ${enemy?'enemy':''}" data-score-unit="${u.id}">
+   <div class="score-mini-portrait"><img src="assets/champions/${championImageId(u.champ.id)}_0.jpg" onerror="this.style.display='none';this.parentElement.textContent='${u.icon}'"></div>
+   <div class="score-mini-main"><div class="score-mini-top"><b>${u.nick}</b><span class="score-mini-kda">${u.kills||0}/${u.deaths||0}/${u.assists||0}</span><span class="score-mini-cs">CS ${u.cs||0}</span></div>
+   <div class="score-mini-items">${[0,1,2,3,4,5].map(i=>`<i class="score-item ${i<itemCount?'filled':''}" data-item="${i}">${i<itemCount?battleItemSymbol(u,i):''}</i>`).join('')}</div></div>
+ </div>`;
+}
+function battleScoreboardHtml(bs){
+ return `<div class="battle-scoreboard" id="battleScoreboard"><div class="battle-scoreboard-head"><span>전투 현황</span><button class="score-close" onclick="toggleBattleScoreboard(false)">×</button></div><div class="battle-scoreboard-teams"><section><h4>우리 팀</h4>${bs.team.map(u=>scoreboardRowHtml(u,false)).join('')}</section><section><h4>적 팀</h4>${bs.enemy.map(u=>scoreboardRowHtml(u,true)).join('')}</section></div></div><button class="mobile-score-toggle" onclick="toggleBattleScoreboard()">현황</button>`;
+}
+function toggleBattleScoreboard(force){
+ const p=document.getElementById('battleScoreboard');if(!p)return;
+ const open=typeof force==='boolean'?force:!p.classList.contains('open');
+ p.classList.toggle('open',open);
+}
+function syncBattleScoreboard(){
+ const bs=battleState;if(!bs)return;
+ for(const u of bs.team.concat(bs.enemy)){
+   const row=document.querySelector(`[data-score-unit="${u.id}"]`);if(!row)continue;
+   const k=row.querySelector('.score-mini-kda');if(k)k.textContent=`${u.kills||0}/${u.deaths||0}/${u.assists||0}`;
+   const cs=row.querySelector('.score-mini-cs');if(cs)cs.textContent=`CS ${u.cs||0}`;
+   const cnt=battleItemCount(u);row.querySelectorAll('.score-item').forEach((el,i)=>{el.classList.toggle('filled',i<cnt);el.textContent=i<cnt?battleItemSymbol(u,i):''});
+ }
+}
 if(mode==="battle"){
 const bs=battleState || {time:0,status:"전투 준비 중",team:[],enemy:[],log:[],speed:1,structures:[],relics:[],fx:[]};
 const portrait=(u)=>`<div class="portrait"><img src="assets/champions/${championImageId(u.champ.id)}_0.jpg" onerror="this.style.display='none';this.parentElement.textContent='${u.icon}'"></div>`;
@@ -704,6 +752,7 @@ const row=(u,right=false)=>`<div class="b2-unit ${u.alive?"":"dead"}" data-hud-u
 body=`<div class="battle-v2"><div class="b2-head"><div></div><div><div class="b2-score"><span class="blue">${bs.teamKills||0}</span> &nbsp; ⚔ &nbsp; <span class="red">${bs.enemyKills||0}</span></div><div class="b2-clock">${formatBattleTime(bs.time)}</div></div><div class="b2-right">${bs.status}</div></div><div class="b2-main"><aside class="b2-side"><div class="b2-side-title">우리 팀</div>${bs.team.map(u=>row(u,false)).join("")}</aside><div class="b2-stage"><div class="b2-map"><div class="clean-bridge"></div></div>
 <div class="structure-track">${bs.structures.map(st=>`<div class="b2-structure ${st.team==='enemy'?'red':''} ${st.type} ${st.alive?'':'dead'}" data-structure="${st.id}" style="left:${st.x}%"><div class="sicon">${st.type==='nexus'?'◆':st.type==='inhib'?'✦':'▥'}</div><div class="sname">${st.name} · ${Math.max(0,Math.round(st.hp))}%</div></div>`).join("")}</div>
 ${bs.units.filter(u=>u.kind==='champ').map(u=>unitV2Html(u)).join("")}
+${battleScoreboardHtml(bs)}
 <div class="b2-speed-dock">${[.5,1,2,4,8,16,32].map(v=>`<button class="${bs.speed===v?'active':''}" onclick="setBattleSpeed(${v})">${v}×</button>`).join('')}</div><div class="b2-panel"><div class="b2-panel-head"><span>LIVE MATCH LOG</span><span>${formatBattleTime(bs.time)}</span></div><div class="b2-log">${bs.log.slice(-9).map(x=>`<div>${x}</div>`).join("")}</div><div class="b2-controls"><button class="${bs.speed===.5?'active':''}" onclick="setBattleSpeed(.5)">0.5×</button><button class="${bs.speed===1?'active':''}" onclick="setBattleSpeed(1)">1×</button><button class="${bs.speed===2?'active':''}" onclick="setBattleSpeed(2)">2×</button><button class="${bs.speed===4?'active':''}" onclick="setBattleSpeed(4)">4×</button><button class="${bs.speed===8?'active':''}" onclick="setBattleSpeed(8)">8×</button><button class="${bs.speed===16?'active':''}" onclick="setBattleSpeed(16)">16×</button><button class="${bs.speed===32?'active':''}" onclick="setBattleSpeed(32)">32×</button></div></div><div class="match-all-chat"><div class="match-all-chat-head">전체 채팅</div><div class="match-all-chat-body">${(bs.chat||[]).slice(-7).map(x=>`<div>${x}</div>`).join("")}</div></div>${bs.jaebinEventOpen?`<div class="chat-event-overlay"><div class="chat-event-card"><div class="event-mark">!</div><h2>이재빈이 전체 채팅을 시도하려고 합니다</h2><p>허락하시겠습니까?</p><div class="warn">‼️ 상대방의 멘탈이 흔들리거나 오히려 각성할 수 있습니다.</div><div class="chat-event-actions"><button onclick="allowJaebinChat()">허락하기</button><button class="deny" onclick="denyJaebinChat()">반대하기</button></div></div></div>`:""}${augmentOverlayHtml(bs)}</div><aside class="b2-side right"><div class="b2-side-title">적 팀</div>${bs.enemy.map(u=>row(u,true)).join("")}</aside></div></div>`;
 }
 if(mode==="battleEnd"){
@@ -1067,7 +1116,7 @@ function createChampionUnit(team,index,champ,nick,realName=null){
  const speed=(2.1+Math.random()*.25)*(1+power*.06);
  const formation=championFormation(champ);
  const combatRange=formation==='back'?6.8:4.9;
- return {id:`${team}-c${index}`,kind:'champ',team,champ,nick,realName,icon:champ.icon,x:team==='team'?8:92,y:36+index*7,maxHp,hp:maxHp,level:3,gold:1400,xp:0,atk,range:combatRange,speed,roleStats,roleSkill,formation,attackCd:0,alive:true,respawn:0,laneBias:(index-2)*5.2,phase:Math.random()*6.28,kills:0,deaths:0,assists:0,damageDealt:0,damageTaken:0,augments:[]};
+ return {id:`${team}-c${index}`,kind:'champ',team,champ,nick,realName,icon:champ.icon,x:team==='team'?8:92,y:36+index*7,maxHp,hp:maxHp,level:3,gold:1400,xp:0,atk,range:combatRange,speed,roleStats,roleSkill,formation,attackCd:0,alive:true,respawn:0,laneBias:(index-2)*5.2,phase:Math.random()*6.28,kills:0,deaths:0,assists:0,cs:0,damageDealt:0,damageTaken:0,augments:[]};
 }
 function createMinion(team,type='melee'){const cannon=type==='cannon';return {id:`m-${team}-${Math.random()}`,kind:'minion',minionType:type,team,nick:'미니언',xpValue:cannon?100:type==='ranged'?32:65,x:team==='team'?7:93,y:46+Math.random()*8,maxHp:cannon?45:type==='melee'?30:23,hp:cannon?45:type==='melee'?30:23,atk:cannon?3.2:type==='melee'?2.0:1.7,range:cannon?4:type==='ranged'?4.2:2.4,speed:1.45,attackCd:0,alive:true,laneBias:(Math.random()-.5)*6,phase:Math.random()*6.28}}
 function startBattle(){
@@ -1080,7 +1129,7 @@ function startBattle(){
  const structures=[
  {id:'tn1',team:'team',type:'nexus',name:'넥서스',x:5,y:50,hp:100,alive:true},{id:'tt1',team:'team',type:'tower',name:'쌍둥이 포탑',x:9,y:50,hp:100,alive:true},{id:'tt2',team:'team',type:'tower',name:'쌍둥이 포탑',x:12,y:50,hp:100,alive:true},{id:'ti',team:'team',type:'inhib',name:'억제기',x:17,y:50,hp:100,alive:true},{id:'t2',team:'team',type:'tower',name:'2차 포탑',x:28,y:50,hp:100,alive:true},{id:'t1',team:'team',type:'tower',name:'1차 포탑',x:40,y:50,hp:100,alive:true},
  {id:'e1',team:'enemy',type:'tower',name:'1차 포탑',x:60,y:50,hp:100,alive:true},{id:'e2',team:'enemy',type:'tower',name:'2차 포탑',x:72,y:50,hp:100,alive:true},{id:'ei',team:'enemy',type:'inhib',name:'억제기',x:83,y:50,hp:100,alive:true},{id:'et1',team:'enemy',type:'tower',name:'쌍둥이 포탑',x:88,y:50,hp:100,alive:true},{id:'et2',team:'enemy',type:'tower',name:'쌍둥이 포탑',x:91,y:50,hp:100,alive:true},{id:'en1',team:'enemy',type:'nexus',name:'넥서스',x:95,y:50,hp:100,alive:true}];
- battleState={time:0,lastTs:performance.now(),lastUiSync:0,status:'경기 진행 중',speed:1,team,enemy,units:[...team,...enemy],structures,relics:[],fx:[],fxSeq:0,log:[],chat:[],teamKills:0,enemyKills:0,nextWaveAt:45,waveCount:0,superTeam:false,superEnemy:false,paused:false,jaebinEventAt:180+Math.random()*300,jaebinEventDone:false,jaebinEventOpen:false,jaebinEventResult:null,augmentOpen:false,augmentStage:null,augmentChoices:[],augments:[],augmentDone:{start:false,7:false,11:false,15:false},augmentTierByStage:{},endPending:null,akaliChatAt:420+Math.random()*60,akaliChatDone:false,teamCompMultiplier:teamComp,enemyCompMultiplier:enemyComp};
+ battleState={time:0,lastTs:performance.now(),lastUiSync:0,status:'경기 진행 중',speed:1,team,enemy,units:[...team,...enemy],structures,relics:[],fx:[],fxSeq:0,log:[],chat:[],teamKills:0,enemyKills:0,nextWaveAt:45,waveCount:0,superTeam:false,superEnemy:false,paused:false,jaebinEventAt:180+Math.random()*300,jaebinEventDone:false,jaebinEventOpen:false,jaebinEventResult:null,jaebinChatAttempted:false,augmentOpen:false,augmentStage:null,augmentChoices:[],augments:[],augmentDone:{start:false,7:false,11:false,15:false},augmentTierByStage:{},endPending:null,akaliChatAt:420+Math.random()*60,akaliChatDone:false,teamCompMultiplier:teamComp,enemyCompMultiplier:enemyComp};
  if(party.some(c=>c.id==='siljeom')) battleState.chat.push(`<span class="all-tag">[전체]</span> <span class="ally-chat">실점:</span> 안녕하세요~ 매너게임이요 ^^`);
  mode='battle';render();setTimeout(()=>{if(mode==='battle'&&battleState&&!battleState.augmentDone.start)openAugment('start')},120);window.__battleRAF=requestAnimationFrame(battleFrame);
 }
@@ -1136,7 +1185,7 @@ function killLog(attacker,target){
  const allies=bs.units.filter(u=>u.kind==='champ'&&u.team===attacker.team&&u!==attacker&&u.alive&&Math.hypot(u.x-target.x,u.y-target.y)<14); allies.forEach(u=>u.assists=(u.assists||0)+1);
  bs.log.push(`[${formatBattleTime(bs.time)}] <span class="${at}">${attacker.nick||attacker.name||'포탑'}</span> → <span class="${tt}">${target.nick}</span> 처치`);
 }
-function dealDamage(attacker,target,dmg){if(!target.alive)return;const out=attacker.kind==='champ'?combatPerformanceMultiplier(attacker):1;const guard=target.kind==='champ'?Math.sqrt(Math.max(.20,combatPerformanceMultiplier(target))):1;dmg=dmg*out/guard;if(attacker.kind==='champ')attacker.damageDealt=(attacker.damageDealt||0)+dmg*12;if(target.kind==='champ')target.damageTaken=(target.damageTaken||0)+dmg*12;target.hp-=dmg;if(target.hp<=0){target.hp=0;target.alive=false;if(target.kind==='minion')grantMinionXp(target);if(target.kind==='champ'){target.respawn=respawnSeconds(target);addFx(target.x,target.y,'KO',attacker.team);killLog(attacker,target)}}else if(Math.random()<.035&&attacker.kind==='champ'){addFx(target.x,target.y,`-${Math.max(1,Math.round(dmg*12))}`,attacker.team)}}
+function dealDamage(attacker,target,dmg){if(!target.alive)return;const out=attacker.kind==='champ'?combatPerformanceMultiplier(attacker):1;const guard=target.kind==='champ'?Math.sqrt(Math.max(.20,combatPerformanceMultiplier(target))):1;dmg=dmg*out/guard;if(attacker.kind==='champ')attacker.damageDealt=(attacker.damageDealt||0)+dmg*12;if(target.kind==='champ')target.damageTaken=(target.damageTaken||0)+dmg*12;target.hp-=dmg;if(target.hp<=0){target.hp=0;target.alive=false;if(target.kind==='minion'){if(attacker.kind==='champ')attacker.cs=(attacker.cs||0)+1;grantMinionXp(target);}if(target.kind==='champ'){target.respawn=respawnSeconds(target);addFx(target.x,target.y,'KO',attacker.team);killLog(attacker,target)}}else if(Math.random()<.035&&attacker.kind==='champ'){addFx(target.x,target.y,`-${Math.max(1,Math.round(dmg*12))}`,attacker.team)}}
 function damageStructure(st,dmg,attacker){
  const bs=battleState;if(!st||!st.alive||!attacker||!isStructureTargetable(st,attacker.team))return;
  const tempo=bs.time>15*60?2.15:bs.time>10*60?1.45:1;
@@ -1245,6 +1294,7 @@ function triggerJaebinEvent(){
 }
 function allowJaebinChat(){
  const bs=battleState;if(!bs||!bs.jaebinEventOpen)return;
+ bs.jaebinChatAttempted=true;
  const target=bs.enemy[Math.floor(Math.random()*bs.enemy.length)];
  bs.chat.push(`<span class="all-tag">[전체]</span> <span class="ally-chat">Nguyen Ngoc Tu:</span> ${target.nick}님은 진짜 개못하시네 ㅋㅋ`);
  bs.chat.push(`<span class="all-tag">[전체]</span> <span class="ally-chat">Nguyen Ngoc Tu:</span> 쳐 접으셈 그냥`);
@@ -1256,7 +1306,7 @@ function allowJaebinChat(){
  bs.jaebinEventDone=true;bs.jaebinEventOpen=false;bs.paused=false;bs.status='경기 진행 중';bs.lastTs=performance.now();render();window.__battleRAF=requestAnimationFrame(battleFrame);
 }
 function denyJaebinChat(){const bs=battleState;if(!bs)return;bs.chat.push(`<span class="all-tag">[SYSTEM]</span> 이재빈의 전체 채팅을 막았습니다.`);bs.jaebinEventDone=true;bs.jaebinEventOpen=false;bs.paused=false;bs.status='경기 진행 중';bs.lastTs=performance.now();render();window.__battleRAF=requestAnimationFrame(battleFrame)}
-function checkEnd(){const bs=battleState;if(bs.endPending&&performance.now()>=bs.endPending.realAt){const winner=bs.endPending.winner;bs.status=winner==='team'?'우리 팀 승리':'적 팀 승리';if(winner==='team'){if(party.some(c=>c.id==='siljeom'))bs.chat.push(`<span class="all-tag">[전체]</span> <span class="ally-chat">실점:</span> 죽어 그냥 ㅋㅋ`);if(party.some(c=>c.id==='nguyen'))bs.chat.push(`<span class="all-tag">[전체]</span> <span class="ally-chat">Nguyen Ngoc Tu:</span> 나1가`);if(party.some(c=>c.id==='3patourwan'))for(let i=0;i<4;i++)bs.chat.push(`<span class="all-tag">[전체]</span> <span class="ally-chat">쓰리빠뚜르완:</span> ㅋ`);if(party.some(c=>c.id==='joguk'))bs.chat.push(`<span class="all-tag">[전체]</span> <span class="ally-chat">조국:</span> 븅`);if(party.some(c=>c.id==='molcho'))bs.chat.push(`<span class="all-tag">[팀원]</span> <span class="ally-chat">몰초:</span> 쉽네 쉬워`);}else{if(party.some(c=>c.id==='nguyen'))bs.chat.push(`<span class="all-tag">[전체]</span> <span class="ally-chat">Nguyen Ngoc Tu:</span> 근데 지고 자..?`);if(party.some(c=>c.id==='siljeom'))bs.chat.push(`<span class="all-tag">[전체]</span> <span class="ally-chat">실점:</span> 지고 자는 건 에바긴 해`);if(party.some(c=>c.id==='3patourwan'))bs.chat.push(`<span class="all-tag">[전체]</span> <span class="ally-chat">쓰리빠뚜르완:</span> 찐막?`);if(party.some(c=>c.id==='joguk'))bs.chat.push(`<span class="all-tag">[전체]</span> <span class="ally-chat">조국:</span> 고조할배찐막?`);}matchResult={winner,time:bs.time,teamKills:bs.teamKills,enemyKills:bs.enemyKills,team:bs.team.map(u=>({...u})),enemy:bs.enemy.map(u=>({...u})),chat:[...(bs.chat||[])]};mode='battleEnd';render();return true}return false}
+function checkEnd(){const bs=battleState;if(bs.endPending&&performance.now()>=bs.endPending.realAt){const winner=bs.endPending.winner;bs.status=winner==='team'?'우리 팀 승리':'적 팀 승리';if(winner==='team'){if(party.some(c=>c.id==='siljeom'))bs.chat.push(`<span class="all-tag">[전체]</span> <span class="ally-chat">실점:</span> 죽어 그냥 ㅋㅋ`);if(party.some(c=>c.id==='nguyen'))bs.chat.push(`<span class="all-tag">[전체]</span> <span class="ally-chat">Nguyen Ngoc Tu:</span> 나1가`);if(party.some(c=>c.id==='3patourwan'))for(let i=0;i<4;i++)bs.chat.push(`<span class="all-tag">[전체]</span> <span class="ally-chat">쓰리빠뚜르완:</span> ㅋ`);if(party.some(c=>c.id==='joguk'))bs.chat.push(`<span class="all-tag">[전체]</span> <span class="ally-chat">조국:</span> 븅`);if(party.some(c=>c.id==='molcho'))bs.chat.push(`<span class="all-tag">[팀원]</span> <span class="ally-chat">몰초:</span> 쉽네 쉬워`);}else{if(party.some(c=>c.id==='nguyen'))bs.chat.push(`<span class="all-tag">[전체]</span> <span class="ally-chat">Nguyen Ngoc Tu:</span> 근데 지고 자..?`);if(party.some(c=>c.id==='siljeom'))bs.chat.push(`<span class="all-tag">[전체]</span> <span class="ally-chat">실점:</span> 지고 자는 건 에바긴 해`);if(party.some(c=>c.id==='3patourwan'))bs.chat.push(`<span class="all-tag">[전체]</span> <span class="ally-chat">쓰리빠뚜르완:</span> 찐막?`);if(party.some(c=>c.id==='joguk'))bs.chat.push(`<span class="all-tag">[전체]</span> <span class="ally-chat">조국:</span> 고조할배찐막?`);if(bs.jaebinChatAttempted){const jaebinUnit=bs.team.find(u=>u.realName==='이재빈'||u.nick==='Nguyen Ngoc Tu');const champName=jaebinUnit?.champ?.name||'그 챔피언';const taunts=['이기고 자라 ㅋㅋㅋㅋㅋㅋㅋㅋㅋ',`${champName} 너는 진짜 접어라 ㅇㅇ`,'그 조합으로 쳐지네 ㅋㅋㅋㅋㅋㅋㅋㅋㅋㅋ','ez','븅신 ㅋㅋㅋㅋㅋㅋㅋㅋㅋㅋㅋㅋ'];bs.enemy.slice(0,5).forEach((u,i)=>bs.chat.push(`<span class="all-tag">[전체]</span> <span class="enemy-chat">${u.nick}:</span> ${taunts[i]}`));}}matchResult={winner,time:bs.time,teamKills:bs.teamKills,enemyKills:bs.enemyKills,team:bs.team.map(u=>({...u})),enemy:bs.enemy.map(u=>({...u})),chat:[...(bs.chat||[])]};mode='battleEnd';render();return true}return false}
 function battleFrame(ts){if(mode!=='battle'||!battleState)return;
  const bs=battleState;if(bs.paused){bs.lastTs=ts;return;}
  if(bs.endPending){bs.lastTs=ts;syncBattleDom();if(checkEnd())return;window.__battleRAF=requestAnimationFrame(battleFrame);return;}let raw=Math.min(.05,(ts-bs.lastTs)/1000);bs.lastTs=ts;let dt=Math.min(.8,raw*bs.speed);bs.time+=dt;
@@ -1306,6 +1356,7 @@ function syncBattleDom(){const bs=battleState;const clock=document.querySelector
      requestAnimationFrame(()=>{const c=document.querySelector('.match-all-chat-body');if(c)c.scrollTop=c.scrollHeight});
    }
  }
+ syncBattleScoreboard();
  const fxWrap=document.querySelector('.b2-stage');if(fxWrap){document.querySelectorAll('[data-fx]').forEach(el=>el.remove());for(const f of bs.fx){const d=document.createElement('div');d.className='b2-fx '+(f.team==='enemy'?'red':'blue');d.dataset.fx=f.id;const p=screenPos(f.x,f.y);d.style.left=p.left+'%';d.style.top=p.top+'%';d.textContent=f.text;fxWrap.appendChild(d)}}}
 function choose(id){me=chars.find(c=>c.id===id);render()}
 function goMethod(){mode="method";render()}
@@ -1800,5 +1851,56 @@ render();
   .final-center{display:none!important;}
   .final-main{padding-bottom:0!important;}
   .final-team{padding-bottom:8px!important;}
+}
+</style>
+<style id="v65-pick-chat-font-fix">
+/* V65: restore clean sans-serif champion typography and enlarge desktop pick chat */
+.champ-card .cc-bottom strong,
+.champ-top .title strong,
+.final-top .picked-title strong,
+.final-team .pick-meta strong,
+.final-enemy .pick-meta strong,
+.final-center .hero-champ h2,
+.center-select h2{
+  font-family:Arial,"Noto Sans KR","Apple SD Gothic Neo",sans-serif!important;
+  font-weight:900!important;
+  letter-spacing:-.025em!important;
+  text-shadow:none!important;
+}
+@media (min-width:801px){
+  .final-chat-left{
+    width:min(520px,42vw)!important;
+    height:300px!important;
+    left:20px!important;
+    bottom:20px!important;
+  }
+  .final-chat-head{
+    height:44px!important;
+    flex-basis:44px!important;
+    padding:0 16px!important;
+    font-size:15px!important;
+    letter-spacing:3px!important;
+  }
+  .final-chat-body{
+    height:calc(100% - 44px)!important;
+    padding:16px 16px 20px!important;
+    overflow-y:auto!important;
+    font-size:17px!important;
+    line-height:1.72!important;
+  }
+  .final-chat-body .chat-line{
+    font-size:17px!important;
+    line-height:1.72!important;
+    margin-bottom:10px!important;
+  }
+  .final-chat-body .tip{
+    font-size:16px!important;
+    line-height:1.72!important;
+  }
+}
+@media (min-width:1500px){
+  .final-chat-left{width:560px!important;height:330px!important;}
+  .final-chat-body,.final-chat-body .chat-line{font-size:18px!important;}
+  .final-chat-body .tip{font-size:17px!important;}
 }
 </style>
