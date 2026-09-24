@@ -16,6 +16,33 @@ button{font:inherit}.app{min-height:100vh;max-width:1050px;margin:auto;padding:3
 .members{display:grid;gap:9px;margin-bottom:20px}.member{display:flex;align-items:center;width:100%;padding:15px;background:#191a17;border:1px solid #34352f;color:#eeeae2;cursor:pointer;text-align:left}.member.sel{border-color:#a58d57}.member .box{width:22px;height:22px;border:1px solid #555750;margin-right:14px;text-align:center;line-height:20px}.member.sel .box{background:#b69b61;color:#111}.member b{display:block}.member small{display:block;color:#777970;margin-top:3px}.counter{margin-left:auto;color:#b69b61;font-weight:800}
 .phonewrap{max-width:430px;margin:auto}.phone{border:1px solid #3b3c37;box-shadow:0 25px 70px #0008;background:#aebfc9;overflow:hidden}.head{height:66px;background:#20211e;display:flex;align-items:center;gap:12px;padding:10px 14px}.head button{border:0;background:none;color:#aaa;font-size:28px;cursor:pointer}.head div{flex:1}.head strong{display:block;font-size:14px}.head small{color:#7e8179;font-size:10px}.head em{font-style:normal;color:#777970;letter-spacing:3px}.chat{min-height:500px;padding:16px 13px;background:linear-gradient(135deg,#b8c8d0,#a9bcc6)}.date{width:max-content;margin:0 auto 18px;background:#58666caa;color:#fff;border-radius:12px;padding:5px 9px;font-size:9px}.msg{margin:0 0 14px 3px;max-width:80%;animation:in .25s}.msg.mine{margin-left:auto;margin-right:3px;text-align:right}.who{font-size:10px;color:#475055;font-weight:800;margin:0 3px 4px}.bubble{display:inline-block;background:#fff;color:#202326;padding:9px 11px;border-radius:4px 11px 11px 11px;font-size:13px;box-shadow:0 1px 2px #0002}.mine .bubble{background:#f8df64;border-radius:11px 4px 11px 11px}.typing{display:flex;gap:3px;background:#fff;padding:9px 12px;width:max-content;border-radius:4px 11px 11px 11px}.typing i{width:4px;height:4px;border-radius:50%;background:#888;animation:b 1s infinite}.typing i:nth-child(2){animation-delay:.15s}.typing i:nth-child(3){animation-delay:.3s}.system{width:max-content;margin:25px auto 0;background:#56646aaa;color:#fff;border-radius:10px;padding:6px 10px;font-size:9px}.input{height:52px;background:#20211e;color:#6f726b;display:flex;align-items:center;padding:0 12px;font-size:11px}.input span{flex:1}.input b{color:#a58d57;margin-left:14px;font-size:16px}.party{display:grid;gap:9px;margin-bottom:18px}.pm{display:flex;align-items:center;padding:15px;border:1px solid #34352f;background:#191a17}.pm .pn{width:28px;color:#9b895c;font-weight:900}.pm div{flex:1}.pm strong{display:block}.pm small{display:block;color:#777970;margin-top:3px}.pm em{font-style:normal;font-size:9px;color:#a58d57}
 .ready{display:flex;gap:18px;align-items:center;margin-bottom:25px}.mark{width:48px;height:48px;border-radius:50%;background:#a58d57;color:#171712;display:grid;place-items:center;font-size:25px;font-weight:900}.ready h2{margin:3px 0;font-size:25px}.ready p{margin:0;color:#898b83;font-size:12px}
+
+.queue-shell{min-height:610px;background:#07131c;border:1px solid #293d48;box-shadow:0 24px 70px #0008;position:relative;overflow:hidden}
+.queue-shell:before{content:"";position:absolute;inset:0;background:radial-gradient(circle at 50% 35%,#173747 0,#0a1b25 38%,#061017 75%);opacity:.8}
+.queue-top{position:relative;z-index:1;height:58px;border-bottom:1px solid #263943;background:#09131aee;display:flex;align-items:center;padding:0 20px;gap:28px}
+.queue-top .lolmark{font-weight:1000;font-size:16px;color:#d5b86b;letter-spacing:1px}
+.queue-top .navitem{font-size:12px;color:#ddd9cf;font-weight:800}
+.queue-top .navitem.dim{color:#68757a}
+.queue-map{position:relative;z-index:1;text-align:center;padding:28px 15px 5px}
+.queue-map .map-kicker{font-size:10px;letter-spacing:3px;color:#8e9b99;font-weight:900}
+.queue-map h2{margin:8px 0 3px;font-size:24px;color:#f1eee6}
+.queue-map p{margin:0;color:#8e9b99;font-size:11px}
+.queue-slots{position:relative;z-index:1;display:grid;grid-template-columns:repeat(5,1fr);gap:8px;padding:30px 28px 18px;max-width:930px;margin:auto}
+.qslot{height:275px;border:1px solid #314650;background:linear-gradient(180deg,#10242fdd,#07131bdd);position:relative;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;padding:15px 7px}
+.qslot.me{border-color:#b39758;box-shadow:inset 0 0 0 1px #6d5a32}
+.qslot .ring{position:absolute;top:48px;width:88px;height:88px;border-radius:50%;border:2px solid #39728e;box-shadow:0 0 22px #1b668588,inset 0 0 18px #1b668533}
+.qslot.me .ring{border-color:#b39758;box-shadow:0 0 24px #a27e3388}
+.qslot .silhouette{position:absolute;top:66px;font-size:37px;opacity:.42;color:#9fb2b5}
+.qslot .role{position:absolute;top:16px;font-size:9px;color:#64777d;letter-spacing:1px}
+.qslot .qname{font-size:13px;font-weight:900;color:#eeeae2;position:relative;z-index:2;text-align:center}
+.qslot .qreal{font-size:9px;color:#6f7d80;margin-top:4px;position:relative;z-index:2}
+.qslot .you{font-size:8px;color:#c2a667;margin-top:7px;letter-spacing:2px}
+.queue-bottom{position:relative;z-index:2;margin-top:5px;border-top:1px solid #273943;background:#081219ee;min-height:116px;display:flex;align-items:center;justify-content:center;gap:18px}
+.findbtn{min-width:230px;padding:14px 24px;border:1px solid #a88e52;background:linear-gradient(#b39a5e,#8f783f);color:#10130f;font-weight:1000;letter-spacing:.5px;cursor:pointer}
+.findbtn.searching{background:#263c46;color:#c7d0cf;border-color:#58707b;cursor:default}
+.cancelbtn{border:0;background:none;color:#7f8b8d;font-size:11px;cursor:pointer}
+.queue-status{position:absolute;left:22px;bottom:17px;color:#66777b;font-size:9px;letter-spacing:1px}
+@media(max-width:800px){.queue-slots{grid-template-columns:repeat(5,130px);overflow-x:auto;justify-content:start}.qslot{height:240px}.queue-bottom{position:relative}.queue-shell{min-height:590px}}
 @keyframes in{from{opacity:0;transform:translateY(7px)}to{opacity:1;transform:none}}@keyframes b{0%,60%,100%{transform:none;opacity:.5}30%{transform:translateY(-3px);opacity:1}}
 @media(max-width:700px){.app{padding:22px 16px}.grid{grid-template-columns:1fr 1fr}.calls{grid-template-columns:1fr}.top h1{font-size:21px}.step{display:none}}
 </style>
@@ -28,7 +55,7 @@ const chars=[
 ["joguk","조국","임도현"],["mundolmaeng","문돌맹","이동기"],["nguyen","Nguyen Ngoc Tu","이재빈"],
 ["dwaemesa","돼메사","조시원"],["galio","갈리오","김정운"],["dage","다케스탄 출신","황재윤"]
 ].map(x=>({id:x[0],nickname:x[1],name:x[2]}));
-let mode="select", me=null, selected=[], party=[], chatMembers=[], replies=0, privateIndex=0, privateTargets=[];
+let mode="select", me=null, selected=[], party=[], chatMembers=[], replies=0, privateIndex=0, privateTargets=[], searching=false, queueSeconds=0, queueTimer=null;
 
 const app=document.getElementById("app");
 const shuffle=a=>[...a].sort(()=>Math.random()-.5);
@@ -70,9 +97,28 @@ ${button(privateIndex===3?"파티 확인 →":privateIndex===0?"답장 기다리
 if(mode==="party"){
 body=`<div class="ready"><div class="mark">✓</div><div><div class="eyebrow">PARTY READY</div><h2>파티가 구성되었습니다.</h2><p>5명이 게임에 참가합니다.</p></div></div>
 <div class="party">${party.map((c,i)=>`<div class="pm"><span class="pn">0${i+1}</span><div><strong>${c.nickname}</strong><small>${c.name}</small></div>${i===0?"<em>YOU</em>":""}</div>`).join("")}</div>
-${button("처음으로 돌아가기",false,"reset()")}`;
+${button("게임 대기열로 →",false,"goQueue()")}`;
+}
+if(mode==="queue"){
+body=`<div class="queue-shell">
+<div class="queue-top"><div class="lolmark">◈</div><div class="navitem">전략적 팀 전투</div><div class="navitem">소환사의 협곡</div><div class="navitem">무작위 총력전</div><div class="navitem dim">연습 모드</div></div>
+<div class="queue-map"><div class="map-kicker">GAME MODE</div><h2>무작위 총력전 · 아수라장</h2><p>5명의 파티가 게임을 준비했습니다.</p></div>
+<div class="queue-slots">${party.map((c,i)=>`<div class="qslot ${i===0?"me":""}"><div class="role">${i===0?"PARTY LEADER":"PARTY MEMBER"}</div><div class="ring"></div><div class="silhouette">◉</div><div class="qname">${c.nickname}</div><div class="qreal">${c.name}</div>${i===0?'<div class="you">YOU</div>':""}</div>`).join("")}</div>
+<div class="queue-bottom"><div class="queue-status">${searching?`게임 찾는 중 · ${String(Math.floor(queueSeconds/60)).padStart(2,"0")}:${String(queueSeconds%60).padStart(2,"0")}`:"준비 완료 · 5인 파티"}</div>
+${searching?`<button class="findbtn searching">게임 찾는 중...</button><button class="cancelbtn" onclick="stopQueue()">취소</button>`:`<button class="findbtn" onclick="startQueue()">게임 찾기</button>`}</div>
+</div>`;
 }
 app.innerHTML=header(mode==="select"?"01 / CHARACTER":mode==="method"?"02 / CALL":"03 / PARTY")+`<main>${body}</main>`;
+}
+function goQueue(){mode="queue";searching=false;queueSeconds=0;render()}
+function startQueue(){
+  if(searching)return;
+  searching=true;queueSeconds=0;render();
+  clearInterval(queueTimer);
+  queueTimer=setInterval(()=>{queueSeconds++;render()},1000);
+}
+function stopQueue(){
+  searching=false;clearInterval(queueTimer);render();
 }
 function choose(id){me=chars.find(c=>c.id===id);render()}
 function goMethod(){mode="method";render()}
@@ -82,7 +128,7 @@ function finishGroup(){mode="party";render()}
 function toggle(id){selected=selected.includes(id)?selected.filter(x=>x!==id):selected.length<4?[...selected,id]:selected;render()}
 function startPrivate(){party=[me,...chars.filter(c=>selected.includes(c.id))];privateTargets=party.slice(1);privateIndex=0;mode="private";render();setTimeout(()=>{privateIndex=1;render()},1100)}
 function nextPrivate(){if(privateIndex<3){privateIndex++;render()}else{mode="party";render()}}
-function reset(){mode="select";me=null;selected=[];party=[];chatMembers=[];replies=0;privateIndex=0;render()}
+function reset(){clearInterval(queueTimer);mode="select";me=null;selected=[];party=[];chatMembers=[];replies=0;privateIndex=0;searching=false;queueSeconds=0;render()}
 render();
 </script>
 </body>

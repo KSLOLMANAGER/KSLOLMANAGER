@@ -1,1 +1,1 @@
-GitHub Pages용 단일 HTML 버전입니다. index.html 하나만 올리고 Settings > Pages > Source: Deploy from a branch > main > /(root)로 설정하면 됩니다.
+GitHub Pages 초간단 버전. index.html을 저장소 루트에 올린 뒤 Settings > Pages > Deploy from a branch > main > /(root)로 설정하세요.
