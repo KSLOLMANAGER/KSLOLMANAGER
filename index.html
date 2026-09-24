@@ -580,6 +580,11 @@ button{font:inherit}.app{min-height:100vh;width:100%;max-width:1240px;margin:0 a
   .result-chat-body{min-height:280px!important;height:40dvh!important;}
 }
 </style>
+
+<style id="augment-db-style">
+.augment-db-note{margin-top:8px;font-size:12px;color:#91a6b5}.augment-db-note b{color:#d7b85b}.augment-rank-badge{display:inline-flex;align-items:center;justify-content:center;min-width:46px;height:22px;padding:0 7px;border:1px solid #6d5b2f;border-radius:999px;background:#1b170d;color:#f0d878;font-size:11px;font-weight:900;letter-spacing:.04em;margin-bottom:7px}.augment-rank-badge.rank-S{border-color:#d6ae3d;box-shadow:0 0 12px #d6ae3d44}.augment-rank-badge.rank-A{border-color:#8aa9c8;color:#bad9f7}.augment-rank-badge.rank-B{border-color:#7f8a92;color:#c8d0d5}.augment-rank-badge.rank-C{border-color:#67574c;color:#bda79b}.augment-db-source{opacity:.82}
+@media(max-width:700px){.augment-db-note{font-size:10px;margin-top:6px}.augment-rank-badge{height:19px;min-width:40px;font-size:9px;padding:0 5px;margin-bottom:4px}}
+</style>
 </head>
 <body>
 <div class="app" id="app"></div>
@@ -1051,7 +1056,8 @@ function moveOrganic(u,target,dt){
  const dx=target.x-u.x, dy=target.y-u.y, dist=Math.max(.001,Math.hypot(dx,dy));
  const desiredX=dx/dist, desiredY=dy/dist;
  const sway=Math.sin(bsTime()*1.7+u.phase)*.18;
- u.x+=desiredX*u.speed*dt; u.y+=desiredY*u.speed*dt + sway*dt;
+ const movePerf=u.kind==='champ'?Math.sqrt(Math.max(.35,augmentPerformanceMultiplier(u))):1;
+ u.x+=desiredX*u.speed*movePerf*dt; u.y+=desiredY*u.speed*movePerf*dt + sway*dt;
  // soft lane bounds and light separation so units don't march in a single file
  const same=battleState.units.filter(v=>v.alive&&v!==u&&v.team===u.team&&Math.abs(v.x-u.x)<2.8&&Math.abs(v.y-u.y)<5).slice(0,3);
  for(const v of same){const sy=u.y-v.y; if(Math.abs(sy)<2.4)u.y+=(sy>=0?1:-1)*.55*dt}
@@ -1082,12 +1088,13 @@ function killLog(attacker,target){
  const allies=bs.units.filter(u=>u.kind==='champ'&&u.team===attacker.team&&u!==attacker&&u.alive&&Math.hypot(u.x-target.x,u.y-target.y)<14); allies.forEach(u=>u.assists=(u.assists||0)+1);
  bs.log.push(`[${formatBattleTime(bs.time)}] <span class="${at}">${attacker.nick||attacker.name||'포탑'}</span> → <span class="${tt}">${target.nick}</span> 처치`);
 }
-function dealDamage(attacker,target,dmg){if(!target.alive)return;if(attacker.kind==='champ')attacker.damageDealt=(attacker.damageDealt||0)+dmg*12;if(target.kind==='champ')target.damageTaken=(target.damageTaken||0)+dmg*12;target.hp-=dmg;if(target.hp<=0){target.hp=0;target.alive=false;if(target.kind==='minion')grantMinionXp(target);if(target.kind==='champ'){target.respawn=respawnSeconds(target);addFx(target.x,target.y,'KO',attacker.team);killLog(attacker,target)}}else if(Math.random()<.035&&attacker.kind==='champ'){addFx(target.x,target.y,`-${Math.max(1,Math.round(dmg*12))}`,attacker.team)}}
+function dealDamage(attacker,target,dmg){if(!target.alive)return;const out=attacker.kind==='champ'?augmentPerformanceMultiplier(attacker):1;const guard=target.kind==='champ'?Math.sqrt(Math.max(.35,augmentPerformanceMultiplier(target))):1;dmg=dmg*out/guard;if(attacker.kind==='champ')attacker.damageDealt=(attacker.damageDealt||0)+dmg*12;if(target.kind==='champ')target.damageTaken=(target.damageTaken||0)+dmg*12;target.hp-=dmg;if(target.hp<=0){target.hp=0;target.alive=false;if(target.kind==='minion')grantMinionXp(target);if(target.kind==='champ'){target.respawn=respawnSeconds(target);addFx(target.x,target.y,'KO',attacker.team);killLog(attacker,target)}}else if(Math.random()<.035&&attacker.kind==='champ'){addFx(target.x,target.y,`-${Math.max(1,Math.round(dmg*12))}`,attacker.team)}}
 function damageStructure(st,dmg,attacker){
  const bs=battleState;if(!st||!st.alive||!attacker||!isStructureTargetable(st,attacker.team))return;
  const tempo=bs.time>15*60?2.15:bs.time>10*60?1.45:1;
  const nexusMod=st.type==='nexus'?.72:1;
- st.hp-=dmg*tempo*nexusMod;
+ const perf=attacker.kind==='champ'?augmentPerformanceMultiplier(attacker):1;
+ st.hp-=dmg*tempo*nexusMod*perf;
  if(st.hp<=0){
   st.hp=0;st.alive=false;
   bs.log.push(`[${formatBattleTime(bs.time)}] ${st.team==='enemy'?'적':'우리'} ${st.name} 파괴`);
@@ -1280,6 +1287,55 @@ function schedulePrivateReply(){const idx=privateIndex;privateAnswered=false;ren
 function startPrivate(){callMode="private";party=[me,...chars.filter(c=>selected.includes(c.id))];privateTargets=party.slice(1);privateIndex=0;mode="private";schedulePrivateReply()}
 function nextPrivate(){if(!privateAnswered)return;if(privateIndex<3){privateIndex++;schedulePrivateReply()}else{mode="party";render()}}
 function reselectPartyFromReady(){ if(callMode==="group"){ startGroup(); } else { selected=[]; party=[]; mode="manual"; render(); } }
+
+// V62: champion-specific OP.GG augment recommendation database.
+// External JSON is the editable source; this inline seed keeps local/offline preview functional.
+const AUGMENT_DB_FALLBACK={source:"OP.GG ARAM: Mayhem",updated:"2026-09-24",rankRules:{S:"1-5",A:"6-12",B:"13-22",C:"23+"},champions:{"jinx":{"patch":"16.19","rankings":["치명적 미사일","상급 조준경 부착","무한의 대검 업그레이드","치명적 리듬","양손잡이","영혼 흡수","치명적인 공격","감쇠 광선"]},"garen":{"patch":"16.19","rankings":["승리를 위한 회전","무한의 대검 업그레이드","꽁!","영혼 흡수","날쌘걸음","드롭킥","취약","치명적인 공격"]},"galio":{"patch":"16.17","rankings":["탱크 엔진","천상의 신체","드롭킥","강타자","강철 같은 심장","거인","거석상의 용기","우당탕탕","불사르기 업그레이드"]},"kled":{"patch":"16.19","rankings":["강타자","탱크 엔진","드롭킥","끝없는 학살","강철 같은 심장","전환: 프리즘","죽음의 무도 업그레이드"]},"ashe":{"patch":"16.19","rankings":["치명적 미사일","상급 조준경 부착","작은 도움","치명적 리듬","양손잡이","능수능란","취약","무한의 대검 업그레이드"]},"briar":{"patch":"16.19","rankings":["꽁!","영혼 흡수","굶주린 속박","죽음의 무도 업그레이드","선혈포식","신비한 주먹","끝없는 학살"]},"rengar":{"patch":"16.19","rankings":["무한의 대검 업그레이드","밤의 추적","육중한 힘","영혼 흡수","광대 대학","이빨 요정","바늘에 실 끼우기","치명적인 공격"]},"mel":{"patch":"16.19","rankings":["마법 미사일","노련한 저격수","유레카","마도사의 주스 상자","되풀이","보석 건틀릿","쌍둥이 불꽃","극악무도"]},"singed":{"patch":"16.19","rankings":["타오르는 이자","마도사의 주스 상자"]},"swain":{"patch":"16.19","rankings":["마도사의 주스 상자","탱크 엔진","선혈포식","굶주린 속박","타오르는 이자","드롭킥","죽음의 순환"]},"teemo":{"patch":"16.19","rankings":["타오르는 이자","되풀이","축소 엔진","마법 미사일","순수주의자 - 마법사","유레카","환영 무기","지옥의 전도체"]},"pyke":{"patch":"16.18","rankings":["밤의 추적","축소 엔진","그림자 질주","되풀이","돌진","전환: 프리즘","이빨 요정","바늘에 실 끼우기"]},"kayle":{"patch":"16.18","rankings":["상급 조준경 부착","마법 명사수","마도사의 주스 상자","능수능란","광신자","최상급 조준경 부착","양손잡이"]},"samira":{"patch":"16.17","rankings":["영혼 흡수","무한의 대검 업그레이드","치명적 미사일"]},"hwei":{"patch":"16.18","rankings":["타오르는 이자","마법 미사일"]},"irelia":{"patch":"16.19","rankings":["무법자의 투지","죽음의 무도 업그레이드"]},"ezreal":{"patch":"16.19","rankings":["광휘의 검 업그레이드","마법 미사일","환영 무기","보석 건틀릿","믿음직한 무기","되풀이","쌍둥이 불꽃"]},"brand":{"patch":"16.19","rankings":["타오르는 이자","지옥의 전도체","마법 미사일","극악무도","마도사의 주스 상자","되풀이","쌍둥이 불꽃","유레카"]},"sett":{"patch":"16.19","rankings":["탱크 엔진","강타자","드롭킥","천상의 신체","강철 같은 심장","거인","보강","육중한 힘","날쌘걸음"]},"senna":{"patch":"16.19","rankings":["치명적 미사일","상급 조준경 부착","무한의 대검 업그레이드"]},"smolder":{"patch":"16.19","rankings":["치명적 미사일","취약","무한의 대검 업그레이드"]}}};
+let championAugmentDb=AUGMENT_DB_FALLBACK;
+async function loadChampionAugmentDb(){
+ try{
+  const res=await fetch('assets/data/augment-tiers.json?v=63',{cache:'no-store'});
+  if(!res.ok)throw new Error('HTTP '+res.status);
+  const data=await res.json();
+  if(data&&data.champions)championAugmentDb=data;
+ }catch(e){console.info('[augment-db] external DB unavailable; using inline fallback');}
+}
+loadChampionAugmentDb();
+function augmentRankInfo(champId,augmentName){
+ const row=championAugmentDb?.champions?.[champId];
+ const list=row?.rankings||[];
+ const idx=list.indexOf(augmentName);
+ if(idx<0)return {grade:null,rank:null,patch:row?.patch||null};
+ const rank=idx+1;
+ const grade=rank<=5?'S':rank<=12?'A':rank<=22?'B':'C';
+ return {grade,rank,patch:row?.patch||null};
+}
+function augmentGradeWeight(grade){return grade==='S'?10:grade==='A'?5.5:grade==='B'?2.5:grade==='C'?1:1.35}
+function augmentGradePerformance(grade){return grade==='S'?1.5:grade==='A'?1.2:grade==='B'?.8:grade==='C'?.5:1}
+function augmentPerformanceMultiplier(u){
+ const picked=(u?.augments||[]).filter(Boolean);
+ if(!picked.length)return 1;
+ const vals=picked.map(a=>augmentGradePerformance(a.opggGrade)).filter(v=>Number.isFinite(v));
+ return vals.length?vals.reduce((a,b)=>a+b,0)/vals.length:1;
+}
+function weightedPickAugmentForChampion(u,choices){
+ if(!choices?.length)return null;
+ const id=u?.champ?.id;
+ const weights=choices.map(a=>augmentGradeWeight(augmentRankInfo(id,a.name).grade));
+ let total=weights.reduce((a,b)=>a+b,0),r=Math.random()*total;
+ for(let i=0;i<choices.length;i++){r-=weights[i];if(r<=0)return choices[i]}
+ return choices[choices.length-1];
+}
+function augmentRankBadgeHtml(champId,name){
+ const info=augmentRankInfo(champId,name);
+ return info.grade?`<div class="augment-rank-badge rank-${info.grade}" title="OP.GG 추천 ${info.rank}위 · ${info.patch||'패치 미상'}">OP.GG ${info.grade}</div>`:'';
+}
+function augmentDbStatusHtml(champId){
+ const row=championAugmentDb?.champions?.[champId];
+ const count=row?.rankings?.length||0;
+ return count?`<div class="augment-db-note"><b>OP.GG 추천 DB</b> · ${row.patch||'-'} 패치 · 상위 ${count}개 반영 <span class="augment-db-source">(S 1~5 / A 6~12 / B 13~22 / C 23+)</span></div>`:`<div class="augment-db-note">OP.GG 추천 DB · 이 챔피언은 아직 데이터 입력 전</div>`;
+}
+
 const augmentNames={
  silver:["감시의 장막", "강타자", "광신자", "궁극의 저지 불가", "그림자 질주", "능력치!", "능수능란", "대지의 영혼", "도주 계획", "도취", "마법공학의 영혼", "마법사 (물리)", "민병대", "바다의 영혼", "부식", "불을 밝혀", "사악한 정신", "선혈포식", "속전속결", "순수주의자 - 마법사", "승리를 위한 회전", "쌍둥이 불꽃", "우당탕탕", "육중한 힘", "음속 폭발", "응급 처치 키트", "적응형 능력치", "전환: 골드", "점멸탄", "정신 변환", "조준경 부착", "지옥불 영혼", "징수의 총 업그레이드", "차가운 냉기", "태풍", "폴터가이스트", "하체 운동의 날", "확보된 킬", "확률적 방어", "다단 중첩", "강력한 방패", "불사르기 업그레이드", "불여우", "빠르고 안전하게", "빙글빙글", "점멸 2", "존야 업그레이드", "치명적 가속", "폭격기", "눈 오는 날", "적응형 와드", "채널 고정", "보강", "장인의 솜씨", "출발할 시간", "흡수", "확고한 의지로", "믿음직한 무기", "죽음의 무도 업그레이드"],
  gold:["감쇠 광선", "극악무도", "급속 성장", "너만을 위해", "넘을 수 없는 벽", "노련한 저격수", "능력치 더하기 능력치!", "되풀이", "마법 명사수", "마법 미사일", "무법자의 투지", "바늘에 실 끼우기", "범람", "부메랑 투척", "빛의 인도자 결의", "빵과 버터", "빵과 잼", "빵과 치즈", "상급 조준경 부착", "소환술사", "속행", "시작부터 끝까지", "신난다!", "신성한 중재", "영혼 흡수", "전술적 대비", "전환: 프리즘", "점멸 난사", "처형 시간", "천상의 신체", "최첨단 발명가", "치명적 미사일", "치명적 치유", "치명적인 공격", "취약", "퀘스트: 강철 같은 심장", "타오르는 새벽", "핀볼", "화염 낙인", "환영 무기", "후원", "광휘의 검 업그레이드", "무한의 대검 업그레이드", "밤의 추적", "소나타", "영혼의 정화", "영혼의 포식자", "축소 엔진", "치명적 리듬", "탱크 엔진", "타오르는 이자", "끝없는 학살", "로켓 배송", "Hide on bush", "자연의 회복", "우리의 치유", "무리한 진입", "격려하기", "고슴도치", "압력솥", "상어 미끼", "상어 폭풍", "눈 폭발", "이빨 요정", "마도사의 주스 상자", "삐뽀삐뽀", "으악, 내 동전!", "꽁!", "작은 도움", "자비의 일격", "위력 추구", "가속 추구", "굶주린 속박", "원기 회복", "지형 생성됨", "날쌘걸음", "공포", "연쇄 반응", "갈라진 하늘 업그레이드", "굶주린 히드라 업그레이드"],
@@ -1306,12 +1362,12 @@ function maybeJungDaunAugmentChat(u,picked){
  const msg=lines[picked.name];if(msg)bs.chat.push(`<span class="all-tag">[전체]</span> <span class="ally-chat">쓰리빠뚜르완:</span> ${msg}`);
 }
 function getAugmentTierForStage(stage){const bs=battleState;if(!bs)return rollAugmentTier();bs.augmentTierByStage=bs.augmentTierByStage||{};const key=String(stage);if(!bs.augmentTierByStage[key])bs.augmentTierByStage[key]=rollAugmentTier();return bs.augmentTierByStage[key]}
-function autoPickAugmentFor(u,stage){if(!u||u.kind!=='champ')return;u.augments=u.augments||[];const idx=stage==='start'?0:stage===7?1:stage===11?2:3;if(u.augments[idx])return;const tier=getAugmentTierForStage(stage),choices=makeAugmentChoices(tier),a=choices[Math.floor(Math.random()*choices.length)];a.apply(u);u.augments[idx]={name:a.name,tier:a.tier,desc:a.desc,stage};maybeJungDaunAugmentChat(u,u.augments[idx]);}
+function autoPickAugmentFor(u,stage){if(!u||u.kind!=='champ')return;u.augments=u.augments||[];const idx=stage==='start'?0:stage===7?1:stage===11?2:3;if(u.augments[idx])return;const tier=getAugmentTierForStage(stage),choices=makeAugmentChoices(tier),a=weightedPickAugmentForChampion(u,choices)||choices[Math.floor(Math.random()*choices.length)];a.apply(u);const ri=augmentRankInfo(u.champ?.id,a.name);u.augments[idx]={name:a.name,tier:a.tier,desc:a.desc,stage,opggGrade:ri.grade,opggRank:ri.rank};maybeJungDaunAugmentChat(u,u.augments[idx]);}
 function syncNpcAugments(){const bs=battleState;if(!bs)return;for(const u of [...bs.team,...bs.enemy]){if(u===bs.team[0])continue;if(!(u.augments||[]).length)autoPickAugmentFor(u,'start');for(const lv of [7,11,15])if(u.level>=lv)autoPickAugmentFor(u,lv)}}
 function openAugment(stage){const bs=battleState;if(!bs||bs.augmentOpen)return;bs.augmentStage=stage;bs.augmentTier=getAugmentTierForStage(stage);bs.augmentChoices=makeAugmentChoices(bs.augmentTier);bs.augmentOpen=true;bs.paused=true;bs.status='증강체 선택 중';render()}
 function rerollAugment(i,e){if(e)e.stopPropagation();const bs=battleState;if(!bs||!bs.augmentOpen||bs.augmentChoices[i].rerolled)return;const old=bs.augmentChoices[i],shown=new Set(bs.augmentChoices.map(a=>a.name)),pool=augmentTemplates[bs.augmentTier].filter(a=>!shown.has(a.name));const a=pool[Math.floor(Math.random()*pool.length)]||augmentTemplates[bs.augmentTier][0];bs.augmentChoices[i]={...a,tier:bs.augmentTier,rerolled:true,key:bs.augmentTier+'-'+Math.random()};render()}
-function chooseAugment(i){const bs=battleState;if(!bs||!bs.augmentOpen)return;const a=bs.augmentChoices[i],me=bs.team[0];a.apply(me);const picked={name:a.name,tier:a.tier,desc:a.desc,stage:bs.augmentStage};bs.augments.push(picked);me.augments=me.augments||[];const ai=bs.augmentStage==='start'?0:bs.augmentStage===7?1:bs.augmentStage===11?2:3;me.augments[ai]=picked;maybeJungDaunAugmentChat(me,picked);bs.augmentDone[bs.augmentStage]=true;bs.augmentOpen=false;bs.paused=false;bs.status='경기 진행 중';bs.lastTs=performance.now();render();window.__battleRAF=requestAnimationFrame(battleFrame)}
-function augmentOverlayHtml(bs){if(!bs||!bs.augmentOpen)return '';const tierName={silver:'실버',gold:'골드',prismatic:'프리즘'},stage=bs.augmentStage==='start'?'게임 시작':`레벨 ${bs.augmentStage}`;return `<div class="augment-overlay"><div class="augment-modal"><div class="augment-kicker">AUGMENT · ${stage}</div><h2>${tierName[bs.augmentTier]} 증강체를 선택하세요</h2><p>이번 선택은 <b>${tierName[bs.augmentTier]}</b> 등급입니다. 세 선택지와 리롤 모두 같은 등급만 등장합니다.</p><div class="augment-cards">${bs.augmentChoices.map((a,i)=>`<div class="augment-card ${a.tier}" onclick="chooseAugment(${i})"><div class="augment-tier">${tierName[a.tier]}</div><div class="augment-gem"><span>${a.icon}</span></div><h3>${a.name}</h3><p>${a.desc}</p><button class="augment-reroll" ${a.rerolled?'disabled':''} onclick="rerollAugment(${i},event)">${a.rerolled?'리롤 사용 완료':'↻ 리롤 1회'}</button></div>`).join('')}</div><div class="augment-picked">현재 선택: ${(bs.augments||[]).length?bs.augments.map(a=>`<b>${a.name}</b>`).join(' · '):'없음'}</div></div></div>`}
+function chooseAugment(i){const bs=battleState;if(!bs||!bs.augmentOpen)return;const a=bs.augmentChoices[i],me=bs.team[0];a.apply(me);const ri=augmentRankInfo(me.champ?.id,a.name);const picked={name:a.name,tier:a.tier,desc:a.desc,stage:bs.augmentStage,opggGrade:ri.grade,opggRank:ri.rank};bs.augments.push(picked);me.augments=me.augments||[];const ai=bs.augmentStage==='start'?0:bs.augmentStage===7?1:bs.augmentStage===11?2:3;me.augments[ai]=picked;maybeJungDaunAugmentChat(me,picked);bs.augmentDone[bs.augmentStage]=true;bs.augmentOpen=false;bs.paused=false;bs.status='경기 진행 중';bs.lastTs=performance.now();render();window.__battleRAF=requestAnimationFrame(battleFrame)}
+function augmentOverlayHtml(bs){if(!bs||!bs.augmentOpen)return '';const tierName={silver:'실버',gold:'골드',prismatic:'프리즘'},stage=bs.augmentStage==='start'?'게임 시작':`레벨 ${bs.augmentStage}`,champId=bs.team?.[0]?.champ?.id;return `<div class="augment-overlay"><div class="augment-modal"><div class="augment-kicker">AUGMENT · ${stage}</div><h2>${tierName[bs.augmentTier]} 증강체를 선택하세요</h2><p>이번 선택은 <b>${tierName[bs.augmentTier]}</b> 등급입니다. 세 선택지와 리롤 모두 같은 등급만 등장합니다.</p><div class="augment-cards">${bs.augmentChoices.map((a,i)=>`<div class="augment-card ${a.tier}" onclick="chooseAugment(${i})"><div class="augment-tier">${tierName[a.tier]}</div><div class="augment-gem"><span>${a.icon}</span></div><h3>${a.name}</h3><p>${a.desc}</p><button class="augment-reroll" ${a.rerolled?'disabled':''} onclick="rerollAugment(${i},event)">${a.rerolled?'리롤 사용 완료':'↻ 리롤 1회'}</button></div>`).join('')}</div><div class="augment-picked">현재 선택: ${(bs.augments||[]).length?bs.augments.map(a=>`<b>${a.name}</b>`).join(' · '):'없음'}</div></div></div>`}
 
 let dragSource=null;
 let mobileSwapSource=null;
