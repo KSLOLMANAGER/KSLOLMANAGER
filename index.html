@@ -1,0 +1,89 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>증강체 칼바람 매니저</title>
+<style>
+*{box-sizing:border-box}body{margin:0;background:#11120f;color:#eeeae2;font-family:Arial,"Noto Sans KR",sans-serif}
+button{font:inherit}.app{min-height:100vh;max-width:1050px;margin:auto;padding:34px 28px 60px;position:relative}
+.top{display:flex;justify-content:space-between;align-items:flex-end;border-bottom:1px solid #373831;padding-bottom:22px;margin-bottom:38px}
+.eyebrow{font-size:11px;letter-spacing:3px;color:#9b895c;font-weight:800}.top h1{margin:7px 0 0;font-size:27px}.step{font-size:11px;color:#777970;letter-spacing:2px}
+.section{display:flex;align-items:end;gap:18px;margin-bottom:24px}.section>span{color:#9b895c;font-weight:800}.section h2{margin:0 0 5px;font-size:25px}.section p{margin:0;color:#898b83;font-size:13px}.section b{color:#d5c18d}
+.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:22px}
+.card,.call{border:1px solid #3a3b35;background:#191a17;color:#eeeae2;text-align:left;cursor:pointer;transition:.2s}.card{min-height:130px;padding:18px;position:relative}.card:hover,.card.sel,.call:hover{border-color:#a58d57;transform:translateY(-2px)}.card .num{font-size:10px;color:#62645d}.nick{display:block;font-size:22px;font-weight:900;margin-top:25px}.real{display:block;color:#85877f;font-size:11px;margin-top:5px}.check{position:absolute;right:14px;top:14px;width:20px;height:20px;border:1px solid #555750;border-radius:50%;text-align:center;font-size:12px;color:#111;background:#b69b61}.primary{width:100%;border:1px solid #a58d57;background:#a58d57;color:#171712;padding:14px 18px;font-weight:900;cursor:pointer}.primary:disabled{opacity:.35;cursor:not-allowed}.back{border:0;background:none;color:#898b83;cursor:pointer;margin-top:15px}
+.calls{display:grid;grid-template-columns:1fr 1fr;gap:15px}.call{padding:27px;min-height:220px}.call .n{color:#9b895c;font-size:11px}.call .ico{font-size:32px;margin:24px 0 14px;color:#b69b61}.call h3{margin:0 0 9px;font-size:19px}.call p{color:#898b83;font-size:12px;line-height:1.7;margin:0}
+.members{display:grid;gap:9px;margin-bottom:20px}.member{display:flex;align-items:center;width:100%;padding:15px;background:#191a17;border:1px solid #34352f;color:#eeeae2;cursor:pointer;text-align:left}.member.sel{border-color:#a58d57}.member .box{width:22px;height:22px;border:1px solid #555750;margin-right:14px;text-align:center;line-height:20px}.member.sel .box{background:#b69b61;color:#111}.member b{display:block}.member small{display:block;color:#777970;margin-top:3px}.counter{margin-left:auto;color:#b69b61;font-weight:800}
+.phonewrap{max-width:430px;margin:auto}.phone{border:1px solid #3b3c37;box-shadow:0 25px 70px #0008;background:#aebfc9;overflow:hidden}.head{height:66px;background:#20211e;display:flex;align-items:center;gap:12px;padding:10px 14px}.head button{border:0;background:none;color:#aaa;font-size:28px;cursor:pointer}.head div{flex:1}.head strong{display:block;font-size:14px}.head small{color:#7e8179;font-size:10px}.head em{font-style:normal;color:#777970;letter-spacing:3px}.chat{min-height:500px;padding:16px 13px;background:linear-gradient(135deg,#b8c8d0,#a9bcc6)}.date{width:max-content;margin:0 auto 18px;background:#58666caa;color:#fff;border-radius:12px;padding:5px 9px;font-size:9px}.msg{margin:0 0 14px 3px;max-width:80%;animation:in .25s}.msg.mine{margin-left:auto;margin-right:3px;text-align:right}.who{font-size:10px;color:#475055;font-weight:800;margin:0 3px 4px}.bubble{display:inline-block;background:#fff;color:#202326;padding:9px 11px;border-radius:4px 11px 11px 11px;font-size:13px;box-shadow:0 1px 2px #0002}.mine .bubble{background:#f8df64;border-radius:11px 4px 11px 11px}.typing{display:flex;gap:3px;background:#fff;padding:9px 12px;width:max-content;border-radius:4px 11px 11px 11px}.typing i{width:4px;height:4px;border-radius:50%;background:#888;animation:b 1s infinite}.typing i:nth-child(2){animation-delay:.15s}.typing i:nth-child(3){animation-delay:.3s}.system{width:max-content;margin:25px auto 0;background:#56646aaa;color:#fff;border-radius:10px;padding:6px 10px;font-size:9px}.input{height:52px;background:#20211e;color:#6f726b;display:flex;align-items:center;padding:0 12px;font-size:11px}.input span{flex:1}.input b{color:#a58d57;margin-left:14px;font-size:16px}.party{display:grid;gap:9px;margin-bottom:18px}.pm{display:flex;align-items:center;padding:15px;border:1px solid #34352f;background:#191a17}.pm .pn{width:28px;color:#9b895c;font-weight:900}.pm div{flex:1}.pm strong{display:block}.pm small{display:block;color:#777970;margin-top:3px}.pm em{font-style:normal;font-size:9px;color:#a58d57}
+.ready{display:flex;gap:18px;align-items:center;margin-bottom:25px}.mark{width:48px;height:48px;border-radius:50%;background:#a58d57;color:#171712;display:grid;place-items:center;font-size:25px;font-weight:900}.ready h2{margin:3px 0;font-size:25px}.ready p{margin:0;color:#898b83;font-size:12px}
+@keyframes in{from{opacity:0;transform:translateY(7px)}to{opacity:1;transform:none}}@keyframes b{0%,60%,100%{transform:none;opacity:.5}30%{transform:translateY(-3px);opacity:1}}
+@media(max-width:700px){.app{padding:22px 16px}.grid{grid-template-columns:1fr 1fr}.calls{grid-template-columns:1fr}.top h1{font-size:21px}.step{display:none}}
+</style>
+</head>
+<body>
+<div class="app" id="app"></div>
+<script>
+const chars=[
+["siljeom","실점","박성진"],["3patourwan","쓰리빠뚜르완","정다운"],["molcho","몰초","김병욱"],
+["joguk","조국","임도현"],["mundolmaeng","문돌맹","이동기"],["nguyen","Nguyen Ngoc Tu","이재빈"],
+["dwaemesa","돼메사","조시원"],["galio","갈리오","김정운"],["dage","다케스탄 출신","황재윤"]
+].map(x=>({id:x[0],nickname:x[1],name:x[2]}));
+let mode="select", me=null, selected=[], party=[], chatMembers=[], replies=0, privateIndex=0, privateTargets=[];
+
+const app=document.getElementById("app");
+const shuffle=a=>[...a].sort(()=>Math.random()-.5);
+function header(step){return `<header class="top"><div><div class="eyebrow">AUGMENT ARENA</div><h1>증강체 칼바람 매니저</h1></div><div class="step">${step}</div></header>`}
+function button(text,disabled=false,onclick=""){return `<button class="primary" ${disabled?"disabled":""} onclick="${onclick}">${text}</button>`}
+function render(){
+let body="";
+if(mode==="select"){
+ body=`<div class="section"><span>01</span><div><h2>캐릭터를 선택하세요</h2><p>선택한 캐릭터가 이번 게임의 당신입니다.</p></div></div>
+ <div class="grid">${chars.map((c,i)=>`<button class="card ${me?.id===c.id?"sel":""}" onclick="choose('${c.id}')"><span class="num">0${i+1}</span><span class="nick">${c.nickname}</span><span class="real">${c.name}</span><span class="check">${me?.id===c.id?"✓":""}</span></button>`).join("")}</div>
+ ${button(me?me.nickname+"으로 계속하기 →":"캐릭터를 먼저 선택하세요",!me,"goMethod()")}`;
+}
+if(mode==="method"){
+body=`<div class="section"><span>02</span><div><h2>어떻게 호출할까요?</h2><p><b>${me.nickname}</b> · ${me.name}으로 플레이합니다.</p></div></div>
+<div class="calls"><button class="call" onclick="startGroup()"><div class="n">01</div><div class="ico">↗</div><h3>단톡으로 호출하기</h3><p>게임 안의 단톡방에 “겜 ㄱ?”을 보내고<br>친구들이 한 명씩 대답합니다.</p></button>
+<button class="call" onclick="mode='manual';render()"><div class="n">02</div><div class="ico">＋</div><h3>개인톡으로 호출하기</h3><p>같이 할 사람 4명을 직접 선택하고<br>개인톡으로 차례차례 호출합니다.</p></button></div>
+<button class="back" onclick="mode='select';render()">← 캐릭터 다시 선택</button>`;
+}
+if(mode==="group"){
+body=`<div class="phonewrap"><div class="phone"><div class="head"><button onclick="mode='method';render()">‹</button><div><strong>우리들의 단톡방</strong><small>9명</small></div><em>•••</em></div><div class="chat"><div class="date">오늘</div>
+<div class="msg mine"><div class="who">${me.nickname}</div><div class="bubble">겜 ㄱ?</div></div>
+${chatMembers.slice(0,replies).map((c,i)=>`<div class="msg"><div class="who">${c.nickname}</div><div class="bubble">${i===3?"ㄱㄱ":"ㄱ"}</div></div>`).join("")}
+${replies<4?`<div class="typing"><i></i><i></i><i></i></div>`:`<div class="system">5명이 게임에 참가했습니다.</div>`}</div><div class="input"><span>메시지를 입력하세요</span><b>＋</b><b>➤</b></div></div>
+${button(replies<4?"친구들이 대답하는 중...":"파티 확인 →",replies<4,"finishGroup()")}</div>`;
+}
+if(mode==="manual"){
+body=`<div class="section"><span>03</span><div><h2>파티원을 선택하세요</h2><p>본인을 제외하고 <b>4명</b>을 선택하세요.</p></div><div class="counter">${selected.length} / 4</div></div>
+<div class="members">${chars.filter(c=>c.id!==me.id).map(c=>`<button class="member ${selected.includes(c.id)?"sel":""}" onclick="toggle('${c.id}')"><span class="box">${selected.includes(c.id)?"✓":""}</span><span><b>${c.nickname}</b><small>${c.name}</small></span></button>`).join("")}</div>
+${button("개인톡 보내기 →",selected.length!==4,"startPrivate()")}<button class="back" onclick="mode='method';render()">← 호출 방식</button>`;
+}
+if(mode==="private"){
+const target=privateTargets[privateIndex];
+body=`<div class="phonewrap"><div class="phone"><div class="head"><button>‹</button><div><strong>${target.nickname}</strong><small>${target.name}</small></div><em>•••</em></div><div class="chat"><div class="date">오늘</div>
+<div class="msg mine"><div class="who">${me.nickname}</div><div class="bubble">겜 ㄱ?</div></div>
+${privateIndex>0?`<div class="msg"><div class="who">${target.nickname}</div><div class="bubble">ㄱ</div></div>`:`<div class="typing"><i></i><i></i><i></i></div>`}
+${privateIndex===3?`<div class="system">4명 모두에게서 답장이 왔습니다.</div>`:""}</div><div class="input"><span>메시지를 입력하세요</span><b>＋</b><b>➤</b></div></div>
+${button(privateIndex===3?"파티 확인 →":privateIndex===0?"답장 기다리는 중...":"다음 친구 호출 →",privateIndex===0,"nextPrivate()")}</div>`;
+}
+if(mode==="party"){
+body=`<div class="ready"><div class="mark">✓</div><div><div class="eyebrow">PARTY READY</div><h2>파티가 구성되었습니다.</h2><p>5명이 게임에 참가합니다.</p></div></div>
+<div class="party">${party.map((c,i)=>`<div class="pm"><span class="pn">0${i+1}</span><div><strong>${c.nickname}</strong><small>${c.name}</small></div>${i===0?"<em>YOU</em>":""}</div>`).join("")}</div>
+${button("처음으로 돌아가기",false,"reset()")}`;
+}
+app.innerHTML=header(mode==="select"?"01 / CHARACTER":mode==="method"?"02 / CALL":"03 / PARTY")+`<main>${body}</main>`;
+}
+function choose(id){me=chars.find(c=>c.id===id);render()}
+function goMethod(){mode="method";render()}
+function startGroup(){party=[me,...shuffle(chars.filter(c=>c.id!==me.id)).slice(0,4)];chatMembers=shuffle(party.slice(1));replies=0;mode="group";render();tickGroup()}
+function tickGroup(){if(replies>=4)return;setTimeout(()=>{replies++;render();tickGroup()},900)}
+function finishGroup(){mode="party";render()}
+function toggle(id){selected=selected.includes(id)?selected.filter(x=>x!==id):selected.length<4?[...selected,id]:selected;render()}
+function startPrivate(){party=[me,...chars.filter(c=>selected.includes(c.id))];privateTargets=party.slice(1);privateIndex=0;mode="private";render();setTimeout(()=>{privateIndex=1;render()},1100)}
+function nextPrivate(){if(privateIndex<3){privateIndex++;render()}else{mode="party";render()}}
+function reset(){mode="select";me=null;selected=[];party=[];chatMembers=[];replies=0;privateIndex=0;render()}
+render();
+</script>
+</body>
+</html>
