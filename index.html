@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>증강체 칼바람 매니저</title>
+<title>곡선 증바람 매니저</title>
 <style>
 *{box-sizing:border-box}body{margin:0;background:#11120f;color:#eeeae2;font-family:Arial,"Noto Sans KR",sans-serif}
 button{font:inherit}.app{min-height:100vh;width:100%;max-width:1240px;margin:0 auto;padding:28px 26px 42px;position:relative}
@@ -439,28 +439,30 @@ const playerRoleStats={
 };
 function roleSkillFor(stats,champ){const rs=(champ.roles&&champ.roles.length?champ.roles:["Fighter"]);return rs.reduce((a,r)=>a+(stats[r]??60),0)/rs.length}
 function enemyRoleStats(){const o={};["Fighter","Tank","Mage","Assassin","Marksman","Support"].forEach(r=>o[r]=64+Math.floor(Math.random()*13));return o}
-const SIGNATURE_CHAMPS={siljeom:"pyke",molcho:"swain",dwaemesa:"samira",joguk:"singed",nguyen:"kayle","3patourwan":"hwei",mundolmaeng:"teemo",galio:"galio",dakestan:"irelia"};
+const SIGNATURE_CHAMPS={siljeom:"pyke",molcho:"swain",dwaemesa:"samira",joguk:"singed",nguyen:"kayle","3patourwan":"hwei",mundolmaeng:"teemo",galio:"galio",dage:"irelia"};
 const SIGNATURE_CHAT={siljeom:"돈 드리겠습니다~",molcho:"보여줄게",dwaemesa:"월월 감사합니다 월월",joguk:"왔다 내 사랑",nguyen:"케권이 횽이야","3patourwan":"흐에!!",mundolmaeng:"티모횽이야",galio:"야 든든하게 막아줄게",dakestan:"야 게임 끝났어"};
 let signatureRequests=[],signatureRequest=null,signatureChatDone=new Set(),signatureChatLog=[];
-let mode="select", me=null, selected=[], party=[], chatMembers=[], declinedMembers=[], replies=0, privateIndex=0, privateTargets=[], searching=false, queueSeconds=0, queueTimer=null, found=false, champOptions=[], teamPicks=[], chosenChamp=null, finalPool=[], enemyTeam=[], loadingSeconds=10, loadingTimer=null, loadingTransitionTimer=null, battleState=null, battleTimer=null, matchResult=null;
+let mode="select", callMode=null, me=null, selected=[], party=[], chatMembers=[], declinedMembers=[], replies=0, privateIndex=0, privateTargets=[], searching=false, queueSeconds=0, queueTimer=null, found=false, champOptions=[], teamPicks=[], chosenChamp=null, finalPool=[], enemyTeam=[], loadingSeconds=10, loadingTimer=null, loadingTransitionTimer=null, battleState=null, battleTimer=null, matchResult=null;
 
 const app=document.getElementById("app");
 const shuffle=a=>[...a].sort(()=>Math.random()-.5);
-function header(step){return `<header class="top"><div><div class="eyebrow">AUGMENT ARENA</div><h1>증강체 칼바람 매니저</h1></div><div class="step">${step}</div></header>`}
+function header(step){return `<header class="top"><div><div class="eyebrow">AUGMENT ARENA</div><h1>곡선 증바람 매니저</h1></div><div class="step">${step}</div></header>`}
 function button(text,disabled=false,onclick=""){return `<button class="primary" ${disabled?"disabled":""} onclick="${onclick}">${text}</button>`}
 const CHAMPION_IMAGE_IDS={reksai:"RekSai",leesin:"LeeSin",masteryi:"MasterYi",drmundo:"DrMundo",missfortune:"MissFortune",xinzhao:"XinZhao",aurelionsol:"AurelionSol",wukong:"MonkeyKing",jarvaniv:"JarvanIV",kogmaw:"KogMaw",ksante:"KSante",tahmkench:"TahmKench",twistedfate:"TwistedFate",fiddlesticks:"FiddleSticks"};
 function championImageId(id){return id ? (CHAMPION_IMAGE_IDS[id]||id.charAt(0).toUpperCase()+id.slice(1)) : id;}
+function signatureChampionName(charId){const id=SIGNATURE_CHAMPS[charId];const c=(typeof champions!=="undefined")?champions.find(x=>x.id===id):null;return c?c.name:id;}
+function isSignaturePick(member,champ){return !!(member&&champ&&SIGNATURE_CHAMPS[member.id]===champ.id);}
 function render(){
 let body="";
 if(mode==="select"){
  body=`<div class="section"><span>01</span><div><h2>캐릭터를 선택하세요</h2><p>선택한 캐릭터가 이번 게임의 당신입니다.</p></div></div>
- <div class="grid">${chars.map((c,i)=>`<button class="card ${me?.id===c.id?"sel":""}" onclick="choose('${c.id}')"><span class="num">0${i+1}</span><span class="nick">${c.nickname}</span><span class="real">${c.name}</span><span class="check">${me?.id===c.id?"✓":""}</span></button>`).join("")}</div>
+ <div class="grid">${chars.map((c,i)=>`<button class="card ${me?.id===c.id?"sel":""}" onclick="choose('${c.id}')"><span class="num">0${i+1}</span><span class="nick">${c.nickname}</span><span class="real">${c.name}</span><span class="signature-label">시그니처 챔피언 - ${signatureChampionName(c.id)}</span><span class="check">${me?.id===c.id?"✓":""}</span></button>`).join("")}</div>
  ${button(me?me.nickname+"으로 계속하기 →":"캐릭터를 먼저 선택하세요",!me,"goMethod()")}`;
 }
 if(mode==="method"){
 body=`<div class="section"><span>02</span><div><h2>어떻게 호출할까요?</h2><p><b>${me.nickname}</b> · ${me.name}으로 플레이합니다.</p></div></div>
-<div class="calls"><button class="call" onclick="startGroup()"><div class="n">01</div><div class="ico">↗</div><h3>단톡으로 호출하기</h3><p>게임 안의 단톡방에 “겜 ㄱ?”을 보내고<br>친구들이 한 명씩 대답합니다.</p></button>
-<button class="call" onclick="mode='manual';render()"><div class="n">02</div><div class="ico">＋</div><h3>개인톡으로 호출하기</h3><p>같이 할 사람 4명을 직접 선택하고<br>개인톡으로 차례차례 호출합니다.</p></button></div>
+<div class="calls"><button class="call" onclick="startGroup()"><div class="n">01</div><div class="ico">↗</div><h3>1. 단톡</h3><p>랜덤으로 멤버가 구해집니다.</p></button>
+<button class="call" onclick="mode='manual';render()"><div class="n">02</div><div class="ico">＋</div><h3>2. 갠톡</h3><p>직접 게임 같이 할 멤버를 선택합니다.</p></button></div>
 <button class="back" onclick="mode='select';render()">← 캐릭터 다시 선택</button>`;
 }
 if(mode==="group"){
@@ -538,7 +540,7 @@ if(mode==="results"){
 if(mode==="party"){
 body=`<div class="ready"><div class="mark">✓</div><div><div class="eyebrow">PARTY READY</div><h2>파티가 구성되었습니다.</h2><p>5명이 게임에 참가합니다.</p></div></div>
 <div class="party">${party.map((c,i)=>`<div class="pm"><span class="pn">0${i+1}</span><div><strong>${c.nickname}</strong><small>${c.name}</small></div>${i===0?"<em>YOU</em>":""}</div>`).join("")}</div>
-${button("게임 대기열로 →",false,"goQueue()")}`;
+${button("게임 대기열로 →",false,"goQueue()") }<button class="back party-reselect" onclick="reselectPartyFromReady()">↻ 멤버 다시 선택</button>`;
 }
 if(mode==="queue"){
 body=`<div class="queue-shell">
@@ -834,7 +836,9 @@ function championFormation(champ){
 }
 function createChampionUnit(team,index,champ,nick,realName=null){
  const roleStats=team==='team'?(playerRoleStats[realName]||Object.fromEntries(["Fighter","Tank","Mage","Assassin","Marksman","Support"].map(r=>[r,60]))):enemyRoleStats();
- const roleSkill=roleSkillFor(roleStats,champ); // 복수 역할군은 해당 점수 평균
+ const member=team==='team'?chars.find(c=>c.name===realName):null;
+ const signatureBoost=team==='team'&&isSignaturePick(member,champ);
+ const roleSkill=signatureBoost?90:roleSkillFor(roleStats,champ); // 시그니처 챔피언은 숙련도 90, 그 외는 역할군 평균
  const power=(roleSkill-60)/40; // 60점을 기준으로 실제 전투 성능에 반영
  const maxHp=Math.round(115*(1+power*.18));
  const atk=(team==='team'?8.8:8.6)*(1+power*.32);
@@ -1050,6 +1054,7 @@ const declineReasons={
 };
 function declineReason(c){return declineReasons[c.name]||"오늘은 못해"}
 function startGroup(){
+  callMode="group";
   const others=shuffle(chars.filter(c=>c.id!==me.id));
   party=[me,...others.slice(0,4)];
   chatMembers=shuffle(party.slice(1));
@@ -1059,8 +1064,9 @@ function startGroup(){
 function tickGroup(){if(replies>=8)return;setTimeout(()=>{replies++;render();tickGroup()},900)}
 function finishGroup(){mode="party";render()}
 function toggle(id){selected=selected.includes(id)?selected.filter(x=>x!==id):selected.length<4?[...selected,id]:selected;render()}
-function startPrivate(){party=[me,...chars.filter(c=>selected.includes(c.id))];privateTargets=party.slice(1);privateIndex=0;mode="private";render();setTimeout(()=>{privateIndex=1;render()},1100)}
+function startPrivate(){callMode="private";party=[me,...chars.filter(c=>selected.includes(c.id))];privateTargets=party.slice(1);privateIndex=0;mode="private";render();setTimeout(()=>{privateIndex=1;render()},1100)}
 function nextPrivate(){if(privateIndex<3){privateIndex++;render()}else{mode="party";render()}}
+function reselectPartyFromReady(){ if(callMode==="group"){ startGroup(); } else { selected=[]; party=[]; mode="manual"; render(); } }
 const augmentNames={
  silver:["감시의 장막", "강타자", "광신자", "궁극의 저지 불가", "그림자 질주", "능력치!", "능수능란", "대지의 영혼", "도주 계획", "도취", "마법공학의 영혼", "마법사 (물리)", "민병대", "바다의 영혼", "부식", "불을 밝혀", "사악한 정신", "선혈포식", "속전속결", "순수주의자 - 마법사", "승리를 위한 회전", "쌍둥이 불꽃", "우당탕탕", "육중한 힘", "음속 폭발", "응급 처치 키트", "적응형 능력치", "전환: 골드", "점멸탄", "정신 변환", "조준경 부착", "지옥불 영혼", "징수의 총 업그레이드", "차가운 냉기", "태풍", "폴터가이스트", "하체 운동의 날", "확보된 킬", "확률적 방어", "다단 중첩", "강력한 방패", "불사르기 업그레이드", "불여우", "빠르고 안전하게", "빙글빙글", "점멸 2", "존야 업그레이드", "치명적 가속", "폭격기", "눈 오는 날", "적응형 와드", "채널 고정", "보강", "장인의 솜씨", "출발할 시간", "흡수", "확고한 의지로", "믿음직한 무기", "죽음의 무도 업그레이드"],
  gold:["감쇠 광선", "극악무도", "급속 성장", "너만을 위해", "넘을 수 없는 벽", "노련한 저격수", "능력치 더하기 능력치!", "되풀이", "마법 명사수", "마법 미사일", "무법자의 투지", "바늘에 실 끼우기", "범람", "부메랑 투척", "빛의 인도자 결의", "빵과 버터", "빵과 잼", "빵과 치즈", "상급 조준경 부착", "소환술사", "속행", "시작부터 끝까지", "신난다!", "신성한 중재", "영혼 흡수", "전술적 대비", "전환: 프리즘", "점멸 난사", "처형 시간", "천상의 신체", "최첨단 발명가", "치명적 미사일", "치명적 치유", "치명적인 공격", "취약", "퀘스트: 강철 같은 심장", "타오르는 새벽", "핀볼", "화염 낙인", "환영 무기", "후원", "광휘의 검 업그레이드", "무한의 대검 업그레이드", "밤의 추적", "소나타", "영혼의 정화", "영혼의 포식자", "축소 엔진", "치명적 리듬", "탱크 엔진", "타오르는 이자", "끝없는 학살", "로켓 배송", "Hide on bush", "자연의 회복", "우리의 치유", "무리한 진입", "격려하기", "고슴도치", "압력솥", "상어 미끼", "상어 폭풍", "눈 폭발", "이빨 요정", "마도사의 주스 상자", "삐뽀삐뽀", "으악, 내 동전!", "꽁!", "작은 도움", "자비의 일격", "위력 추구", "가속 추구", "굶주린 속박", "원기 회복", "지형 생성됨", "날쌘걸음", "공포", "연쇄 반응", "갈라진 하늘 업그레이드", "굶주린 히드라 업그레이드"],
@@ -1220,4 +1226,11 @@ render();
   .chat-event-card{padding:18px 13px!important}.chat-event-card h2{font-size:17px!important}
   .b2-side{width:62px!important}.match-all-chat,.b2-panel{width:calc(100% - 140px)!important}.b2-speed-dock button{padding:4px!important;font-size:6px!important}
 }
+</style>
+
+<style>
+.signature-label{display:block;margin-top:7px;color:#c8a85d;font-size:11px;font-weight:800;letter-spacing:-.2px}.card.sel .signature-label{color:#f0cf78}.party-reselect{display:block;max-width:860px;width:100%;margin:10px auto 0!important;padding:13px!important;border:1px solid #4a4b44!important;background:#20211e!important;color:#c7c8c2!important}
+/* V46 KakaoTalk-inspired call UI */
+.phone{background:#555!important;border-color:#707070!important}.head{background:#555!important;border-bottom:1px solid #626262!important;height:72px!important}.head strong{border:0!important;background:transparent!important;padding:0!important;font-size:16px!important;color:#fff!important}.head small{display:block!important;color:#c8c8c8!important;font-size:11px!important;margin-top:3px}.head em,.head button{color:#f0f0f0!important}.chat{background:#555!important;min-height:500px!important}.date{background:#666!important;color:#ddd!important}.who{color:#f2f2f2!important}.bubble{background:#fff!important;color:#222!important;border-radius:3px!important}.mine .bubble{background:#fff!important;color:#222!important}.system{background:#666!important;color:#eee!important}.typing{background:#fff!important}.input{background:#fff!important;color:#aaa!important;border-top:1px solid #ddd!important}.input b{color:#555!important}
+@media(max-width:700px){.signature-label{font-size:10px}.phonewrap{max-width:100%!important}.phone{border-radius:0!important}.chat{min-height:52dvh!important}.party-reselect{font-size:13px!important}}
 </style>
