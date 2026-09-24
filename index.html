@@ -423,6 +423,19 @@ const chars=[
 ["joguk","조국","임도현"],["mundolmaeng","문돌맹","이동기"],["nguyen","Nguyen Ngoc Tu","이재빈"],
 ["dwaemesa","돼메사","조시원"],["galio","갈리오","김정운"],["dage","다케스탄 출신","황재윤"]
 ].map(x=>({id:x[0],nickname:x[1],name:x[2]}));
+const playerRoleStats={
+  "박성진":{Fighter:50,Tank:85,Mage:70,Assassin:50,Marksman:85,Support:95},
+  "정다운":{Fighter:60,Tank:80,Mage:50,Assassin:50,Marksman:80,Support:80},
+  "임도현":{Fighter:60,Tank:75,Mage:70,Assassin:60,Marksman:60,Support:90},
+  "이재빈":{Fighter:60,Tank:80,Mage:60,Assassin:30,Marksman:65,Support:80},
+  "김정운":{Fighter:65,Tank:75,Mage:60,Assassin:75,Marksman:40,Support:50},
+  "김병욱":{Fighter:60,Tank:70,Mage:55,Assassin:50,Marksman:55,Support:60},
+  "이동기":{Fighter:50,Tank:70,Mage:60,Assassin:40,Marksman:50,Support:70},
+  "황재윤":{Fighter:70,Tank:65,Mage:60,Assassin:70,Marksman:65,Support:50},
+  "조시원":{Fighter:50,Tank:40,Mage:60,Assassin:50,Marksman:80,Support:30}
+};
+function roleSkillFor(stats,champ){const rs=(champ.roles&&champ.roles.length?champ.roles:["Fighter"]);return rs.reduce((a,r)=>a+(stats[r]??60),0)/rs.length}
+function enemyRoleStats(){const o={};["Fighter","Tank","Mage","Assassin","Marksman","Support"].forEach(r=>o[r]=64+Math.floor(Math.random()*13));return o}
 let mode="select", me=null, selected=[], party=[], chatMembers=[], declinedMembers=[], replies=0, privateIndex=0, privateTargets=[], searching=false, queueSeconds=0, queueTimer=null, found=false, champOptions=[], teamPicks=[], chosenChamp=null, finalPool=[], enemyTeam=[], loadingSeconds=10, loadingTimer=null, loadingTransitionTimer=null, battleState=null, battleTimer=null, matchResult=null;
 
 const app=document.getElementById("app");
@@ -761,13 +774,25 @@ function startGame(){
     if(mode==="loading") startBattle();
   },10000);
 }
-function createChampionUnit(team,index,champ,nick){
- return {id:`${team}-c${index}`,kind:'champ',team,champ,nick,icon:champ.icon,x:team==='team'?8:92,y:36+index*7,maxHp:115,hp:115,level:3,gold:1400,xp:0,atk:team==='team'?8.8:8.6,range:5.2,speed:2.1+Math.random()*.25,attackCd:0,alive:true,respawn:0,laneBias:(index-2)*5.2,phase:Math.random()*6.28,kills:0,deaths:0,assists:0,damageDealt:0,damageTaken:0,augments:[]};
+function championFormation(champ){
+ const primary=(champ.roles&&champ.roles[0])||'Fighter';
+ return ['Tank','Fighter','Assassin'].includes(primary)?'front':'back';
+}
+function createChampionUnit(team,index,champ,nick,realName=null){
+ const roleStats=team==='team'?(playerRoleStats[realName]||Object.fromEntries(["Fighter","Tank","Mage","Assassin","Marksman","Support"].map(r=>[r,60]))):enemyRoleStats();
+ const roleSkill=roleSkillFor(roleStats,champ); // 복수 역할군은 해당 점수 평균
+ const power=(roleSkill-60)/40; // 60점을 기준으로 실제 전투 성능에 반영
+ const maxHp=Math.round(115*(1+power*.18));
+ const atk=(team==='team'?8.8:8.6)*(1+power*.32);
+ const speed=(2.1+Math.random()*.25)*(1+power*.06);
+ const formation=championFormation(champ);
+ const combatRange=formation==='back'?6.8:4.9;
+ return {id:`${team}-c${index}`,kind:'champ',team,champ,nick,realName,icon:champ.icon,x:team==='team'?8:92,y:36+index*7,maxHp,hp:maxHp,level:3,gold:1400,xp:0,atk,range:combatRange,speed,roleStats,roleSkill,formation,attackCd:0,alive:true,respawn:0,laneBias:(index-2)*5.2,phase:Math.random()*6.28,kills:0,deaths:0,assists:0,damageDealt:0,damageTaken:0,augments:[]};
 }
 function createMinion(team,type='melee'){const cannon=type==='cannon';return {id:`m-${team}-${Math.random()}`,kind:'minion',minionType:type,team,nick:'미니언',xpValue:cannon?100:type==='ranged'?32:65,x:team==='team'?7:93,y:46+Math.random()*8,maxHp:cannon?45:type==='melee'?30:23,hp:cannon?45:type==='melee'?30:23,atk:cannon?3.2:type==='melee'?2.0:1.7,range:cannon?4:type==='ranged'?4.2:2.4,speed:1.45,attackCd:0,alive:true,laneBias:(Math.random()-.5)*6,phase:Math.random()*6.28}}
 function startBattle(){
  clearInterval(loadingTimer); clearTimeout(loadingTransitionTimer); loadingTimer=null; loadingTransitionTimer=null;
- const team=teamPicks.map((c,i)=>createChampionUnit('team',i,c,party[i].nickname));
+ const team=teamPicks.map((c,i)=>createChampionUnit('team',i,c,party[i].nickname,party[i].name));
  const enemy=enemyTeam.map((e,i)=>createChampionUnit('enemy',i,e.champ,e.nick));
  const structures=[
  {id:'tn1',team:'team',type:'nexus',name:'넥서스',x:5,y:50,hp:100,alive:true},{id:'tt1',team:'team',type:'tower',name:'쌍둥이 포탑',x:9,y:50,hp:100,alive:true},{id:'tt2',team:'team',type:'tower',name:'쌍둥이 포탑',x:12,y:50,hp:100,alive:true},{id:'ti',team:'team',type:'inhib',name:'억제기',x:17,y:50,hp:100,alive:true},{id:'t2',team:'team',type:'tower',name:'2차 포탑',x:28,y:50,hp:100,alive:true},{id:'t1',team:'team',type:'tower',name:'1차 포탑',x:40,y:50,hp:100,alive:true},
@@ -857,10 +882,16 @@ function updateUnits(dt){const bs=battleState;syncNpcAugments();const all=bs.uni
  const alliedMinions=bs.units.filter(m=>m.alive&&m.kind==='minion'&&m.team===u.team&&(!st||Math.abs(m.x-st.x)<8));
  if(u.kind==='champ'){
    // 교전 빈도를 낮춘다: 가까워도 항상 싸우지 않고, 팀 라인 간격을 유지하며 전진/후퇴한다.
-   const engage=targetChamp && champDist<11.0 && (u.hp/u.maxHp>.32) && (Math.sin(bs.time*.22+u.phase)>.05);
+   const engageRange=u.formation==='back'?14.5:10.8;
+   const engage=targetChamp && champDist<engageRange && (u.hp/u.maxHp>.32) && (Math.sin(bs.time*.22+u.phase)>.05);
    if(engage){
      if(champDist<=u.range && u.attackCd<=0){dealDamage(u,targetChamp,u.atk*(.48+Math.random()*.28));u.attackCd=(2.25+Math.random()*1.15)*(u.attackRateMod||1);}
-     else moveOrganic(u,{x:targetChamp.x,y:targetChamp.y+u.laneBias*.32},dt*.72);
+     else {
+       // 전방군은 적에게 붙고, 후방군은 아군 전선 뒤에서 사거리를 유지한다.
+       const dir=u.team==='team'?1:-1;
+       const spacing=u.formation==='back'?u.range*.82:Math.max(1.4,u.range*.28);
+       moveOrganic(u,{x:targetChamp.x-dir*spacing,y:targetChamp.y+u.laneBias*.32},dt*(u.formation==='back'?.58:.76));
+     }
    }else if(st){
      const enemyTower=st.type==='tower';
      // 적 포탑 앞에 아군 미니언이 없으면 챔피언은 뒤로 빠진다.
@@ -868,7 +899,8 @@ function updateUnits(dt){const bs=battleState;syncNpcAugments();const all=bs.uni
        const retreatX=u.team==='team'?st.x-11:st.x+11;
        moveOrganic(u,{x:retreatX,y:50+u.laneBias},dt*.85);
      }else{
-       const targetX=st.x+(u.team==='team'?-4.2:4.2);
+       const formationGap=u.formation==='back'?9.0:4.2;
+       const targetX=st.x+(u.team==='team'?-formationGap:formationGap);
        const targetY=50+u.laneBias;
        if(Math.abs(u.x-targetX)<3.5 && alliedMinions.length>0 && u.attackCd<=0){damageStructure(st,u.atk*.38,u);u.attackCd=1.45+Math.random()*.5}
        else moveOrganic(u,{x:targetX,y:targetY},dt*.62);
@@ -881,6 +913,15 @@ function updateUnits(dt){const bs=battleState;syncNpcAugments();const all=bs.uni
    if(mt&&md<=u.range&&u.attackCd<=0){dealDamage(u,mt,u.atk);u.attackCd=1.15}
    else if(st&&Math.abs(u.x-st.x)<3.4){if(u.attackCd<=0){damageStructure(st,u.atk*.24,u);u.attackCd=1.2}}
    else if(st)moveOrganic(u,{x:st.x+(u.team==='team'?-1.6:1.6),y:50+u.laneBias*.2},dt);
+ }
+ // 후방군은 살아있는 아군 전방군보다 과하게 앞으로 튀어나가지 않는다.
+ if(u.kind==='champ'&&u.formation==='back'){
+   const fronts=bs.units.filter(v=>v.alive&&v.kind==='champ'&&v.team===u.team&&v.formation==='front');
+   if(fronts.length){
+     const dir=u.team==='team'?1:-1;
+     const frontX=dir===1?Math.max(...fronts.map(v=>v.x)):Math.min(...fronts.map(v=>v.x));
+     if(dir===1)u.x=Math.min(u.x,frontX-3.2); else u.x=Math.max(u.x,frontX+3.2);
+   }
  }
  // 챔피언은 서로 겹치지 않도록 더 넓은 횡간격을 유지한다.
  if(u.kind==='champ'){
