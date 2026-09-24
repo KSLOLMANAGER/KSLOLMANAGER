@@ -342,6 +342,12 @@ button{font:inherit}.app{min-height:100vh;width:100%;max-width:1240px;margin:0 a
  .b2-head{grid-template-columns:1fr 120px 1fr}.b2-side{width:66px}.b2-unit,.b2-side.right .b2-unit{grid-template-columns:23px 1fr!important;height:44px}.portrait{width:22px;height:29px}.match-all-chat,.b2-panel{width:calc(100% - 148px)!important}.b2-panel{bottom:82px!important}.match-all-chat{height:74px}.augment-card{min-height:190px}.augment-card p{font-size:8px}
 }
 
+
+/* V28: always-visible speed dock + per-player augment slots */
+.b2-speed-dock{position:absolute;z-index:35;top:12px;left:50%;transform:translateX(-50%);display:flex;gap:4px;padding:5px;background:#061219e8;border:1px solid #38515d;box-shadow:0 5px 18px #0008}
+.b2-speed-dock button{border:1px solid #314b57;background:#0a1b24;color:#9fb0b7;padding:5px 8px;font-size:9px;font-weight:900;cursor:pointer}.b2-speed-dock button.active{color:#f0d784;border-color:#b8994d;background:#19251f}
+.unit-augments{display:grid;grid-template-columns:repeat(4,1fr);gap:2px;margin-top:4px}.unit-augment{height:15px;border:1px solid #314550;background:#071219;color:#657780;font-size:8px;display:grid;place-items:center;overflow:hidden;white-space:nowrap}.unit-augment.filled{color:#e8d797;border-color:#75663f}.unit-augment.silver{border-color:#89979e;color:#cbd5da}.unit-augment.gold{border-color:#a98839;color:#e9c45e}.unit-augment.prismatic{border-color:#8c5db7;color:#d2a4ff}
+@media(max-width:800px){.b2-speed-dock{top:4px;gap:2px;padding:3px}.b2-speed-dock button{padding:4px 5px;font-size:7px}.unit-augments{gap:1px}.unit-augment{height:10px;font-size:0}.unit-augment.filled:after{content:'◆';font-size:6px}.b2-unit{height:52px!important}}
 </style>
 </head>
 <body>
@@ -417,8 +423,9 @@ body=`<div class="loading-screen"><div class="loading-inner"><div class="loading
 if(mode==="battle"){
 const bs=battleState || {time:0,status:"전투 준비 중",team:[],enemy:[],log:[],speed:1,structures:[],relics:[],fx:[]};
 const portrait=(u)=>`<div class="portrait"><img src="assets/champions/${u.champ.id}_0.png" onerror="this.style.display='none';this.parentElement.textContent='${u.icon}'"></div>`;
-const row=(u,right=false)=>`<div class="b2-unit ${u.alive?"":"dead"}">${right?`<div class="unit-info"><strong>${u.nick}</strong><small>${u.champ.name} · Lv.${u.level}</small><div class="b2-hp"><i style="width:${Math.max(0,u.hp/u.maxHp*100)}%"></i></div><div class="b2-gold">${Math.floor(u.gold).toLocaleString()} G</div></div>${portrait(u)}`:`${portrait(u)}<div class="unit-info"><strong>${u.nick}</strong><small>${u.champ.name} · Lv.${u.level}</small><div class="b2-hp"><i style="width:${Math.max(0,u.hp/u.maxHp*100)}%"></i></div><div class="b2-gold">${Math.floor(u.gold).toLocaleString()} G</div></div>`}</div>`;
-body=`<div class="battle-v2"><div class="b2-head"><div></div><div><div class="b2-score"><span class="blue">${bs.teamKills||0}</span> &nbsp; ⚔ &nbsp; <span class="red">${bs.enemyKills||0}</span></div><div class="b2-clock">${formatBattleTime(bs.time)}</div></div><div class="b2-right">${bs.status}</div></div><div class="b2-main"><aside class="b2-side"><div class="b2-side-title">우리 팀</div>${bs.team.map(u=>row(u,false)).join("")}</aside><div class="b2-stage"><div class="b2-map"><div class="clean-bridge"></div></div>
+const augSlots=(u)=>`<div class="unit-augments">${[0,1,2,3].map(i=>{const a=(u.augments||[])[i];return `<span class="unit-augment ${a?'filled '+a.tier:''}" title="${a?a.name+' · '+a.desc:'미선택'}">${a?a.name:'-'}</span>`}).join('')}</div>`;
+const row=(u,right=false)=>`<div class="b2-unit ${u.alive?"":"dead"}">${right?`<div class="unit-info"><strong>${u.nick}</strong><small>${u.champ.name} · Lv.${u.level}</small><div class="b2-hp"><i style="width:${Math.max(0,u.hp/u.maxHp*100)}%"></i></div><div class="b2-gold">${Math.floor(u.gold).toLocaleString()} G</div>${augSlots(u)}</div>${portrait(u)}`:`${portrait(u)}<div class="unit-info"><strong>${u.nick}</strong><small>${u.champ.name} · Lv.${u.level}</small><div class="b2-hp"><i style="width:${Math.max(0,u.hp/u.maxHp*100)}%"></i></div><div class="b2-gold">${Math.floor(u.gold).toLocaleString()} G</div>${augSlots(u)}</div>`}</div>`;
+body=`<div class="battle-v2"><div class="b2-head"><div></div><div><div class="b2-score"><span class="blue">${bs.teamKills||0}</span> &nbsp; ⚔ &nbsp; <span class="red">${bs.enemyKills||0}</span></div><div class="b2-clock">${formatBattleTime(bs.time)}</div></div><div class="b2-right">${bs.status}</div></div><div class="b2-main"><aside class="b2-side"><div class="b2-side-title">우리 팀</div>${bs.team.map(u=>row(u,false)).join("")}</aside><div class="b2-stage"><div class="b2-speed-dock">${[.5,1,2,4,8,16,32].map(v=>`<button class="${bs.speed===v?'active':''}" onclick="setBattleSpeed(${v})">${v}×</button>`).join('')}</div><div class="b2-map"><div class="clean-bridge"></div></div>
 <div class="structure-track">${bs.structures.map(st=>`<div class="b2-structure ${st.team==='enemy'?'red':''} ${st.type} ${st.alive?'':'dead'}" data-structure="${st.id}" style="left:${st.x}%"><div class="sicon">${st.type==='nexus'?'◆':st.type==='inhib'?'✦':'▥'}</div><div class="sname">${st.name} · ${Math.max(0,Math.round(st.hp))}%</div></div>`).join("")}</div>
 ${bs.units.filter(u=>u.kind==='champ').map(u=>unitV2Html(u)).join("")}
 <div class="b2-panel"><div class="b2-panel-head"><span>LIVE MATCH LOG</span><span>${formatBattleTime(bs.time)}</span></div><div class="b2-log">${bs.log.slice(-6).map(x=>`<div>${x}</div>`).join("")}</div><div class="b2-controls"><button class="${bs.speed===.5?'active':''}" onclick="setBattleSpeed(.5)">0.5×</button><button class="${bs.speed===1?'active':''}" onclick="setBattleSpeed(1)">1×</button><button class="${bs.speed===2?'active':''}" onclick="setBattleSpeed(2)">2×</button><button class="${bs.speed===4?'active':''}" onclick="setBattleSpeed(4)">4×</button><button class="${bs.speed===8?'active':''}" onclick="setBattleSpeed(8)">8×</button><button class="${bs.speed===16?'active':''}" onclick="setBattleSpeed(16)">16×</button><button class="${bs.speed===32?'active':''}" onclick="setBattleSpeed(32)">32×</button></div></div><div class="match-all-chat"><div class="match-all-chat-head">전체 채팅</div><div class="match-all-chat-body">${(bs.chat||[]).slice(-5).map(x=>`<div>${x}</div>`).join("")}</div></div>${bs.jaebinEventOpen?`<div class="chat-event-overlay"><div class="chat-event-card"><div class="event-mark">!</div><h2>이재빈이 전체 채팅을 시도하려고 합니다</h2><p>허락하시겠습니까?</p><div class="warn">‼️ 상대방의 멘탈이 흔들리거나 오히려 각성할 수 있습니다.</div><div class="chat-event-actions"><button onclick="allowJaebinChat()">허락하기</button><button class="deny" onclick="denyJaebinChat()">반대하기</button></div></div></div>`:""}${augmentOverlayHtml(bs)}</div><aside class="b2-side right"><div class="b2-side-title">적 팀</div>${bs.enemy.map(u=>row(u,true)).join("")}</aside></div></div>`;
@@ -513,9 +520,9 @@ function startGame(){
   },10000);
 }
 function createChampionUnit(team,index,champ,nick){
- return {id:`${team}-c${index}`,kind:'champ',team,champ,nick,icon:champ.icon,x:team==='team'?8:92,y:36+index*7,maxHp:115,hp:115,level:3,gold:1400,xp:0,atk:team==='team'?8.8:8.6,range:5.2,speed:2.1+Math.random()*.25,attackCd:0,alive:true,respawn:0,laneBias:(index-2)*5.2,phase:Math.random()*6.28,kills:0,deaths:0,assists:0,damageDealt:0,damageTaken:0};
+ return {id:`${team}-c${index}`,kind:'champ',team,champ,nick,icon:champ.icon,x:team==='team'?8:92,y:36+index*7,maxHp:115,hp:115,level:3,gold:1400,xp:0,atk:team==='team'?8.8:8.6,range:5.2,speed:2.1+Math.random()*.25,attackCd:0,alive:true,respawn:0,laneBias:(index-2)*5.2,phase:Math.random()*6.28,kills:0,deaths:0,assists:0,damageDealt:0,damageTaken:0,augments:[]};
 }
-function createMinion(team,cannon=false){return {id:`m-${team}-${Math.random()}`,kind:'minion',team,nick:'미니언',x:team==='team'?7:93,y:46+Math.random()*8,maxHp:cannon?45:25,hp:cannon?45:25,atk:cannon?3.2:1.8,range:cannon?4:2.4,speed:1.45,attackCd:0,alive:true,laneBias:(Math.random()-.5)*6,phase:Math.random()*6.28}}
+function createMinion(team,type='melee'){const cannon=type==='cannon';return {id:`m-${team}-${Math.random()}`,kind:'minion',minionType:type,team,nick:'미니언',xpValue:cannon?100:type==='ranged'?32:65,x:team==='team'?7:93,y:46+Math.random()*8,maxHp:cannon?45:type==='melee'?30:23,hp:cannon?45:type==='melee'?30:23,atk:cannon?3.2:type==='melee'?2.0:1.7,range:cannon?4:type==='ranged'?4.2:2.4,speed:1.45,attackCd:0,alive:true,laneBias:(Math.random()-.5)*6,phase:Math.random()*6.28}}
 function startBattle(){
  clearInterval(loadingTimer); clearTimeout(loadingTransitionTimer); loadingTimer=null; loadingTransitionTimer=null;
  const team=teamPicks.map((c,i)=>createChampionUnit('team',i,c,party[i].nickname));
@@ -542,21 +549,30 @@ function moveOrganic(u,target,dt){
  // soft lane bounds and light separation so units don't march in a single file
  const same=battleState.units.filter(v=>v.alive&&v!==u&&v.team===u.team&&Math.abs(v.x-u.x)<2.8&&Math.abs(v.y-u.y)<5).slice(0,3);
  for(const v of same){const sy=u.y-v.y; if(Math.abs(sy)<2.4)u.y+=(sy>=0?1:-1)*.55*dt}
+ // 같은 라인의 적을 관통해서 서로 엇갈려 지나가지 않게 전선을 유지한다.
+ const blockers=battleState.units.filter(v=>v.alive&&v.kind==='champ'&&v.team!==u.team&&Math.abs(v.y-u.y)<8);
+ if(blockers.length){const b=blockers.reduce((a,v)=>!a||Math.abs(v.x-u.x)<Math.abs(a.x-u.x)?v:a,null);if(b&&Math.abs(b.x-u.x)<4.6){if(u.team==='team')u.x=Math.min(u.x,b.x-2.3);else u.x=Math.max(u.x,b.x+2.3)}}
  u.y=Math.max(34,Math.min(66,u.y));
 }
 function bsTime(){return battleState?battleState.time:0}
+
+const XP_CUMULATIVE={3:0,4:478,5:988,6:1738,7:2518,8:3398,9:4378,10:5458,11:6638,12:7918,13:9298,14:10778,15:12358,16:14038,17:15818,18:17698};
+function levelFromXp(xp){let lv=3;for(let n=4;n<=18;n++){if(xp>=XP_CUMULATIVE[n])lv=n;else break}return lv}
+function championKillXp(level){return Math.round(42+Math.max(0,Math.min(15,(level||3)-3))*(948/15))}
+function grantMinionXp(minion){const bs=battleState;if(!bs)return;const nearby=bs.units.filter(u=>u.kind==='champ'&&u.alive&&u.team!==minion.team&&Math.hypot(u.x-minion.x,u.y-minion.y)<=14);if(!nearby.length)return;const base=minion.xpValue||32;const each=nearby.length===1?base*.95:(base*1.24/nearby.length);nearby.forEach(u=>u.xp+=each)}
+
 function respawnSeconds(u){return Math.max(1,(u.level||1)*2+4)}
 function killLog(attacker,target){
  const bs=battleState, at=attacker.team==='team'?'blue-name':'red-name', tt=target.team==='team'?'blue-name':'red-name';
  if(attacker.kind==='champ'){
    if(attacker.team==='team')bs.teamKills++; else if(attacker.team==='enemy')bs.enemyKills++;
-   attacker.kills=(attacker.kills||0)+1; attacker.gold+=300;
+   attacker.kills=(attacker.kills||0)+1; attacker.gold+=300; attacker.xp+=(target.kind==='champ'?championKillXp(target.level):0);
  }
  target.deaths=(target.deaths||0)+1;
  const allies=bs.units.filter(u=>u.kind==='champ'&&u.team===attacker.team&&u!==attacker&&u.alive&&Math.hypot(u.x-target.x,u.y-target.y)<14); allies.forEach(u=>u.assists=(u.assists||0)+1);
  bs.log.push(`[${formatBattleTime(bs.time)}] <span class="${at}">${attacker.nick||attacker.name||'포탑'}</span> → <span class="${tt}">${target.nick}</span> 처치`);
 }
-function dealDamage(attacker,target,dmg){if(!target.alive)return;if(attacker.kind==='champ')attacker.damageDealt=(attacker.damageDealt||0)+dmg*12;if(target.kind==='champ')target.damageTaken=(target.damageTaken||0)+dmg*12;target.hp-=dmg;if(target.hp<=0){target.hp=0;target.alive=false;if(target.kind==='champ'){target.respawn=respawnSeconds(target);addFx(target.x,target.y,'KO',attacker.team);killLog(attacker,target)}}else if(Math.random()<.035&&attacker.kind==='champ'){addFx(target.x,target.y,`-${Math.max(1,Math.round(dmg*12))}`,attacker.team)}}
+function dealDamage(attacker,target,dmg){if(!target.alive)return;if(attacker.kind==='champ')attacker.damageDealt=(attacker.damageDealt||0)+dmg*12;if(target.kind==='champ')target.damageTaken=(target.damageTaken||0)+dmg*12;target.hp-=dmg;if(target.hp<=0){target.hp=0;target.alive=false;if(target.kind==='minion')grantMinionXp(target);if(target.kind==='champ'){target.respawn=respawnSeconds(target);addFx(target.x,target.y,'KO',attacker.team);killLog(attacker,target)}}else if(Math.random()<.035&&attacker.kind==='champ'){addFx(target.x,target.y,`-${Math.max(1,Math.round(dmg*12))}`,attacker.team)}}
 function damageStructure(st,dmg,attacker){
  const tempo=battleState.time>15*60?2.4:battleState.time>10*60?1.55:1;
  st.hp-=dmg*tempo;
@@ -571,9 +587,12 @@ function spawnWave(){
  const bs=battleState;bs.waveCount++;
  const cannon=(bs.waveCount%2===1); // 첫 웨이브부터 한 웨이브 건너 대포
  for(let i=0;i<6;i++){
-   bs.units.push(createMinion('team',(cannon||bs.superTeam)&&i===0));
-   bs.units.push(createMinion('enemy',(cannon||bs.superEnemy)&&i===0));
+   const type=i<3?'melee':'ranged';
+   bs.units.push(createMinion('team',type));
+   bs.units.push(createMinion('enemy',type));
  }
+ if(cannon||bs.superTeam)bs.units.push(createMinion('team','cannon'));
+ if(cannon||bs.superEnemy)bs.units.push(createMinion('enemy','cannon'));
 
 }
 function updateRelics(dt){const bs=battleState;for(const r of bs.relics){if(r.cooldown>0){r.cooldown-=dt;continue}const nearby=bs.units.filter(u=>u.alive&&Math.abs(u.x-r.x)<2.4&&u.kind==='champ');if(nearby.length){const u=nearby.sort((a,b)=>a.hp/b.maxHp-b.hp/b.maxHp)[0];if(u.hp<u.maxHp*.92){u.hp=Math.min(u.maxHp,u.hp+u.maxHp*.08);r.cooldown=35}}}}
@@ -584,9 +603,9 @@ function updateStructures(dt){const bs=battleState;for(const st of bs.structures
  if(!target)continue;
  dealDamage({kind:'structure',nick:st.name,team:st.team},target,(target.kind==='minion'?13:6.2)*dt);
  }}
-function updateUnits(dt){const bs=battleState;const all=bs.units;for(const u of all){
+function updateUnits(dt){const bs=battleState;syncNpcAugments();const all=bs.units;for(const u of all){
  if(!u.alive){if(u.kind==='champ'&&u.respawn>0){u.respawn-=dt;if(u.respawn<=0){u.alive=true;u.hp=u.maxHp*.72;u.x=u.team==='team'?8:92;u.y=50+u.laneBias;u.gold=Math.max(u.gold,1400);u.phase=Math.random()*6.28}}continue}
- u.gold+=6*dt;u.xp+=12*dt;u.level=Math.min(18,3+Math.floor(u.xp/100));u.attackCd=Math.max(0,(u.attackCd||0)-dt);
+ u.gold+=6*dt;if(u.kind==='champ')u.xp+=5*dt;u.level=u.kind==='champ'?levelFromXp(u.xp):u.level;u.attackCd=Math.max(0,(u.attackCd||0)-dt);
  if(u===bs.team[0]&&!bs.augmentOpen&&!bs.jaebinEventOpen){for(const lv of [7,11,15]){if(u.level>=lv&&!bs.augmentDone[lv]){openAugment(lv);return}}}
  const enemyChamps=bs.units.filter(e=>e.alive&&e.kind==='champ'&&e.team!==u.team);
  const enemyMinions=bs.units.filter(e=>e.alive&&e.kind==='minion'&&e.team!==u.team);
@@ -596,7 +615,7 @@ function updateUnits(dt){const bs=battleState;const all=bs.units;for(const u of 
  const alliedMinions=bs.units.filter(m=>m.alive&&m.kind==='minion'&&m.team===u.team&&(!st||Math.abs(m.x-st.x)<8));
  if(u.kind==='champ'){
    // 교전 빈도를 낮춘다: 가까워도 항상 싸우지 않고, 팀 라인 간격을 유지하며 전진/후퇴한다.
-   const engage=targetChamp && champDist<9.2 && (u.hp/u.maxHp>.32) && (Math.sin(bs.time*.22+u.phase)>.05);
+   const engage=targetChamp && champDist<11.0 && (u.hp/u.maxHp>.32) && (Math.sin(bs.time*.22+u.phase)>.05);
    if(engage){
      if(champDist<=u.range && u.attackCd<=0){dealDamage(u,targetChamp,u.atk*(.48+Math.random()*.28));u.attackCd=(2.25+Math.random()*1.15)*(u.attackRateMod||1);}
      else moveOrganic(u,{x:targetChamp.x,y:targetChamp.y+u.laneBias*.32},dt*.72);
@@ -710,9 +729,11 @@ function makeAugmentChoices(){
  const tiers=['silver','gold','prismatic'];
  return tiers.map((tier,i)=>{const pool=augmentTemplates[tier];const a=pool[Math.floor(Math.random()*pool.length)];return {...a,tier,rerolled:false,key:tier+'-'+i+'-'+Math.random()}});
 }
+function autoPickAugmentFor(u,stage){if(!u||u.kind!=='champ')return;u.augments=u.augments||[];const idx=stage==='start'?0:stage===7?1:stage===11?2:3;if(u.augments[idx])return;const choices=makeAugmentChoices();const a=choices[Math.floor(Math.random()*choices.length)];a.apply(u);u.augments[idx]={name:a.name,tier:a.tier,desc:a.desc,stage};}
+function syncNpcAugments(){const bs=battleState;if(!bs)return;for(const u of [...bs.team,...bs.enemy]){if(u===bs.team[0])continue;if(!(u.augments||[]).length)autoPickAugmentFor(u,'start');for(const lv of [7,11,15])if(u.level>=lv)autoPickAugmentFor(u,lv)}}
 function openAugment(stage){const bs=battleState;if(!bs||bs.augmentOpen)return;bs.augmentStage=stage;bs.augmentChoices=makeAugmentChoices();bs.augmentOpen=true;bs.paused=true;bs.status='증강체 선택 중';render()}
 function rerollAugment(i,e){if(e){e.stopPropagation()}const bs=battleState;if(!bs||!bs.augmentOpen||bs.augmentChoices[i].rerolled)return;const old=bs.augmentChoices[i],pool=augmentTemplates[old.tier].filter(a=>a.name!==old.name);const a=pool[Math.floor(Math.random()*pool.length)]||augmentTemplates[old.tier][0];bs.augmentChoices[i]={...a,tier:old.tier,rerolled:true,key:old.tier+'-'+Math.random()};render()}
-function chooseAugment(i){const bs=battleState;if(!bs||!bs.augmentOpen)return;const a=bs.augmentChoices[i],me=bs.team[0];a.apply(me);bs.augments.push({name:a.name,tier:a.tier,stage:bs.augmentStage});bs.augmentDone[bs.augmentStage]=true;bs.augmentOpen=false;bs.paused=false;bs.status='경기 진행 중';bs.lastTs=performance.now();render();window.__battleRAF=requestAnimationFrame(battleFrame)}
+function chooseAugment(i){const bs=battleState;if(!bs||!bs.augmentOpen)return;const a=bs.augmentChoices[i],me=bs.team[0];a.apply(me);const picked={name:a.name,tier:a.tier,desc:a.desc,stage:bs.augmentStage};bs.augments.push(picked);me.augments=me.augments||[];const ai=bs.augmentStage==='start'?0:bs.augmentStage===7?1:bs.augmentStage===11?2:3;me.augments[ai]=picked;bs.augmentDone[bs.augmentStage]=true;bs.augmentOpen=false;bs.paused=false;bs.status='경기 진행 중';bs.lastTs=performance.now();render();window.__battleRAF=requestAnimationFrame(battleFrame)}
 function augmentOverlayHtml(bs){if(!bs||!bs.augmentOpen)return '';const tierName={silver:'실버',gold:'골드',prismatic:'프리즘'};const stage=bs.augmentStage==='start'?'게임 시작':`레벨 ${bs.augmentStage}`;return `<div class="augment-overlay"><div class="augment-modal"><div class="augment-kicker">AUGMENT · ${stage}</div><h2>증강체를 선택하세요</h2><p>3개의 증강체 중 하나를 선택합니다. 각 칸은 한 번씩 리롤할 수 있습니다.</p><div class="augment-cards">${bs.augmentChoices.map((a,i)=>`<div class="augment-card ${a.tier}" onclick="chooseAugment(${i})"><div class="augment-tier">${tierName[a.tier]}</div><div class="augment-gem"><span>${a.icon}</span></div><h3>${a.name}</h3><p>${a.desc}</p><button class="augment-reroll" ${a.rerolled?'disabled':''} onclick="rerollAugment(${i},event)">${a.rerolled?'리롤 사용 완료':'↻ 리롤 1회'}</button></div>`).join('')}</div><div class="augment-picked">현재 선택: ${(bs.augments||[]).length?bs.augments.map(a=>`<b>${a.name}</b>`).join(' · '):'없음'}</div></div></div>`}
 
 let dragSource=null;
