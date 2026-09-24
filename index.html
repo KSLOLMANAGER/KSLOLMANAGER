@@ -413,6 +413,9 @@ button{font:inherit}.app{min-height:100vh;width:100%;max-width:1240px;margin:0 a
 @media(max-width:1000px){
  .unit-augment img{width:100%;height:100%;object-fit:cover;display:block}.unit-augment i{place-items:center;font-style:normal}
 }
+
+/* V41: compact circular match champion tokens */
+@media(min-width:801px){.b2-token{width:34px;height:34px;border-radius:50%}.b2-token .token-portrait{width:30px;height:30px;border-radius:50%}.b2-token b{top:36px}.b2-token .t-hp{width:34px;bottom:-7px}}
 </style>
 </head>
 <body>
@@ -442,7 +445,8 @@ const app=document.getElementById("app");
 const shuffle=a=>[...a].sort(()=>Math.random()-.5);
 function header(step){return `<header class="top"><div><div class="eyebrow">AUGMENT ARENA</div><h1>증강체 칼바람 매니저</h1></div><div class="step">${step}</div></header>`}
 function button(text,disabled=false,onclick=""){return `<button class="primary" ${disabled?"disabled":""} onclick="${onclick}">${text}</button>`}
-function championImageId(id){return id ? id.charAt(0).toUpperCase()+id.slice(1) : id;}
+const CHAMPION_IMAGE_IDS={reksai:"RekSai",leesin:"LeeSin",masteryi:"MasterYi",drmundo:"DrMundo",missfortune:"MissFortune",xinzhao:"XinZhao",aurelionsol:"AurelionSol",wukong:"MonkeyKing",jarvaniv:"JarvanIV",kogmaw:"KogMaw",ksante:"KSante",tahmkench:"TahmKench",twistedfate:"TwistedFate",fiddlesticks:"FiddleSticks"};
+function championImageId(id){return id ? (CHAMPION_IMAGE_IDS[id]||id.charAt(0).toUpperCase()+id.slice(1)) : id;}
 function render(){
 let body="";
 if(mode==="select"){
