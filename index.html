@@ -459,6 +459,49 @@ button{font:inherit}.app{min-height:100vh;width:100%;max-width:1240px;margin:0 a
 @media(max-width:390px){.champ-card{height:172px!important}.champ-art{height:112px!important}.champ-options{gap:4px!important}.center-select h2{font-size:20px!important}}
 </style>
 
+
+<style>
+/* ===== V51 MOBILE INTERACTION / QUEUE / CHAT FIX ===== */
+@media(max-width:800px){
+  /* Kakao chat: fixed viewport + newest message auto-visible */
+  .phonewrap{width:100%!important;max-width:520px!important;margin:0 auto!important}
+  .phone{height:min(72dvh,650px)!important;display:flex!important;flex-direction:column!important;overflow:hidden!important}
+  .phone .head{flex:0 0 64px!important;height:64px!important}
+  .phone .chat{flex:1 1 auto!important;min-height:0!important;height:auto!important;overflow-y:auto!important;overscroll-behavior:contain!important;-webkit-overflow-scrolling:touch!important;padding-bottom:22px!important}
+  .phone .input{flex:0 0 52px!important;height:52px!important}
+
+  /* Game found modal: fit portrait phones and safe areas */
+  .matchfound{padding:max(14px,env(safe-area-inset-top)) 14px max(14px,env(safe-area-inset-bottom))!important;box-sizing:border-box!important;overflow:auto!important}
+  .matchfound:before{width:min(88vw,390px)!important;height:min(88vw,390px)!important;max-height:70dvh!important}
+  .matchfound .mf-inner{width:100%!important;max-width:360px!important;padding:20px 16px!important;box-sizing:border-box!important}
+  .matchfound .mf-icon{width:74px!important;height:74px!important;margin:0 auto 12px!important}
+  .matchfound h2{font-size:25px!important;line-height:1.2!important;margin:7px 0!important}
+  .matchfound p{font-size:11px!important;margin-bottom:18px!important}
+  .matchfound .accept,.matchfound .decline{width:min(82vw,320px)!important;max-width:100%!important;margin:5px auto!important;padding:13px 12px!important;display:block!important}
+
+  /* Final pick: chat must not cover Ready; whole screen can scroll naturally */
+  .final-screen{height:100dvh!important;min-height:100dvh!important;overflow-y:auto!important;-webkit-overflow-scrolling:touch!important;overscroll-behavior-y:auto!important}
+  .final-main{padding:8px 8px 18px!important;overflow:visible!important}
+  .final-chat-left{position:relative!important;left:auto!important;right:auto!important;bottom:auto!important;width:calc(100% - 16px)!important;height:138px!important;margin:12px 8px calc(22px + env(safe-area-inset-bottom))!important;z-index:20!important}
+  .game-start-btn{position:relative!important;z-index:25!important;margin:14px auto 10px!important;display:block!important;min-height:48px!important}
+  .swap-zone{touch-action:pan-y!important}
+  .unused-pool .swap-zone{touch-action:pan-x pan-y!important}
+  .final-team .player-row{user-select:none;-webkit-user-select:none}
+}
+@media(max-width:430px){
+  .phone{height:min(76dvh,620px)!important}
+  .matchfound:before{width:92vw!important;height:92vw!important}
+  .matchfound h2{font-size:22px!important}
+  .final-main{padding-bottom:14px!important}
+  .final-chat-left{height:132px!important;margin-bottom:calc(18px + env(safe-area-inset-bottom))!important}
+  .hero-champ .hero-art{height:200px!important;min-height:170px!important}
+}
+@media(max-width:380px){
+  .matchfound .mf-icon{width:62px!important;height:62px!important}
+  .matchfound .mf-inner{padding:12px 10px!important}
+  .matchfound h2{font-size:20px!important}
+}
+</style>
 </head>
 <body>
 <div class="app" id="app"></div>
@@ -595,6 +638,10 @@ ${searching?`<button class="findbtn searching">게임 찾는 중...</button><but
 ${found?`<div class="matchfound"><div class="mf-inner"><div class="mf-icon"><span>⚔</span></div><div class="eyebrow">ARAM · CHAOS</div><h2>게임을 찾았습니다!</h2><p>무작위 총력전 · 아수라장</p><button class="accept" onclick="acceptMatch()">수락</button><button class="decline" onclick="stopQueue()">거절</button></div></div>`:""}`;
 }
 app.innerHTML=header(mode==="select"?"01 / CHARACTER":mode==="method"?"02 / CALL":"03 / PARTY")+`<main>${body}</main>`;
+// V51: 새 카톡 메시지가 렌더링될 때 항상 최신 메시지가 보이도록 자동 스크롤
+if(mode==="group" || mode==="private"){
+  requestAnimationFrame(()=>{const chat=app.querySelector('.phone .chat');if(chat)chat.scrollTop=chat.scrollHeight;});
+}
 }
 function goQueue(){mode="queue";searching=false;queueSeconds=0;render()}
 function startQueue(){
