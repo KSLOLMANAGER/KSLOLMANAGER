@@ -643,6 +643,39 @@ button{font:inherit}.app{min-height:100vh;width:100%;max-width:1240px;margin:0 a
 }
 </style>
 
+
+<style id="v77-end-chat-fix">
+/* V77: 종료 오버레이 채팅은 가로만 넓히지 않고 세로 공간을 크게 사용 */
+.end-chat{
+  width:min(860px,88vw)!important;
+  height:clamp(300px,42vh,480px)!important;
+  min-height:300px!important;
+  max-height:48vh!important;
+  bottom:22px!important;
+  display:flex!important;
+  flex-direction:column!important;
+}
+.end-chat .match-all-chat-head{flex:0 0 36px!important;height:36px!important;font-size:14px!important;padding:0 16px!important;}
+.end-chat .match-all-chat-body{
+  flex:1 1 auto!important;
+  height:auto!important;
+  min-height:0!important;
+  max-height:none!important;
+  overflow-y:auto!important;
+  padding:12px 16px!important;
+  font-size:15px!important;
+  line-height:1.75!important;
+  -webkit-overflow-scrolling:touch!important;
+}
+.match-all-chat-body .enemy-chat{color:#ff5964!important;font-weight:1000!important;text-shadow:0 0 8px rgba(255,60,70,.22)!important;}
+@media(max-width:800px){
+  .end-chat{width:94vw!important;height:76dvh!important;min-height:480px!important;max-height:80dvh!important;bottom:max(8px,env(safe-area-inset-bottom))!important;}
+  .end-chat .match-all-chat-body{font-size:14px!important;}
+}
+@media(max-width:390px){
+  .end-chat{height:74dvh!important;min-height:440px!important;}
+}
+</style>
 </head>
 <body>
 <div class="app" id="app"></div>
@@ -852,6 +885,12 @@ if(mode==="results"){
  if(molcho && (molcho.damageDealt||0)===lowest) resultChat.push(`<div><span class="result-chat-name">몰초:</span> 이거 버그야? 버그 아니야?</div>`);
  if(jaebin && (jaebin.damageDealt||0)>lowest) resultChat.push(`<div><span class="result-chat-name">Nguyen Ngoc Tu:</span> 흠.. 범인이 있네..</div>`);
  if(siljeom && (siljeom.damageDealt||0)===highest) resultChat.push(`<div><span class="result-chat-name">실점:</span> 아 쳐패고싶네 진짜</div>`);
+ if(!win){
+   if(matchResult.team.some(u=>u.nick==='Nguyen Ngoc Tu')) resultChat.push(`<div><span class="result-chat-name">Nguyen Ngoc Tu:</span> 근데 지고 자..?</div>`);
+   if(matchResult.team.some(u=>u.nick==='실점')) resultChat.push(`<div><span class="result-chat-name">실점:</span> 지고 자는 건 에바긴 해</div>`);
+   if(matchResult.team.some(u=>u.nick==='쓰리빠뚜르완')) resultChat.push(`<div><span class="result-chat-name">쓰리빠뚜르완:</span> 찐막?</div>`);
+   if(matchResult.team.some(u=>u.nick==='조국')) resultChat.push(`<div><span class="result-chat-name">조국:</span> 고조할배찐막?</div>`);
+ }
  body=`<div class="result-screen"><div class="result-wrap"><div class="result-head ${win?'win':'lose'}"><small>무작위 총력전 · 아수라장</small><h1>${win?'승리':'패배'}</h1><p>${formatBattleTime(matchResult.time)} · ${matchResult.teamKills} : ${matchResult.enemyKills}</p></div>${team('1팀 · 우리 팀',matchResult.team)}${team('2팀 · 적 팀',matchResult.enemy,true)}${resultChat.length?`<div class="result-chat-box"><div class="result-chat-head">게임 종료 채팅</div><div class="result-chat-body">${resultChat.join('')}</div></div>`:''}<div class="result-actions"><button onclick="playAgain()">한 번 더 하기</button><button class="alt" onclick="reselectTeam()">팀원 다시 선정하기</button></div></div></div>`;
 }
 if(mode==="party"){
@@ -1483,7 +1522,7 @@ function denyJaebinChat(){const bs=battleState;if(!bs)return;bs.chat.push(`<span
 function triggerMolchoPhone(){const bs=battleState;if(!bs||bs.molchoPhoneDone||bs.molchoPhoneOpen||!party.some(c=>c.id==='molcho'))return;bs.molchoPhoneOpen=true;bs.paused=true;bs.status='이벤트 일시정지';render()}
 function confirmMolchoPhone(){const bs=battleState;if(!bs||!bs.molchoPhoneOpen)return;bs.molchoPhoneOpen=false;bs.molchoPhoneDone=true;bs.molchoPhoneUntil=bs.time+600;bs.chat.push(`<span class="all-tag">[SYSTEM]</span> 몰초가 여자친구 전화를 받으러 갔습니다. 10분간 경기력 0.8배.`);bs.paused=false;bs.status='경기 진행 중';bs.lastTs=performance.now();render();scheduleBattleFrame()}
 
-function finalizeBattleEnd(expectedState=battleState){const bs=expectedState;if(!bs||battleState!==bs||mode!=='battle'||bs.endFinalized||!bs.endPending)return false;bs.endFinalized=true;if(bs.endTimer){clearTimeout(bs.endTimer);bs.endTimer=null;}bs.engineStarted=false;const winner=bs.endPending.winner;bs.status=winner==='team'?'우리 팀 승리':'적 팀 승리';if(winner==='team'){if(party.some(c=>c.id==='siljeom'))bs.chat.push(`<span class="all-tag">[전체]</span> <span class="ally-chat">실점:</span> 죽어 그냥 ㅋㅋ`);if(party.some(c=>c.id==='nguyen'))bs.chat.push(`<span class="all-tag">[전체]</span> <span class="ally-chat">Nguyen Ngoc Tu:</span> 나1가`);if(party.some(c=>c.id==='3patourwan'))for(let i=0;i<4;i++)bs.chat.push(`<span class="all-tag">[전체]</span> <span class="ally-chat">쓰리빠뚜르완:</span> ㅋ`);if(party.some(c=>c.id==='joguk'))bs.chat.push(`<span class="all-tag">[전체]</span> <span class="ally-chat">조국:</span> 븅`);if(party.some(c=>c.id==='molcho'))bs.chat.push(`<span class="all-tag">[팀원]</span> <span class="ally-chat">몰초:</span> 쉽네 쉬워`);}else{if(party.some(c=>c.id==='nguyen'))bs.chat.push(`<span class="all-tag">[전체]</span> <span class="ally-chat">Nguyen Ngoc Tu:</span> 근데 지고 자..?`);if(party.some(c=>c.id==='siljeom'))bs.chat.push(`<span class="all-tag">[전체]</span> <span class="ally-chat">실점:</span> 지고 자는 건 에바긴 해`);if(party.some(c=>c.id==='3patourwan'))bs.chat.push(`<span class="all-tag">[전체]</span> <span class="ally-chat">쓰리빠뚜르완:</span> 찐막?`);if(party.some(c=>c.id==='joguk'))bs.chat.push(`<span class="all-tag">[전체]</span> <span class="ally-chat">조국:</span> 고조할배찐막?`);if(bs.jaebinChatAttempted){const jaebinUnit=bs.team.find(u=>u.realName==='이재빈'||u.nick==='Nguyen Ngoc Tu');const champName=jaebinUnit?.champ?.name||'그 챔피언';const taunts=['이기고 자라 ㅋㅋㅋㅋㅋㅋㅋㅋㅋ',`${champName} 너는 진짜 접어라 ㅇㅇ`,'그 조합으로 쳐지네 ㅋㅋㅋㅋㅋㅋㅋㅋㅋㅋ','ez','븅신 ㅋㅋㅋㅋㅋㅋㅋㅋㅋㅋㅋㅋ'];bs.enemy.slice(0,5).forEach((u,i)=>bs.chat.push(`<span class="all-tag">[전체]</span> <span class="enemy-chat">${u.nick}:</span> ${taunts[i]}`));}}matchResult={winner,time:bs.time,teamKills:bs.teamKills,enemyKills:bs.enemyKills,team:bs.team.map(u=>({...u})),enemy:bs.enemy.map(u=>({...u})),chat:[...(bs.chat||[])]};mode='battleEnd';render();return true}
+function finalizeBattleEnd(expectedState=battleState){const bs=expectedState;if(!bs||battleState!==bs||mode!=='battle'||bs.endFinalized||!bs.endPending)return false;bs.endFinalized=true;if(bs.endTimer){clearTimeout(bs.endTimer);bs.endTimer=null;}bs.engineStarted=false;const winner=bs.endPending.winner;bs.status=winner==='team'?'우리 팀 승리':'적 팀 승리';if(winner==='team'){if(party.some(c=>c.id==='siljeom'))bs.chat.push(`<span class="all-tag">[전체]</span> <span class="ally-chat">실점:</span> 죽어 그냥 ㅋㅋ`);if(party.some(c=>c.id==='nguyen'))bs.chat.push(`<span class="all-tag">[전체]</span> <span class="ally-chat">Nguyen Ngoc Tu:</span> 나1가`);if(party.some(c=>c.id==='3patourwan'))for(let i=0;i<4;i++)bs.chat.push(`<span class="all-tag">[전체]</span> <span class="ally-chat">쓰리빠뚜르완:</span> ㅋ`);if(party.some(c=>c.id==='joguk'))bs.chat.push(`<span class="all-tag">[전체]</span> <span class="ally-chat">조국:</span> 븅`);if(party.some(c=>c.id==='molcho'))bs.chat.push(`<span class="all-tag">[팀원]</span> <span class="ally-chat">몰초:</span> 쉽네 쉬워`);}else{if(bs.jaebinChatAttempted){const jaebinUnit=bs.team.find(u=>u.realName==='이재빈'||u.nick==='Nguyen Ngoc Tu');const champName=jaebinUnit?.champ?.name||'그 챔피언';const taunts=['이기고 자라 ㅋㅋㅋㅋㅋㅋㅋㅋㅋ',`${champName} 너는 진짜 접어라 ㅇㅇ`,'그 조합으로 쳐지네 ㅋㅋㅋㅋㅋㅋㅋㅋㅋㅋ','ez','븅신 ㅋㅋㅋㅋㅋㅋㅋㅋㅋㅋㅋㅋ'];bs.enemy.slice(0,5).forEach((u,i)=>bs.chat.push(`<span class="all-tag">[전체]</span> <span class="enemy-chat">${u.nick}:</span> ${taunts[i]}`));}}matchResult={winner,time:bs.time,teamKills:bs.teamKills,enemyKills:bs.enemyKills,team:bs.team.map(u=>({...u})),enemy:bs.enemy.map(u=>({...u})),chat:[...(bs.chat||[])]};mode='battleEnd';render();return true}
 function checkEnd(){const bs=battleState;if(!bs||!bs.endPending)return false;if(performance.now()>=bs.endPending.realAt)return finalizeBattleEnd(bs);return false}
 function battleFrame(ts){
  if(mode!=='battle'||!battleState||!battleState.engineStarted)return;
