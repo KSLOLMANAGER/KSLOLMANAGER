@@ -6,7 +6,7 @@
 <title>증강체 칼바람 매니저</title>
 <style>
 *{box-sizing:border-box}body{margin:0;background:#11120f;color:#eeeae2;font-family:Arial,"Noto Sans KR",sans-serif}
-button{font:inherit}.app{min-height:100vh;width:100%;max-width:none;margin:0;padding:22px 24px 32px;position:relative}
+button{font:inherit}.app{min-height:100vh;width:100%;max-width:1240px;margin:0 auto;padding:28px 26px 42px;position:relative}
 .top{display:flex;justify-content:space-between;align-items:flex-end;border-bottom:1px solid #373831;padding-bottom:22px;margin-bottom:38px}
 .eyebrow{font-size:11px;letter-spacing:3px;color:#9b895c;font-weight:800}.top h1{margin:7px 0 0;font-size:27px}.step{font-size:11px;color:#777970;letter-spacing:2px}
 .section{display:flex;align-items:end;gap:18px;margin-bottom:24px}.section>span{color:#9b895c;font-weight:800}.section h2{margin:0 0 5px;font-size:25px}.section p{margin:0;color:#898b83;font-size:13px}.section b{color:#d5c18d}
@@ -71,6 +71,91 @@ button{font:inherit}.app{min-height:100vh;width:100%;max-width:none;margin:0;pad
 @media(max-width:900px){.champ-body,.final-main{grid-template-columns:190px 1fr 150px}.player-row{padding:5px}.player-row .avatar{width:40px;height:40px}.champ-options{grid-template-columns:repeat(3,1fr);gap:8px}.champ-card{height:270px}.champ-art{height:190px}.unused{width:38px}.unused-pool{overflow:hidden}}
 @keyframes in{from{opacity:0;transform:translateY(7px)}to{opacity:1;transform:none}}@keyframes b{0%,60%,100%{transform:none;opacity:.5}30%{transform:translateY(-3px);opacity:1}}
 @media(max-width:700px){.app{padding:22px 16px}.grid{grid-template-columns:1fr 1fr}.calls{grid-template-columns:1fr}.top h1{font-size:21px}.step{display:none}}
+
+/* V4 layout tuning */
+.grid{gap:12px;margin-bottom:18px}
+.card{min-height:112px;padding:16px}
+.nick{font-size:19px;margin-top:21px}
+.calls{gap:14px}
+.call{padding:22px;min-height:185px}
+.ready{max-width:860px;margin:0 auto 20px}
+.party{max-width:860px;margin:0 auto 16px}
+.ready+.party{width:100%}
+.phonewrap{max-width:410px}
+.head{border-radius:18px 18px 0 0}
+.head div{padding-left:4px}
+.head strong{display:inline-block;border:1px solid #555a52;border-radius:999px;padding:6px 13px;background:#292b27}
+.queue-shell{min-height:650px;width:100%}
+
+/* Champion select / final composition */
+.champ-screen{padding-bottom:12px}
+.champ-top{height:70px;flex:0 0 70px}
+.champ-body{grid-template-columns:320px minmax(0,1fr) 320px}
+.team-side,.enemy-side{padding:24px 16px}
+.player-row{height:88px;padding:10px;gap:12px}
+.player-row .avatar{width:60px;height:60px;font-size:29px}
+.player-row strong{font-size:14px}
+.player-row small{font-size:10px}
+.enemy-side{opacity:1}
+.enemy-side .player-row{background:#0a171e;border-color:#243840}
+.enemy-side .avatar{color:#344a52;background:#081319}
+.center-select{padding:92px 38px 24px;justify-content:flex-start;position:relative}
+.center-select .sub{margin-top:8px}
+.champ-options{grid-template-columns:repeat(3,minmax(210px,260px));gap:18px}
+.champ-card{height:340px}
+.champ-art{height:248px}
+
+/* A separate row for the 10 unused champions, below the header, never overlapping the title. */
+.unused-select-row{height:64px;flex:0 0 64px;display:flex;align-items:center;justify-content:center;gap:6px;border-bottom:1px solid #1f343c;background:#061018cc}
+.unused-select-mini{width:50px;height:42px;border:1px solid #304a54;background:#0d2029;display:grid;place-items:center;font-size:19px;color:#7f9ba4}
+.unused-select-mini:nth-child(-n+5){border-color:#49636d}
+
+/* Final champion screen */
+.final-screen{overflow:hidden}
+.final-top{height:76px;flex:0 0 76px}
+.final-top .picked-title{position:static;transform:none;min-width:245px;margin-left:18px}
+.final-top .picked-title strong{font-size:18px}
+.unused-pool{order:2;flex:1;max-width:none}
+.final-main{grid-template-columns:340px minmax(0,1fr) 300px}
+.final-team{padding:24px 16px}
+.final-team .player-row{height:88px}
+.final-center{align-items:flex-start;padding-top:48px}
+.hero-champ{display:flex;flex-direction:column;align-items:center;width:min(600px,100%);position:relative}
+.hero-champ .hero-art{width:min(430px,32vw);height:min(360px,29vw);font-size:min(145px,11vw)}
+.hero-champ h2{margin:12px 0 3px}
+.final-label{top:18px}
+
+/* Chat panel under the selected champion */
+.champ-chat{width:min(600px,92%);margin-top:14px;border:1px solid #29424c;background:#07141bdd;box-shadow:0 12px 35px #0006}
+.champ-chat-head{height:34px;display:flex;align-items:center;padding:0 12px;border-bottom:1px solid #29424c;color:#9baaae;font-size:9px;letter-spacing:1px}
+.champ-chat-body{height:84px;padding:9px 12px;display:flex;flex-direction:column;gap:6px;overflow:hidden}
+.champ-chat-msg{font-size:10px;color:#c6d0d1}
+.champ-chat-msg b{color:#c3a660;margin-right:7px}
+.champ-chat-bubble{display:inline-block;padding:5px 8px;border-radius:4px 9px 9px 9px;background:#132a34}
+.champ-chat-msg.mine{text-align:right}
+.champ-chat-msg.mine b{color:#e0c578}
+.champ-chat-msg.mine .champ-chat-bubble{background:#a98c4d;color:#101512;border-radius:9px 4px 9px 9px}
+.final-enemy{font-size:10px;line-height:2;text-align:center;padding:20px}
+.final-enemy .enemy-list{width:100%;padding:0 20px}
+.enemy-row{height:68px;border:1px solid #263d46;background:#0a171e;margin-bottom:8px;display:flex;align-items:center;padding:0 14px;gap:12px}
+.enemy-hidden{width:42px;height:42px;border:1px solid #344c55;background:#071218;display:grid;place-items:center;color:#435960}
+.enemy-row strong{font-size:12px;color:#98a8ac}
+@media(max-width:1100px){
+  .champ-body,.final-main{grid-template-columns:260px minmax(0,1fr) 230px}
+  .player-row{height:78px}.player-row .avatar{width:52px;height:52px}
+  .champ-options{grid-template-columns:repeat(3,minmax(160px,1fr))}
+  .champ-card{height:290px}.champ-art{height:200px}
+  .hero-champ .hero-art{width:330px;height:300px}
+}
+@media(max-width:760px){
+  .app{padding:20px 14px 30px}
+  .grid{grid-template-columns:1fr 1fr}
+  .champ-body,.final-main{grid-template-columns:1fr}
+  .team-side,.enemy-side{display:none}
+  .unused-select-row{overflow:auto;justify-content:flex-start;padding:0 10px}
+  .champ-options{grid-template-columns:repeat(3,1fr);gap:7px}
+  .champ-card{height:240px}.champ-art{height:160px;font-size:60px}
+}
 </style>
 </head>
 <body>
@@ -102,8 +187,8 @@ body=`<div class="section"><span>02</span><div><h2>어떻게 호출할까요?</h
 }
 if(mode==="group"){
 body=`<div class="phonewrap"><div class="phone"><div class="head"><button onclick="mode='method';render()">‹</button><div><strong>우리들의 단톡방</strong><small>9명</small></div><em>•••</em></div><div class="chat"><div class="date">오늘</div>
-<div class="msg mine"><div class="who">${me.nickname}</div><div class="bubble">겜 ㄱ?</div></div>
-${chatMembers.slice(0,replies).map((c,i)=>`<div class="msg"><div class="who">${c.nickname}</div><div class="bubble">${i===3?"ㄱㄱ":"ㄱ"}</div></div>`).join("")}
+<div class="msg mine"><div class="who">${me.name}</div><div class="bubble">겜 ㄱ?</div></div>
+${chatMembers.slice(0,replies).map((c,i)=>`<div class="msg"><div class="who">${c.name}</div><div class="bubble">${i===3?"ㄱㄱ":"ㄱ"}</div></div>`).join("")}
 ${replies<4?`<div class="typing"><i></i><i></i><i></i></div>`:`<div class="system">5명이 게임에 참가했습니다.</div>`}</div><div class="input"><span>메시지를 입력하세요</span><b>＋</b><b>➤</b></div></div>
 ${button(replies<4?"친구들이 대답하는 중...":"파티 확인 →",replies<4,"finishGroup()")}</div>`;
 }
@@ -115,13 +200,14 @@ ${button("개인톡 보내기 →",selected.length!==4,"startPrivate()")}<button
 if(mode==="private"){
 const target=privateTargets[privateIndex];
 body=`<div class="phonewrap"><div class="phone"><div class="head"><button>‹</button><div><strong>${target.nickname}</strong><small>${target.name}</small></div><em>•••</em></div><div class="chat"><div class="date">오늘</div>
-<div class="msg mine"><div class="who">${me.nickname}</div><div class="bubble">겜 ㄱ?</div></div>
+<div class="msg mine"><div class="who">${me.name}</div><div class="bubble">겜 ㄱ?</div></div>
 ${privateIndex>0?`<div class="msg"><div class="who">${target.nickname}</div><div class="bubble">ㄱ</div></div>`:`<div class="typing"><i></i><i></i><i></i></div>`}
 ${privateIndex===3?`<div class="system">4명 모두에게서 답장이 왔습니다.</div>`:""}</div><div class="input"><span>메시지를 입력하세요</span><b>＋</b><b>➤</b></div></div>
 ${button(privateIndex===3?"파티 확인 →":privateIndex===0?"답장 기다리는 중...":"다음 친구 호출 →",privateIndex===0,"nextPrivate()")}</div>`;
 }
 if(mode==="champSelect"){
 body=`<div class="champ-screen"><div class="champ-top"><div class="champ-timer">12</div><div class="title"><small>무작위 총력전 · 아수라장</small><strong>챔피언 선택</strong></div><div style="width:90px;text-align:right;color:#75878c;font-size:9px">내 차례</div></div>
+<div class="unused-select-row">${champions.filter(c=>!champOptions.some(o=>o.id===c.id)).slice(0,10).map(c=>`<div class="unused-select-mini">${c.icon}</div>`).join("")}</div>
 <div class="champ-body"><div class="team-side"><div class="side-title">우리 팀</div>${party.map((c,i)=>`<div class="player-row ${i===0?"you":""}"><div class="avatar">${teamPicks[i]?teamPicks[i].icon:"?"}</div><div><strong>${c.nickname}</strong><small>${teamPicks[i]?teamPicks[i].name:"선택 중..."}</small></div>${i===0?"<em>YOU</em>":""}</div>`).join("")}</div>
 <div class="center-select"><div class="sub">YOUR TURN</div><h2>챔피언을 선택하세요</h2><p>무작위로 제시된 3명의 챔피언 중 하나를 선택합니다.</p><div class="champ-options">${champOptions.map(c=>`<button class="champ-card" onclick="pickChampion('${c.id}')"><div class="champ-art">${c.icon}</div><div class="cc-bottom"><strong>${c.name}</strong><small>${c.title}</small></div></button>`).join("")}</div></div>
 <div class="enemy-side"><div class="side-title">상대 팀</div>${[1,2,3,4,5].map(i=>`<div class="player-row"><div class="avatar">?</div><div><strong>상대 ${i}</strong><small>선택 중...</small></div></div>`).join("")}</div></div></div>`;
@@ -129,8 +215,13 @@ body=`<div class="champ-screen"><div class="champ-top"><div class="champ-timer">
 if(mode==="finalChamp"){
 body=`<div class="final-screen"><div class="final-top"><div class="picked-title"><small>무작위 총력전 · 아수라장</small><strong>챔피언 선택 완료</strong></div><div class="unused-pool">${finalPool.map(c=>`<div class="unused">${c.icon}</div>`).join("")}</div></div>
 <div class="final-main"><div class="final-team"><div class="side-title">우리 팀 · 선택한 챔피언</div>${party.map((c,i)=>`<div class="player-row ${i===0?"you":""}"><div class="avatar">${teamPicks[i].icon}</div><div><strong>${c.nickname}</strong><small>${teamPicks[i].name}</small></div>${i===0?"<em>YOU</em>":""}</div>`).join("")}</div>
-<div class="final-center"><div class="final-label">YOUR CHAMPION</div><div class="hero-champ"><div class="hero-art">${chosenChamp.icon}</div><h2>${chosenChamp.name}</h2><p>${chosenChamp.title}</p></div></div>
-<div class="final-enemy">상대 팀 챔피언은 게임 시작 전까지<br>공개되지 않습니다.</div></div></div>`;
+<div class="final-center"><div class="final-label">YOUR CHAMPION</div><div class="hero-champ"><div class="hero-art">${chosenChamp.icon}</div><h2>${chosenChamp.name}</h2><p>${chosenChamp.title}</p>
+<div class="champ-chat"><div class="champ-chat-head">파티 채팅 · 게임 시작 전</div><div class="champ-chat-body">
+<div class="champ-chat-msg mine"><b>${me.name}</b><span class="champ-chat-bubble">이걸로 간다</span></div>
+<div class="champ-chat-msg"><b>${party[1].name}</b><span class="champ-chat-bubble">ㄱ</span></div>
+<div class="champ-chat-msg"><b>${party[2].name}</b><span class="champ-chat-bubble">좋다</span></div>
+</div></div></div></div>
+<div class="final-enemy"><div class="enemy-list"><div class="side-title">상대 팀 · 챔피언 비공개</div>${[1,2,3,4,5].map(i=>`<div class="enemy-row"><div class="enemy-hidden">?</div><strong>적${i}</strong></div>`).join("")}</div></div></div></div>`;
 }
 if(mode==="party"){
 body=`<div class="ready"><div class="mark">✓</div><div><div class="eyebrow">PARTY READY</div><h2>파티가 구성되었습니다.</h2><p>5명이 게임에 참가합니다.</p></div></div>
