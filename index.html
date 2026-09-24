@@ -501,8 +501,8 @@ finalChatLine("mundolmaeng","블루윙 수원 블루윙");
 if(party.some(c=>c.id==="molcho") && party.some(c=>c.id==="dwaemesa")) finalChatLine("dwaemesa","병욱아 진짜 그거 골랐으면 캐리해야된다");
 signatureChatLog.forEach(x=>special.push(`<div class="chat-line"><strong>${x.name}:</strong> ${x.msg}</div>`));
 const sigPopup=signatureRequest?`<div class="chat-event-overlay"><div class="chat-event-card"><div class="event-mark">!</div><h2>${signatureRequest.member.name}가 ${signatureRequest.champ.name}를 원하고 있습니다.</h2><p>챔피언을 주시겠습니까?</p><div class="chat-event-actions"><button onclick="answerSignatureRequest(true)">예</button><button class="deny" onclick="answerSignatureRequest(false)">아니오</button></div></div></div>`:"";
-body=`<div class="final-screen"><div class="final-top"><div class="unused-pool" aria-label="남은 챔피언">${finalPool.map((c,i)=>`<div class="unused swap-zone" draggable="true" data-swap-type="pool" data-swap-index="${i}" ondragstart="dragStart(event,'pool',${i})" ondragover="allowDrop(event)" ondragenter="dragEnter(event)" ondragleave="dragLeave(event)" ondrop="dropSwap(event,'pool',${i})" ondragend="dragEnd(event)"><img src="assets/champions/${championImageId(c.id)}_0.jpg" onerror="this.remove();this.parentElement.textContent='${c.icon}'"></div>`).join("")}</div><div class="swap-hint">DRAG TO SWAP</div></div>
-<div class="final-main"><div class="final-team"><div class="side-title">우리 팀 · 선택한 챔피언</div>${party.map((c,i)=>`<div class="player-row swap-zone ${i===0?"you":""}" draggable="true" data-swap-type="team" data-swap-index="${i}" ondragstart="dragStart(event,'team',${i})" ondragover="allowDrop(event)" ondragenter="dragEnter(event)" ondragleave="dragLeave(event)" ondrop="dropSwap(event,'team',${i})" ondragend="dragEnd(event)"><div class="avatar"><img src="assets/champions/${championImageId(teamPicks[i].id)}_0.jpg" onerror="this.remove();this.parentElement.textContent='${teamPicks[i].icon}'"></div><div class="pick-meta"><strong>${teamPicks[i].name}</strong><small>${c.nickname}</small></div>${i===0?"<em>YOU</em>":""}</div>`).join("")}</div>
+body=`<div class="final-screen"><div class="final-top"><div class="unused-pool" aria-label="남은 챔피언">${finalPool.map((c,i)=>`<div class="unused swap-zone" draggable="true" data-swap-type="pool" data-swap-index="${i}" onclick="mobileSwapTap(event,'pool',${i})" ondragstart="dragStart(event,'pool',${i})" ondragover="allowDrop(event)" ondragenter="dragEnter(event)" ondragleave="dragLeave(event)" ondrop="dropSwap(event,'pool',${i})" ondragend="dragEnd(event)"><img src="assets/champions/${championImageId(c.id)}_0.jpg" onerror="this.remove();this.parentElement.textContent='${c.icon}'"></div>`).join("")}</div><div class="swap-hint">DRAG TO SWAP</div></div>
+<div class="final-main"><div class="final-team"><div class="side-title">우리 팀 · 선택한 챔피언</div>${party.map((c,i)=>`<div class="player-row swap-zone ${i===0?"you":""}" draggable="true" data-swap-type="team" data-swap-index="${i}" onclick="mobileSwapTap(event,'team',${i})" ondragstart="dragStart(event,'team',${i})" ondragover="allowDrop(event)" ondragenter="dragEnter(event)" ondragleave="dragLeave(event)" ondrop="dropSwap(event,'team',${i})" ondragend="dragEnd(event)"><div class="avatar"><img src="assets/champions/${championImageId(teamPicks[i].id)}_0.jpg" onerror="this.remove();this.parentElement.textContent='${teamPicks[i].icon}'"></div><div class="pick-meta"><strong>${teamPicks[i].name}</strong><small>${c.nickname}</small></div>${i===0?"<em>YOU</em>":""}</div>`).join("")}</div>
 <div class="final-center"><div class="final-label">YOUR CHAMPION</div><div class="hero-champ"><div class="hero-art"><img src="assets/champions/${championImageId(chosenChamp.id)}_0.jpg" onerror="this.remove();this.parentElement.textContent='${chosenChamp.icon}'"></div><h2>${chosenChamp.name}</h2></div><button class="game-start-btn" onclick="startGame()">준비 완료</button></div>
 <div class="final-enemy"><div class="enemy-list"><div class="side-title">상대 팀 · 챔피언 비공개</div>${[1,2,3,4,5].map(i=>`<div class="enemy-row"><div class="enemy-hidden">?</div><div class="pick-meta"><strong>적${i}</strong><small>챔피언 비공개</small></div></div>`).join("")}</div></div></div><div class="final-chat final-chat-left"><div class="final-chat-head">CHAT</div><div class="final-chat-body">${tip}${special.join("")}</div></div>${sigPopup}</div>`;
 }
@@ -751,18 +751,17 @@ function pickChampion(id){
   if(!chosen)return;
   chosenChamp=chosen; teamPicks[0]=chosen;
   const used=new Set([chosen.id]);
-  // 내가 아닌 팀원은 자신의 시그니처 챔피언을 최우선으로 잡는다.
-  for(let i=1;i<5;i++){
-    const sig=SIGNATURE_CHAMPS[party[i].id];
-    const c=champions.find(x=>x.id===sig && !used.has(x.id));
-    if(c){teamPicks[i]=c;used.add(c.id)}
-  }
-  const remaining=shuffle(champions.filter(c=>!used.has(c.id)));
-  let ri=0;
-  for(let i=1;i<5;i++) if(!teamPicks[i]){teamPicks[i]=remaining[ri++];used.add(teamPicks[i].id)}
-  finalPool=remaining.slice(ri,ri+10);
+  // 팀원/대기창 챔피언은 먼저 완전 랜덤으로 뽑는다.
+  // 시그니처가 이 랜덤 풀 안에 등장했을 때만 해당 팀원이 우선적으로 원한다.
+  // 따라서 시그니처 자체의 등장 확률은 다른 챔피언과 동일하다.
+  const randomPool=shuffle(champions.filter(c=>!used.has(c.id))).slice(0,14);
+  for(let i=1;i<5;i++){teamPicks[i]=randomPool[i-1];used.add(teamPicks[i].id)}
+  finalPool=randomPool.slice(4,14);
   signatureRequests=[];signatureRequest=null;signatureChatDone=new Set();signatureChatLog=[];
   mode="finalChamp";
+  // 랜덤으로 자기 시그니처를 바로 받은 경우 전용 채팅은 1회만 출력.
+  for(let i=1;i<party.length;i++)signatureReceived(i);
+  // 시그니처가 다른 팀원/대기창에 랜덤 등장한 경우에만 요청 팝업.
   queueSignatureRequests();
   render();
 }
@@ -1092,6 +1091,21 @@ function chooseAugment(i){const bs=battleState;if(!bs||!bs.augmentOpen)return;co
 function augmentOverlayHtml(bs){if(!bs||!bs.augmentOpen)return '';const tierName={silver:'실버',gold:'골드',prismatic:'프리즘'},stage=bs.augmentStage==='start'?'게임 시작':`레벨 ${bs.augmentStage}`;return `<div class="augment-overlay"><div class="augment-modal"><div class="augment-kicker">AUGMENT · ${stage}</div><h2>${tierName[bs.augmentTier]} 증강체를 선택하세요</h2><p>이번 선택은 <b>${tierName[bs.augmentTier]}</b> 등급입니다. 세 선택지와 리롤 모두 같은 등급만 등장합니다.</p><div class="augment-cards">${bs.augmentChoices.map((a,i)=>`<div class="augment-card ${a.tier}" onclick="chooseAugment(${i})"><div class="augment-tier">${tierName[a.tier]}</div><div class="augment-gem"><span>${a.icon}</span></div><h3>${a.name}</h3><p>${a.desc}</p><button class="augment-reroll" ${a.rerolled?'disabled':''} onclick="rerollAugment(${i},event)">${a.rerolled?'리롤 사용 완료':'↻ 리롤 1회'}</button></div>`).join('')}</div><div class="augment-picked">현재 선택: ${(bs.augments||[]).length?bs.augments.map(a=>`<b>${a.name}</b>`).join(' · '):'없음'}</div></div></div>`}
 
 let dragSource=null;
+let mobileSwapSource=null;
+function performChampionSwap(a,targetType,targetIndex){
+  if(!a||(a.type===targetType&&a.index===targetIndex))return;
+  if(a.type==="team"&&targetType==="team"){const t=teamPicks[a.index];teamPicks[a.index]=teamPicks[targetIndex];teamPicks[targetIndex]=t}
+  else if(a.type==="pool"&&targetType==="pool"){const t=finalPool[a.index];finalPool[a.index]=finalPool[targetIndex];finalPool[targetIndex]=t}
+  else if(a.type==="team"&&targetType==="pool"){const t=teamPicks[a.index];teamPicks[a.index]=finalPool[targetIndex];finalPool[targetIndex]=t}
+  else if(a.type==="pool"&&targetType==="team"){const t=finalPool[a.index];finalPool[a.index]=teamPicks[targetIndex];teamPicks[targetIndex]=t}
+  chosenChamp=teamPicks[0];for(let i=1;i<party.length;i++)signatureReceived(i);
+}
+function mobileSwapTap(e,type,index){
+  if(!window.matchMedia('(max-width:800px)').matches)return;
+  e.preventDefault();e.stopPropagation();
+  if(!mobileSwapSource){mobileSwapSource={type,index};e.currentTarget.classList.add('tap-selected');return}
+  const a=mobileSwapSource;mobileSwapSource=null;performChampionSwap(a,type,index);render();
+}
 function dragStart(e,type,index){dragSource={type,index}; if(e.dataTransfer){e.dataTransfer.effectAllowed="move";e.dataTransfer.setData("text/plain",`${type}:${index}`)}}
 function allowDrop(e){e.preventDefault(); if(e.dataTransfer)e.dataTransfer.dropEffect="move"}
 function dragEnter(e){e.preventDefault();e.currentTarget.classList.add("drag-over")}
@@ -1101,17 +1115,7 @@ function dropSwap(e,targetType,targetIndex){e.preventDefault();e.stopPropagation
   if(!dragSource)return;
   const a=dragSource;
   if(a.type===targetType && a.index===targetIndex){dragSource=null;return;}
-  if(a.type==="team" && targetType==="team"){
-    const t=teamPicks[a.index];teamPicks[a.index]=teamPicks[targetIndex];teamPicks[targetIndex]=t;
-  }else if(a.type==="pool" && targetType==="pool"){
-    const t=finalPool[a.index];finalPool[a.index]=finalPool[targetIndex];finalPool[targetIndex]=t;
-  }else if(a.type==="team" && targetType==="pool"){
-    const t=teamPicks[a.index];teamPicks[a.index]=finalPool[targetIndex];finalPool[targetIndex]=t;
-  }else if(a.type==="pool" && targetType==="team"){
-    const t=finalPool[a.index];finalPool[a.index]=teamPicks[targetIndex];teamPicks[targetIndex]=t;
-  }
-  chosenChamp=teamPicks[0];
-  for(let i=1;i<party.length;i++) signatureReceived(i);
+  performChampionSwap(a,targetType,targetIndex);
   dragSource=null;render();
 }
 function openResults(){mode='results';render()}
@@ -1176,5 +1180,40 @@ render();
 .loading-bar{order:20;width:100%;height:12px;margin:18px 0 0;border:1px solid #5b6570;background:#101c24;box-shadow:0 0 18px #0008}
 .loading-bar div{background:linear-gradient(90deg,#9d7c35,#e1c46f);height:100%;transition:width .25s linear}
 .loading-inner>p{order:21;margin:8px 0 0;font-size:13px;color:#8b999d}
+}
+
+/* ===== V43 MOBILE STABILITY PASS ===== */
+@media(max-width:800px){
+  html,body{min-height:100%;touch-action:manipulation}
+  button,.swap-zone,.champ-card{touch-action:manipulation;-webkit-tap-highlight-color:transparent}
+  .final-screen{height:100dvh!important;min-height:100dvh!important;overflow-y:auto!important;overflow-x:hidden!important}
+  .final-top{position:sticky!important;top:0!important;z-index:45!important;height:auto!important;min-height:74px!important;flex:0 0 auto!important;padding:8px 8px 20px!important;background:#061019f2!important}
+  .unused-pool{max-width:100%!important;width:100%!important;gap:6px!important;overflow-x:auto!important;justify-content:flex-start!important;padding:2px 4px 6px!important;scrollbar-width:thin}
+  .unused-pool .unused{width:48px!important;height:48px!important;flex:0 0 48px!important;border-radius:50%!important}
+  .swap-hint{right:10px!important;bottom:3px!important;font-size:7px!important}.swap-hint:after{content:' · 모바일은 두 번 탭';color:#c9aa62}
+  .swap-zone.tap-selected{border-color:#e4c36c!important;box-shadow:0 0 0 3px #e4c36c66,0 0 18px #e4c36c55!important}
+  .final-main{display:block!important;padding:8px 8px 176px!important;overflow:visible!important}
+  .final-team,.final-enemy{padding:8px 4px!important}.final-enemy{display:none!important}
+  .final-team .side-title{font-size:10px!important;margin:3px 0 8px!important}
+  .final-team .player-row{height:64px!important;padding:6px 9px!important;margin-bottom:6px!important;gap:9px!important}
+  .final-team .avatar{width:48px!important;height:48px!important;flex:0 0 48px!important}
+  .final-team .pick-meta strong{font-size:15px!important}.final-team .pick-meta small{font-size:11px!important;margin-top:2px!important}
+  .final-center{padding:8px 0 18px!important;gap:7px!important}.final-label{position:static!important;font-size:8px!important}
+  .hero-champ{width:100%!important}.hero-champ .hero-art{width:min(78vw,330px)!important;height:min(36vh,300px)!important;min-width:0!important;min-height:190px!important}
+  .hero-champ h2{font-size:27px!important;margin:8px 0!important}.game-start-btn{width:min(88vw,360px)!important;padding:13px 18px!important;font-size:14px!important}
+  .final-chat-left{position:fixed!important;z-index:50!important;left:8px!important;right:8px!important;bottom:max(8px,env(safe-area-inset-bottom))!important;width:auto!important;height:142px!important}
+  .final-chat-head{height:27px!important;flex-basis:27px!important;font-size:9px!important}.final-chat-body{padding:6px 8px!important}.final-chat-body .chat-line{font-size:10px!important;line-height:1.45!important}
+  .chat-event-overlay{z-index:200!important;padding:max(12px,env(safe-area-inset-top)) 12px max(12px,env(safe-area-inset-bottom))!important;box-sizing:border-box!important}
+  .chat-event-card{width:100%!important;max-width:430px!important;max-height:88dvh!important;overflow:auto!important;padding:22px 16px!important;box-sizing:border-box!important;border-radius:10px!important}
+  .chat-event-card .event-mark{font-size:34px!important}.chat-event-card h2{font-size:19px!important;line-height:1.4!important}.chat-event-card p{font-size:13px!important}
+  .chat-event-actions{gap:8px!important}.chat-event-actions button{min-width:0!important;flex:1!important;padding:13px 8px!important;font-size:14px!important}
+  .loading-screen{height:100dvh!important;box-sizing:border-box!important}.loading-inner{min-height:100%!important}.loading-team{grid-template-columns:repeat(5,minmax(0,1fr))!important}.loading-card{height:min(22vh,155px)!important}.loading-champ{font-size:9px!important}.loading-nick{font-size:8px!important}
+  .battle-v2{height:100dvh!important;min-height:100dvh!important}.b2-token{width:24px!important;height:24px!important;border-radius:50%!important}.b2-token .token-portrait{width:22px!important;height:22px!important;border-radius:50%!important}.b2-token .t-hp{width:26px!important}
+  .augment-overlay{z-index:210!important}.augment-modal{max-height:94dvh!important}.augment-cards{grid-template-columns:1fr!important;gap:8px!important}.augment-card{min-height:150px!important}.augment-gem{width:38px!important;height:38px!important;margin:8px auto!important}.augment-card h3{font-size:14px!important}.augment-card p{font-size:10px!important}
+}
+@media(max-width:430px){
+  .final-main{padding-bottom:168px!important}.final-chat-left{height:134px!important}.hero-champ .hero-art{height:210px!important;min-height:180px!important}
+  .chat-event-card{padding:18px 13px!important}.chat-event-card h2{font-size:17px!important}
+  .b2-side{width:62px!important}.match-all-chat,.b2-panel{width:calc(100% - 140px)!important}.b2-speed-dock button{padding:4px!important;font-size:6px!important}
 }
 </style>
