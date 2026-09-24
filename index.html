@@ -421,6 +421,11 @@ button{font:inherit}.app{min-height:100vh;width:100%;max-width:1240px;margin:0 a
 .party + .primary{display:block;max-width:860px;width:100%;margin:16px auto 0!important}
 .party-reselect{box-sizing:border-box}
 @media(max-width:900px){.party + .primary,.party-reselect{max-width:100%;width:100%}}
+
+/* V49 signature/image/mobile/HUD sync */
+.champ-art img,.unused-select-mini img{width:100%;height:100%;object-fit:cover;display:block}.signature-help{color:#e6c768;font-weight:800}.champ-card.my-signature,.unused.my-signature,.unused-select-mini.my-signature{border:2px solid #e7c65e!important;box-shadow:0 0 10px #e7c65e,0 0 24px #e7c65e66,inset 0 0 16px #e7c65e33!important}.champ-card.my-signature .cc-bottom{background:linear-gradient(180deg,#332a0d,#100d05)!important}.champ-card.my-signature small{color:#f2d878!important;font-weight:800}.unused-select-mini{overflow:hidden}.b2-hp i,.t-hp em{transition:width .12s linear}
+@media(max-width:760px){.center-select p{font-size:10px!important;line-height:1.55}.signature-help{display:inline-block;margin-top:4px}.champ-options{grid-template-columns:repeat(3,minmax(0,1fr))!important}.champ-card{height:190px!important}.champ-art{height:128px!important}.champ-card strong{font-size:11px!important}.champ-card small{font-size:7px!important;line-height:1.25}.unused-select-row{height:54px!important;min-height:54px!important}.unused-select-mini{width:42px!important;height:38px!important;flex:0 0 42px}.unused-pool .unused.my-signature{border-radius:50%!important}.b2-hp{height:5px!important}}
+@media(max-width:390px){.champ-card{height:172px!important}.champ-art{height:112px!important}.champ-options{gap:4px!important}.center-select h2{font-size:20px!important}}
 </style>
 
 <style>
@@ -447,6 +452,11 @@ button{font:inherit}.app{min-height:100vh;width:100%;max-width:1240px;margin:0 a
 @media(max-width:800px) and (orientation:landscape){
   .battle-v2{height:100dvh!important}.b2-head{height:38px!important;flex-basis:38px!important}.b2-side{width:52px!important}.b2-stage{inset:0 52px!important}.b2-unit{padding:1px!important}.portrait,.b2-orb{width:24px!important;height:24px!important;flex-basis:24px!important}.match-all-chat{display:none!important}.b2-panel{left:58px!important;right:58px!important;bottom:3px!important}.b2-log{height:34px!important}.b2-panel-head{display:none!important}.b2-speed-dock{top:2px!important}.augment-modal{max-height:96dvh!important}.augment-cards{grid-template-columns:repeat(3,1fr)!important}.augment-card{min-height:120px!important}
 }
+
+/* V49 signature/image/mobile/HUD sync */
+.champ-art img,.unused-select-mini img{width:100%;height:100%;object-fit:cover;display:block}.signature-help{color:#e6c768;font-weight:800}.champ-card.my-signature,.unused.my-signature,.unused-select-mini.my-signature{border:2px solid #e7c65e!important;box-shadow:0 0 10px #e7c65e,0 0 24px #e7c65e66,inset 0 0 16px #e7c65e33!important}.champ-card.my-signature .cc-bottom{background:linear-gradient(180deg,#332a0d,#100d05)!important}.champ-card.my-signature small{color:#f2d878!important;font-weight:800}.unused-select-mini{overflow:hidden}.b2-hp i,.t-hp em{transition:width .12s linear}
+@media(max-width:760px){.center-select p{font-size:10px!important;line-height:1.55}.signature-help{display:inline-block;margin-top:4px}.champ-options{grid-template-columns:repeat(3,minmax(0,1fr))!important}.champ-card{height:190px!important}.champ-art{height:128px!important}.champ-card strong{font-size:11px!important}.champ-card small{font-size:7px!important;line-height:1.25}.unused-select-row{height:54px!important;min-height:54px!important}.unused-select-mini{width:42px!important;height:38px!important;flex:0 0 42px}.unused-pool .unused.my-signature{border-radius:50%!important}.b2-hp{height:5px!important}}
+@media(max-width:390px){.champ-card{height:172px!important}.champ-art{height:112px!important}.champ-options{gap:4px!important}.center-select h2{font-size:20px!important}}
 </style>
 
 </head>
@@ -472,7 +482,7 @@ const playerRoleStats={
 function roleSkillFor(stats,champ){const rs=(champ.roles&&champ.roles.length?champ.roles:["Fighter"]);return rs.reduce((a,r)=>a+(stats[r]??60),0)/rs.length}
 function enemyRoleStats(){const o={};["Fighter","Tank","Mage","Assassin","Marksman","Support"].forEach(r=>o[r]=64+Math.floor(Math.random()*13));return o}
 const SIGNATURE_CHAMPS={siljeom:"pyke",molcho:"swain",dwaemesa:"samira",joguk:"singed",nguyen:"kayle","3patourwan":"hwei",mundolmaeng:"teemo",galio:"galio",dage:"irelia"};
-const SIGNATURE_CHAT={siljeom:"돈 드리겠습니다~",molcho:"보여줄게",dwaemesa:"월월 감사합니다 월월",joguk:"왔다 내 사랑",nguyen:"케권이 횽이야","3patourwan":"흐에!!",mundolmaeng:"티모횽이야",galio:"야 든든하게 막아줄게",dakestan:"야 게임 끝났어"};
+const SIGNATURE_CHAT={siljeom:"돈 드리겠습니다~",molcho:"보여줄게",dwaemesa:"월월 감사합니다 월월",joguk:"왔다 내 사랑",nguyen:"케권이 횽이야","3patourwan":"흐에!!",mundolmaeng:"티모횽이야",galio:"야 든든하게 막아줄게",dage:"야 게임 끝났어"};
 let signatureRequests=[],signatureRequest=null,signatureChatDone=new Set(),signatureChatLog=[];
 let mode="select", callMode=null, me=null, selected=[], party=[], chatMembers=[], declinedMembers=[], replies=0, privateIndex=0, privateTargets=[], searching=false, queueSeconds=0, queueTimer=null, found=false, champOptions=[], teamPicks=[], chosenChamp=null, finalPool=[], enemyTeam=[], loadingSeconds=10, loadingTimer=null, loadingTransitionTimer=null, battleState=null, battleTimer=null, matchResult=null;
 
@@ -520,9 +530,9 @@ ${button(privateIndex===3?"파티 확인 →":privateIndex===0?"답장 기다리
 }
 if(mode==="champSelect"){
 body=`<div class="champ-screen"><div class="champ-top"><div class="champ-timer">12</div><div class="title"><small>무작위 총력전 · 아수라장</small><strong>챔피언 선택</strong></div><div style="width:90px;text-align:right;color:#75878c;font-size:9px">내 차례</div></div>
-<div class="unused-select-row">${champions.filter(c=>!champOptions.some(o=>o.id===c.id)).slice(0,10).map(c=>`<div class="unused-select-mini">${c.icon}</div>`).join("")}</div>
+<div class="unused-select-row">${champions.filter(c=>!champOptions.some(o=>o.id===c.id)).slice(0,10).map(c=>`<div class="unused-select-mini ${isSignaturePick(me,c)?'my-signature':''}"><img src="assets/champions/${championImageId(c.id)}_0.jpg" onerror="this.style.display='none';this.parentElement.textContent='${c.icon}'"></div>`).join("")}</div>
 <div class="champ-body"><div class="team-side"><div class="side-title">우리 팀</div>${party.map((c,i)=>`<div class="player-row ${i===0?"you":""}"><div class="avatar">${teamPicks[i]?teamPicks[i].icon:"?"}</div><div><strong>${c.nickname}</strong><small>${teamPicks[i]?teamPicks[i].name:"선택 중..."}</small></div>${i===0?"<em>YOU</em>":""}</div>`).join("")}</div>
-<div class="center-select"><div class="sub">YOUR TURN</div><h2>챔피언을 선택하세요</h2><p>무작위로 제시된 3명의 챔피언 중 하나를 선택합니다.</p><div class="champ-options">${champOptions.map(c=>`<button class="champ-card" onclick="pickChampion('${c.id}')"><div class="champ-art">${c.icon}</div><div class="cc-bottom"><strong>${c.name}</strong><small>${c.title}</small></div></button>`).join("")}</div></div>
+<div class="center-select"><div class="sub">YOUR TURN</div><h2>챔피언을 선택하세요</h2><p>무작위로 제시된 3명의 챔피언 중 하나를 선택합니다.<br><b class="signature-help">시그니처 캐릭터는 전투 능력이 향상됩니다.</b></p><div class="champ-options">${champOptions.map(c=>`<button class="champ-card ${isSignaturePick(me,c)?'my-signature':''}" onclick="pickChampion('${c.id}')"><div class="champ-art"><img src="assets/champions/${championImageId(c.id)}_0.jpg" onerror="this.style.display='none';this.parentElement.textContent='${c.icon}'"></div><div class="cc-bottom"><strong>${c.name}</strong><small>${isSignaturePick(me,c)?'★ SIGNATURE · 전투 능력 향상':c.title}</small></div></button>`).join("")}</div></div>
 <div class="enemy-side"><div class="side-title">상대 팀</div>${[1,2,3,4,5].map(i=>`<div class="player-row"><div class="avatar">?</div><div><strong>상대 ${i}</strong><small>선택 중...</small></div></div>`).join("")}</div></div></div>`;
 }
 if(mode==="finalChamp"){
@@ -535,7 +545,7 @@ finalChatLine("mundolmaeng","블루윙 수원 블루윙");
 if(party.some(c=>c.id==="molcho") && party.some(c=>c.id==="dwaemesa")) finalChatLine("dwaemesa","병욱아 진짜 그거 골랐으면 캐리해야된다");
 signatureChatLog.forEach(x=>special.push(`<div class="chat-line"><strong>${x.name}:</strong> ${x.msg}</div>`));
 const sigPopup=signatureRequest?`<div class="chat-event-overlay"><div class="chat-event-card"><div class="event-mark">!</div><h2>${signatureRequest.member.name}가 ${signatureRequest.champ.name}를 원하고 있습니다.</h2><p>챔피언을 주시겠습니까?</p><div class="chat-event-actions"><button onclick="answerSignatureRequest(true)">예</button><button class="deny" onclick="answerSignatureRequest(false)">아니오</button></div></div></div>`:"";
-body=`<div class="final-screen"><div class="final-top"><div class="unused-pool" aria-label="남은 챔피언">${finalPool.map((c,i)=>`<div class="unused swap-zone" draggable="true" data-swap-type="pool" data-swap-index="${i}" onclick="mobileSwapTap(event,'pool',${i})" ondragstart="dragStart(event,'pool',${i})" ondragover="allowDrop(event)" ondragenter="dragEnter(event)" ondragleave="dragLeave(event)" ondrop="dropSwap(event,'pool',${i})" ondragend="dragEnd(event)"><img src="assets/champions/${championImageId(c.id)}_0.jpg" onerror="this.remove();this.parentElement.textContent='${c.icon}'"></div>`).join("")}</div><div class="swap-hint">DRAG TO SWAP</div></div>
+body=`<div class="final-screen"><div class="final-top"><div class="unused-pool" aria-label="남은 챔피언">${finalPool.map((c,i)=>`<div class="unused swap-zone ${isSignaturePick(me,c)?'my-signature':''}" draggable="true" data-swap-type="pool" data-swap-index="${i}" onclick="mobileSwapTap(event,'pool',${i})" ondragstart="dragStart(event,'pool',${i})" ondragover="allowDrop(event)" ondragenter="dragEnter(event)" ondragleave="dragLeave(event)" ondrop="dropSwap(event,'pool',${i})" ondragend="dragEnd(event)"><img src="assets/champions/${championImageId(c.id)}_0.jpg" onerror="this.remove();this.parentElement.textContent='${c.icon}'"></div>`).join("")}</div><div class="swap-hint">DRAG TO SWAP</div></div>
 <div class="final-main"><div class="final-team"><div class="side-title">우리 팀 · 선택한 챔피언</div>${party.map((c,i)=>`<div class="player-row swap-zone ${i===0?"you":""}" draggable="true" data-swap-type="team" data-swap-index="${i}" onclick="mobileSwapTap(event,'team',${i})" ondragstart="dragStart(event,'team',${i})" ondragover="allowDrop(event)" ondragenter="dragEnter(event)" ondragleave="dragLeave(event)" ondrop="dropSwap(event,'team',${i})" ondragend="dragEnd(event)"><div class="avatar"><img src="assets/champions/${championImageId(teamPicks[i].id)}_0.jpg" onerror="this.remove();this.parentElement.textContent='${teamPicks[i].icon}'"></div><div class="pick-meta"><strong>${teamPicks[i].name}</strong><small>${c.nickname}</small></div>${i===0?"<em>YOU</em>":""}</div>`).join("")}</div>
 <div class="final-center"><div class="final-label">YOUR CHAMPION</div><div class="hero-champ"><div class="hero-art"><img src="assets/champions/${championImageId(chosenChamp.id)}_0.jpg" onerror="this.remove();this.parentElement.textContent='${chosenChamp.icon}'"></div><h2>${chosenChamp.name}</h2></div><button class="game-start-btn" onclick="startGame()">준비 완료</button></div>
 <div class="final-enemy"><div class="enemy-list"><div class="side-title">상대 팀 · 챔피언 비공개</div>${[1,2,3,4,5].map(i=>`<div class="enemy-row"><div class="enemy-hidden">?</div><div class="pick-meta"><strong>적${i}</strong><small>챔피언 비공개</small></div></div>`).join("")}</div></div></div><div class="final-chat final-chat-left"><div class="final-chat-head">CHAT</div><div class="final-chat-body">${tip}${special.join("")}</div></div>${sigPopup}</div>`;
@@ -547,7 +557,7 @@ if(mode==="battle"){
 const bs=battleState || {time:0,status:"전투 준비 중",team:[],enemy:[],log:[],speed:1,structures:[],relics:[],fx:[]};
 const portrait=(u)=>`<div class="portrait"><img src="assets/champions/${championImageId(u.champ.id)}_0.jpg" onerror="this.style.display='none';this.parentElement.textContent='${u.icon}'"></div>`;
 const augSlots=(u)=>`<div class="unit-augments">${[0,1,2,3].map(i=>{const a=(u.augments||[])[i];return a?`<span class="unit-augment filled ${a.tier}" title="${a.name} · ${a.desc}"><img src="assets/augments/${a.tier}/${a.name}.jpg" alt="${a.name}" onerror="this.style.display='none';this.nextElementSibling.style.display='grid'"><i style="display:none">◆</i></span>`:`<span class="unit-augment" title="미선택"><i>+</i></span>`}).join('')}</div>`;
-const row=(u,right=false)=>`<div class="b2-unit ${u.alive?"":"dead"}">${right?`<div class="unit-info"><strong>${u.nick}</strong><small>${u.champ.name} · Lv.${u.level}</small><div class="b2-hp"><i style="width:${Math.max(0,u.hp/u.maxHp*100)}%"></i></div><div class="b2-gold">${Math.floor(u.gold).toLocaleString()} G</div>${augSlots(u)}</div>${portrait(u)}`:`${portrait(u)}<div class="unit-info"><strong>${u.nick}</strong><small>${u.champ.name} · Lv.${u.level}</small><div class="b2-hp"><i style="width:${Math.max(0,u.hp/u.maxHp*100)}%"></i></div><div class="b2-gold">${Math.floor(u.gold).toLocaleString()} G</div>${augSlots(u)}</div>`}</div>`;
+const row=(u,right=false)=>`<div class="b2-unit ${u.alive?"":"dead"}" data-hud-unit="${u.id}">${right?`<div class="unit-info"><strong>${u.nick}</strong><small>${u.champ.name} · Lv.${u.level}</small><div class="b2-hp"><i style="width:${Math.max(0,u.hp/u.maxHp*100)}%"></i></div><div class="b2-gold">${Math.floor(u.gold).toLocaleString()} G</div>${augSlots(u)}</div>${portrait(u)}`:`${portrait(u)}<div class="unit-info"><strong>${u.nick}</strong><small>${u.champ.name} · Lv.${u.level}</small><div class="b2-hp"><i style="width:${Math.max(0,u.hp/u.maxHp*100)}%"></i></div><div class="b2-gold">${Math.floor(u.gold).toLocaleString()} G</div>${augSlots(u)}</div>`}</div>`;
 body=`<div class="battle-v2"><div class="b2-head"><div></div><div><div class="b2-score"><span class="blue">${bs.teamKills||0}</span> &nbsp; ⚔ &nbsp; <span class="red">${bs.enemyKills||0}</span></div><div class="b2-clock">${formatBattleTime(bs.time)}</div></div><div class="b2-right">${bs.status}</div></div><div class="b2-main"><aside class="b2-side"><div class="b2-side-title">우리 팀</div>${bs.team.map(u=>row(u,false)).join("")}</aside><div class="b2-stage"><div class="b2-map"><div class="clean-bridge"></div></div>
 <div class="structure-track">${bs.structures.map(st=>`<div class="b2-structure ${st.team==='enemy'?'red':''} ${st.type} ${st.alive?'':'dead'}" data-structure="${st.id}" style="left:${st.x}%"><div class="sicon">${st.type==='nexus'?'◆':st.type==='inhib'?'✦':'▥'}</div><div class="sname">${st.name} · ${Math.max(0,Math.round(st.hp))}%</div></div>`).join("")}</div>
 ${bs.units.filter(u=>u.kind==='champ').map(u=>unitV2Html(u)).join("")}
@@ -793,6 +803,7 @@ function pickChampion(id){
   finalPool=randomPool.slice(4,14);
   signatureRequests=[];signatureRequest=null;signatureChatDone=new Set();signatureChatLog=[];
   mode="finalChamp";
+  signatureReceived(0);
   // 랜덤으로 자기 시그니처를 바로 받은 경우 전용 채팅은 1회만 출력.
   for(let i=1;i<party.length;i++)signatureReceived(i);
   // 시그니처가 다른 팀원/대기창에 랜덤 등장한 경우에만 요청 팝업.
@@ -1009,11 +1020,15 @@ function updateUnits(dt){const bs=battleState;syncNpcAugments();const all=bs.uni
        const retreatX=u.team==='team'?st.x-11:st.x+11;
        moveOrganic(u,{x:retreatX,y:50+u.laneBias},dt*.85);
      }else{
-       const formationGap=u.formation==='back'?9.0:4.2;
-       const targetX=st.x+(u.team==='team'?-formationGap:formationGap);
-       const targetY=50+u.laneBias;
-       if(Math.abs(u.x-targetX)<3.5 && alliedMinions.length>0 && u.attackCd<=0){damageStructure(st,u.atk*.38,u);u.attackCd=1.45+Math.random()*.5}
-       else moveOrganic(u,{x:targetX,y:targetY},dt*.62);
+       // 구조물 공격은 챔피언 사거리와 무관하게 구조물 바로 앞까지 접근해야 가능하다.
+       // 원거리 챔피언도 화면 밖/장거리에서 포탑을 때리지 않는다.
+       const structureAttackRange=3.0;
+       const approachGap=2.35;
+       const targetX=st.x+(u.team==='team'?-approachGap:approachGap);
+       const targetY=50+u.laneBias*.28;
+       const structureDist=Math.hypot(u.x-st.x,(u.y-(st.y||50))*.45);
+       if(structureDist<=structureAttackRange && alliedMinions.length>0 && u.attackCd<=0){damageStructure(st,u.atk*.38,u);u.attackCd=1.45+Math.random()*.5}
+       else moveOrganic(u,{x:targetX,y:targetY},dt*.68);
      }
    }
  }else{
@@ -1084,6 +1099,7 @@ function syncStaticBattlePositions(){
 }
 function syncBattleDom(){const bs=battleState;const clock=document.querySelector('.b2-clock');if(clock)clock.textContent=formatBattleTime(bs.time);const right=document.querySelector('.b2-right');if(right)right.innerHTML=`<span>${bs.status}</span>`;
  for(const u of bs.team.concat(bs.enemy)){const el=document.querySelector(`[data-unit="${u.id}"]`);if(!el)continue;const p=screenPos(u.x,u.y);el.style.left=p.left+'%';el.style.top=p.top+'%';el.classList.toggle('dead',!u.alive);const hp=el.querySelector('.t-hp em');if(hp)hp.style.width=Math.max(0,u.hp/u.maxHp*100)+'%'}
+ for(const u of bs.team.concat(bs.enemy)){const hud=document.querySelector(`[data-hud-unit="${u.id}"]`);if(!hud)continue;hud.classList.toggle('dead',!u.alive);const hp=hud.querySelector('.b2-hp i');if(hp)hp.style.width=Math.max(0,Math.min(100,u.hp/u.maxHp*100))+'%';const info=hud.querySelector('.unit-info small');if(info)info.textContent=`${u.champ.name} · Lv.${u.level}`;const gold=hud.querySelector('.b2-gold');if(gold)gold.textContent=Math.floor(u.gold).toLocaleString()+' G'}
  for(const st of bs.structures){const el=document.querySelector(`[data-structure="${st.id}"]`);if(el){el.classList.toggle('dead',!st.alive);const n=el.querySelector('.sname');if(n)n.textContent=`${st.name} · ${Math.max(0,Math.round(st.hp))}%`}}
  for(const r of bs.relics){const els=[...document.querySelectorAll('.b2-relic')];const idx=bs.relics.indexOf(r);if(els[idx])els[idx].classList.toggle('cool',r.cooldown>0)}
  if(bs.log.length>120)bs.log.splice(0,bs.log.length-120);const log=document.querySelector('.b2-log');if(log){const atBottom=log.scrollTop+log.clientHeight>=log.scrollHeight-8;log.innerHTML=bs.log.slice(-9).map(x=>`<div>${x}</div>`).join('');if(atBottom)log.scrollTop=log.scrollHeight} const chat=document.querySelector('.match-all-chat-body');if(chat)chat.innerHTML=(bs.chat||[]).slice(-7).map(x=>`<div>${x}</div>`).join('');
@@ -1157,7 +1173,7 @@ function performChampionSwap(a,targetType,targetIndex){
   else if(a.type==="pool"&&targetType==="pool"){const t=finalPool[a.index];finalPool[a.index]=finalPool[targetIndex];finalPool[targetIndex]=t}
   else if(a.type==="team"&&targetType==="pool"){const t=teamPicks[a.index];teamPicks[a.index]=finalPool[targetIndex];finalPool[targetIndex]=t}
   else if(a.type==="pool"&&targetType==="team"){const t=finalPool[a.index];finalPool[a.index]=teamPicks[targetIndex];teamPicks[targetIndex]=t}
-  chosenChamp=teamPicks[0];for(let i=1;i<party.length;i++)signatureReceived(i);
+  chosenChamp=teamPicks[0];for(let i=0;i<party.length;i++)signatureReceived(i);
 }
 function mobileSwapTap(e,type,index){
   if(!window.matchMedia('(max-width:800px)').matches)return;
@@ -1275,6 +1291,11 @@ render();
   .chat-event-card{padding:18px 13px!important}.chat-event-card h2{font-size:17px!important}
   .b2-side{width:62px!important}.match-all-chat,.b2-panel{width:calc(100% - 140px)!important}.b2-speed-dock button{padding:4px!important;font-size:6px!important}
 }
+
+/* V49 signature/image/mobile/HUD sync */
+.champ-art img,.unused-select-mini img{width:100%;height:100%;object-fit:cover;display:block}.signature-help{color:#e6c768;font-weight:800}.champ-card.my-signature,.unused.my-signature,.unused-select-mini.my-signature{border:2px solid #e7c65e!important;box-shadow:0 0 10px #e7c65e,0 0 24px #e7c65e66,inset 0 0 16px #e7c65e33!important}.champ-card.my-signature .cc-bottom{background:linear-gradient(180deg,#332a0d,#100d05)!important}.champ-card.my-signature small{color:#f2d878!important;font-weight:800}.unused-select-mini{overflow:hidden}.b2-hp i,.t-hp em{transition:width .12s linear}
+@media(max-width:760px){.center-select p{font-size:10px!important;line-height:1.55}.signature-help{display:inline-block;margin-top:4px}.champ-options{grid-template-columns:repeat(3,minmax(0,1fr))!important}.champ-card{height:190px!important}.champ-art{height:128px!important}.champ-card strong{font-size:11px!important}.champ-card small{font-size:7px!important;line-height:1.25}.unused-select-row{height:54px!important;min-height:54px!important}.unused-select-mini{width:42px!important;height:38px!important;flex:0 0 42px}.unused-pool .unused.my-signature{border-radius:50%!important}.b2-hp{height:5px!important}}
+@media(max-width:390px){.champ-card{height:172px!important}.champ-art{height:112px!important}.champ-options{gap:4px!important}.center-select h2{font-size:20px!important}}
 </style>
 
 <style>
@@ -1282,4 +1303,9 @@ render();
 /* V46 KakaoTalk-inspired call UI */
 .phone{background:#555!important;border-color:#707070!important}.head{background:#555!important;border-bottom:1px solid #626262!important;height:72px!important}.head strong{border:0!important;background:transparent!important;padding:0!important;font-size:16px!important;color:#fff!important}.head small{display:block!important;color:#c8c8c8!important;font-size:11px!important;margin-top:3px}.head em,.head button{color:#f0f0f0!important}.chat{background:#555!important;min-height:500px!important}.date{background:#666!important;color:#ddd!important}.who{color:#f2f2f2!important}.bubble{background:#fff!important;color:#222!important;border-radius:3px!important}.mine .bubble{background:#fff!important;color:#222!important}.system{background:#666!important;color:#eee!important}.typing{background:#fff!important}.input{background:#fff!important;color:#aaa!important;border-top:1px solid #ddd!important}.input b{color:#555!important}
 @media(max-width:700px){.signature-label{font-size:10px}.phonewrap{max-width:100%!important}.phone{border-radius:0!important}.chat{min-height:52dvh!important}.party-reselect{font-size:13px!important}}
+
+/* V49 signature/image/mobile/HUD sync */
+.champ-art img,.unused-select-mini img{width:100%;height:100%;object-fit:cover;display:block}.signature-help{color:#e6c768;font-weight:800}.champ-card.my-signature,.unused.my-signature,.unused-select-mini.my-signature{border:2px solid #e7c65e!important;box-shadow:0 0 10px #e7c65e,0 0 24px #e7c65e66,inset 0 0 16px #e7c65e33!important}.champ-card.my-signature .cc-bottom{background:linear-gradient(180deg,#332a0d,#100d05)!important}.champ-card.my-signature small{color:#f2d878!important;font-weight:800}.unused-select-mini{overflow:hidden}.b2-hp i,.t-hp em{transition:width .12s linear}
+@media(max-width:760px){.center-select p{font-size:10px!important;line-height:1.55}.signature-help{display:inline-block;margin-top:4px}.champ-options{grid-template-columns:repeat(3,minmax(0,1fr))!important}.champ-card{height:190px!important}.champ-art{height:128px!important}.champ-card strong{font-size:11px!important}.champ-card small{font-size:7px!important;line-height:1.25}.unused-select-row{height:54px!important;min-height:54px!important}.unused-select-mini{width:42px!important;height:38px!important;flex:0 0 42px}.unused-pool .unused.my-signature{border-radius:50%!important}.b2-hp{height:5px!important}}
+@media(max-width:390px){.champ-card{height:172px!important}.champ-art{height:112px!important}.champ-options{gap:4px!important}.center-select h2{font-size:20px!important}}
 </style>
