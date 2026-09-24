@@ -1212,7 +1212,7 @@ function startBattle(){
  const structures=[
  {id:'tn1',team:'team',type:'nexus',name:'넥서스',x:5,y:50,hp:100,alive:true},{id:'tt1',team:'team',type:'tower',name:'쌍둥이 포탑',x:9,y:50,hp:100,alive:true},{id:'tt2',team:'team',type:'tower',name:'쌍둥이 포탑',x:12,y:50,hp:100,alive:true},{id:'ti',team:'team',type:'inhib',name:'억제기',x:17,y:50,hp:100,alive:true},{id:'t2',team:'team',type:'tower',name:'2차 포탑',x:28,y:50,hp:100,alive:true},{id:'t1',team:'team',type:'tower',name:'1차 포탑',x:40,y:50,hp:100,alive:true},
  {id:'e1',team:'enemy',type:'tower',name:'1차 포탑',x:60,y:50,hp:100,alive:true},{id:'e2',team:'enemy',type:'tower',name:'2차 포탑',x:72,y:50,hp:100,alive:true},{id:'ei',team:'enemy',type:'inhib',name:'억제기',x:83,y:50,hp:100,alive:true},{id:'et1',team:'enemy',type:'tower',name:'쌍둥이 포탑',x:88,y:50,hp:100,alive:true},{id:'et2',team:'enemy',type:'tower',name:'쌍둥이 포탑',x:91,y:50,hp:100,alive:true},{id:'en1',team:'enemy',type:'nexus',name:'넥서스',x:95,y:50,hp:100,alive:true}];
- battleState={time:0,lastTs:performance.now(),lastUiSync:0,status:'시작 증강체 선택 중',speed:1,team,enemy,units:[...team,...enemy],structures,relics:[],fx:[],fxSeq:0,log:[],chat:[],teamKills:0,enemyKills:0,nextWaveAt:45,waveCount:0,superTeam:false,superEnemy:false,paused:true,engineStarted:false,jaebinEventAt:180+Math.random()*300,jaebinEventDone:false,jaebinEventOpen:false,jaebinEventResult:null,jaebinChatAttempted:false,augmentOpen:true,augmentStage:'start',augmentChoices:[],augments:[],augmentDone:{start:false,7:false,11:false,15:false},augmentTierByStage:{},endPending:null,akaliChatAt:420+Math.random()*60,akaliChatDone:false,teamCompMultiplier:teamComp,enemyCompMultiplier:enemyComp};
+ battleState={time:0,lastTs:performance.now(),lastUiSync:0,status:'시작 증강체 선택 중',speed:1,team,enemy,units:[...team,...enemy],structures,relics:[],fx:[],fxSeq:0,log:[],chat:[],teamKills:0,enemyKills:0,nextWaveAt:45,waveCount:0,superTeam:false,superEnemy:false,paused:true,engineStarted:false,jaebinEventAt:180+Math.random()*300,jaebinEventDone:false,jaebinEventOpen:false,jaebinEventResult:null,jaebinChatAttempted:false,augmentOpen:true,augmentStage:'start',augmentChoices:[],augments:[],augmentDone:{start:false,7:false,11:false,15:false},augmentTierByStage:{},endPending:null,endTimer:null,endFinalized:false,akaliChatAt:420+Math.random()*60,akaliChatDone:false,teamCompMultiplier:teamComp,enemyCompMultiplier:enemyComp};
  // 시작 증강은 전투 루프를 돌리기 전에 먼저 확정한다.
  // 이전처럼 RAF를 먼저 시작한 뒤 0.7초 후 paused=true를 거는 순서를 없애서 00:00 정지 상태를 방지한다.
  battleState.augmentTier=getAugmentTierForStage('start');
@@ -1284,7 +1284,14 @@ function damageStructure(st,dmg,attacker){
   st.hp=0;st.alive=false;
   bs.log.push(`[${formatBattleTime(bs.time)}] ${st.team==='enemy'?'적':'우리'} ${st.name} 파괴`);
   if(st.type==='inhib'){if(st.team==='team')bs.superEnemy=true;else bs.superTeam=true}
-  if(st.type==='nexus'&&!bs.endPending){bs.endPending={winner:st.team==='enemy'?'team':'enemy',realAt:performance.now()+900};bs.status='넥서스 파괴';}
+  if(st.type==='nexus'&&!bs.endPending){
+   // 넥서스 파괴는 RAF 상태와 무관하게 결과 화면으로 확실히 넘어가도록 별도 타이머로 마감한다.
+   bs.endPending={winner:st.team==='enemy'?'team':'enemy',realAt:performance.now()+1100};
+   bs.status='넥서스 파괴';
+   bs.engineStarted=false;
+   if(bs.endTimer)clearTimeout(bs.endTimer);
+   bs.endTimer=setTimeout(()=>finalizeBattleEnd(bs),1100);
+  }
  }
 }
 function waveIntervalAt(t){
@@ -1375,7 +1382,22 @@ function updateUnits(dt){const bs=battleState;syncNpcAugments();const all=bs.uni
  }
  u.y=Math.max(30,Math.min(70,u.y));
 }}
-function applyOvercharge(){const bs=battleState;if(bs.time>=40*60){for(const st of bs.structures.filter(s=>s.alive&&s.type==='tower')){st.hp-=1.2;if(st.hp<=0){st.hp=0;st.alive=false}}}}
+function applyOvercharge(dt){
+ const bs=battleState;if(!bs||bs.time<40*60)return;
+ // 기존 코드는 매 프레임 모든 포탑 HP를 1.2씩 직접 깎아 구조물 순서를 무시하고
+ // 쌍둥이 포탑이 거의 동시에 사라지는 현상을 만들었다.
+ // 후반 가속은 현재 공격 가능한 구조물 티어에만, 시간(dt) 기준으로 아주 천천히 적용한다.
+ for(const attackingTeam of ['team','enemy']){
+  const open=structureTierOpen(attackingTeam).filter(st=>st.type==='tower');
+  if(!open.length)continue;
+  const enemyUnits=bs.units.filter(u=>u.alive&&u.team===attackingTeam&&u.kind==='champ');
+  const near=open.some(st=>enemyUnits.some(u=>Math.abs(u.x-st.x)<10));
+  if(!near)continue;
+  for(const st of open){
+   st.hp=Math.max(1,st.hp-(0.035*dt)); // 오버차지는 구조물을 직접 파괴하지 않는다.
+  }
+ }
+}
 function triggerJaebinEvent(){
  const bs=battleState;if(!bs||bs.jaebinEventDone||bs.jaebinEventOpen||!party.some(c=>c.id==='nguyen'))return;
  bs.jaebinEventOpen=true;bs.paused=true;bs.status='이벤트 일시정지';render();
@@ -1394,7 +1416,8 @@ function allowJaebinChat(){
  bs.jaebinEventDone=true;bs.jaebinEventOpen=false;bs.paused=false;bs.status='경기 진행 중';bs.lastTs=performance.now();render();scheduleBattleFrame();
 }
 function denyJaebinChat(){const bs=battleState;if(!bs)return;bs.chat.push(`<span class="all-tag">[SYSTEM]</span> 이재빈의 전체 채팅을 막았습니다.`);bs.jaebinEventDone=true;bs.jaebinEventOpen=false;bs.paused=false;bs.status='경기 진행 중';bs.lastTs=performance.now();render();scheduleBattleFrame()}
-function checkEnd(){const bs=battleState;if(bs.endPending&&performance.now()>=bs.endPending.realAt){const winner=bs.endPending.winner;bs.status=winner==='team'?'우리 팀 승리':'적 팀 승리';if(winner==='team'){if(party.some(c=>c.id==='siljeom'))bs.chat.push(`<span class="all-tag">[전체]</span> <span class="ally-chat">실점:</span> 죽어 그냥 ㅋㅋ`);if(party.some(c=>c.id==='nguyen'))bs.chat.push(`<span class="all-tag">[전체]</span> <span class="ally-chat">Nguyen Ngoc Tu:</span> 나1가`);if(party.some(c=>c.id==='3patourwan'))for(let i=0;i<4;i++)bs.chat.push(`<span class="all-tag">[전체]</span> <span class="ally-chat">쓰리빠뚜르완:</span> ㅋ`);if(party.some(c=>c.id==='joguk'))bs.chat.push(`<span class="all-tag">[전체]</span> <span class="ally-chat">조국:</span> 븅`);if(party.some(c=>c.id==='molcho'))bs.chat.push(`<span class="all-tag">[팀원]</span> <span class="ally-chat">몰초:</span> 쉽네 쉬워`);}else{if(party.some(c=>c.id==='nguyen'))bs.chat.push(`<span class="all-tag">[전체]</span> <span class="ally-chat">Nguyen Ngoc Tu:</span> 근데 지고 자..?`);if(party.some(c=>c.id==='siljeom'))bs.chat.push(`<span class="all-tag">[전체]</span> <span class="ally-chat">실점:</span> 지고 자는 건 에바긴 해`);if(party.some(c=>c.id==='3patourwan'))bs.chat.push(`<span class="all-tag">[전체]</span> <span class="ally-chat">쓰리빠뚜르완:</span> 찐막?`);if(party.some(c=>c.id==='joguk'))bs.chat.push(`<span class="all-tag">[전체]</span> <span class="ally-chat">조국:</span> 고조할배찐막?`);if(bs.jaebinChatAttempted){const jaebinUnit=bs.team.find(u=>u.realName==='이재빈'||u.nick==='Nguyen Ngoc Tu');const champName=jaebinUnit?.champ?.name||'그 챔피언';const taunts=['이기고 자라 ㅋㅋㅋㅋㅋㅋㅋㅋㅋ',`${champName} 너는 진짜 접어라 ㅇㅇ`,'그 조합으로 쳐지네 ㅋㅋㅋㅋㅋㅋㅋㅋㅋㅋ','ez','븅신 ㅋㅋㅋㅋㅋㅋㅋㅋㅋㅋㅋㅋ'];bs.enemy.slice(0,5).forEach((u,i)=>bs.chat.push(`<span class="all-tag">[전체]</span> <span class="enemy-chat">${u.nick}:</span> ${taunts[i]}`));}}matchResult={winner,time:bs.time,teamKills:bs.teamKills,enemyKills:bs.enemyKills,team:bs.team.map(u=>({...u})),enemy:bs.enemy.map(u=>({...u})),chat:[...(bs.chat||[])]};mode='battleEnd';render();return true}return false}
+function finalizeBattleEnd(expectedState=battleState){const bs=expectedState;if(!bs||battleState!==bs||mode!=='battle'||bs.endFinalized||!bs.endPending)return false;bs.endFinalized=true;if(bs.endTimer){clearTimeout(bs.endTimer);bs.endTimer=null;}bs.engineStarted=false;const winner=bs.endPending.winner;bs.status=winner==='team'?'우리 팀 승리':'적 팀 승리';if(winner==='team'){if(party.some(c=>c.id==='siljeom'))bs.chat.push(`<span class="all-tag">[전체]</span> <span class="ally-chat">실점:</span> 죽어 그냥 ㅋㅋ`);if(party.some(c=>c.id==='nguyen'))bs.chat.push(`<span class="all-tag">[전체]</span> <span class="ally-chat">Nguyen Ngoc Tu:</span> 나1가`);if(party.some(c=>c.id==='3patourwan'))for(let i=0;i<4;i++)bs.chat.push(`<span class="all-tag">[전체]</span> <span class="ally-chat">쓰리빠뚜르완:</span> ㅋ`);if(party.some(c=>c.id==='joguk'))bs.chat.push(`<span class="all-tag">[전체]</span> <span class="ally-chat">조국:</span> 븅`);if(party.some(c=>c.id==='molcho'))bs.chat.push(`<span class="all-tag">[팀원]</span> <span class="ally-chat">몰초:</span> 쉽네 쉬워`);}else{if(party.some(c=>c.id==='nguyen'))bs.chat.push(`<span class="all-tag">[전체]</span> <span class="ally-chat">Nguyen Ngoc Tu:</span> 근데 지고 자..?`);if(party.some(c=>c.id==='siljeom'))bs.chat.push(`<span class="all-tag">[전체]</span> <span class="ally-chat">실점:</span> 지고 자는 건 에바긴 해`);if(party.some(c=>c.id==='3patourwan'))bs.chat.push(`<span class="all-tag">[전체]</span> <span class="ally-chat">쓰리빠뚜르완:</span> 찐막?`);if(party.some(c=>c.id==='joguk'))bs.chat.push(`<span class="all-tag">[전체]</span> <span class="ally-chat">조국:</span> 고조할배찐막?`);if(bs.jaebinChatAttempted){const jaebinUnit=bs.team.find(u=>u.realName==='이재빈'||u.nick==='Nguyen Ngoc Tu');const champName=jaebinUnit?.champ?.name||'그 챔피언';const taunts=['이기고 자라 ㅋㅋㅋㅋㅋㅋㅋㅋㅋ',`${champName} 너는 진짜 접어라 ㅇㅇ`,'그 조합으로 쳐지네 ㅋㅋㅋㅋㅋㅋㅋㅋㅋㅋ','ez','븅신 ㅋㅋㅋㅋㅋㅋㅋㅋㅋㅋㅋㅋ'];bs.enemy.slice(0,5).forEach((u,i)=>bs.chat.push(`<span class="all-tag">[전체]</span> <span class="enemy-chat">${u.nick}:</span> ${taunts[i]}`));}}matchResult={winner,time:bs.time,teamKills:bs.teamKills,enemyKills:bs.enemyKills,team:bs.team.map(u=>({...u})),enemy:bs.enemy.map(u=>({...u})),chat:[...(bs.chat||[])]};mode='battleEnd';render();return true}
+function checkEnd(){const bs=battleState;if(!bs||!bs.endPending)return false;if(performance.now()>=bs.endPending.realAt)return finalizeBattleEnd(bs);return false}
 function battleFrame(ts){
  if(mode!=='battle'||!battleState||!battleState.engineStarted)return;
  const bs=battleState;bs.lastEngineHeartbeat=performance.now();
@@ -1405,7 +1428,7 @@ function battleFrame(ts){
    if(!bs.akaliChatDone&&party.some(c=>c.id==='nguyen')&&bs.enemy.some(u=>u.champ?.id==='akali')&&bs.time>=bs.akaliChatAt){bs.chat.push(`<span class="all-tag">[전체]</span> <span class="ally-chat">Nguyen Ngoc Tu:</span> 아칼리 사기 챔피언 하면 재미있음?`);bs.akaliChatDone=true;}
    if(!bs.jaebinEventDone&&!bs.jaebinEventOpen&&party.some(c=>c.id==='nguyen')&&bs.time>=bs.jaebinEventAt){triggerJaebinEvent();scheduleBattleFrame();return;}
    while(bs.time>=bs.nextWaveAt){spawnWave();bs.nextWaveAt+=waveIntervalAt(bs.nextWaveAt)}
-   updateUnits(dt);updateStructures(dt);updateRelics(dt);applyOvercharge();
+   updateUnits(dt);updateStructures(dt);updateRelics(dt);applyOvercharge(dt);
    if(bs.units.length>70)bs.units=bs.units.filter(u=>u.kind==='champ'||u.alive);
    for(const f of bs.fx)f.ttl-=dt;bs.fx=bs.fx.filter(f=>f.ttl>0);
    if(checkEnd()){render();return}
