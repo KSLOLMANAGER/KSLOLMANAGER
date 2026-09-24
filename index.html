@@ -254,6 +254,14 @@ button{font:inherit}.app{min-height:100vh;width:100%;max-width:1240px;margin:0 a
 .b2-panel{position:absolute!important;left:50%!important;bottom:14px!important;transform:translateX(-50%)!important;width:min(660px,64%)!important;z-index:30;background:#06111bea;border:1px solid #31546b;box-shadow:0 8px 30px #0008}.b2-panel-head{font-size:11px;padding:8px 12px}.b2-log{height:94px!important;font-size:11px!important;line-height:1.7;padding:7px 12px!important}.b2-controls{padding:7px!important}.b2-controls button{min-width:38px}
 @media(max-width:1000px){.b2-main{grid-template-columns:170px 1fr 170px}.b2-unit{grid-template-columns:44px 1fr;height:78px}.b2-side.right .b2-unit{grid-template-columns:1fr 44px}.portrait{width:40px;height:40px}.b2-panel{width:72%!important}}
 
+
+/* V16 end-of-game + results */
+.end-overlay{position:fixed;inset:0;z-index:90;background:rgba(1,7,12,.78);display:grid;place-items:center;backdrop-filter:blur(3px)}
+.end-emblem{text-align:center;min-width:420px;padding:42px 60px;background:radial-gradient(circle,#123249 0,#06131d 58%,transparent 72%)}
+.end-emblem.defeat{background:radial-gradient(circle,#43151a 0,#16080b 58%,transparent 72%)}
+.end-word{font-size:72px;font-weight:1000;letter-spacing:12px;color:#e9d7a4;text-shadow:0 0 24px #58bfff88}.defeat .end-word{color:#e0a49d;text-shadow:0 0 24px #e64d4d88}
+.end-sub{font-size:12px;color:#8fa6ae;margin:8px 0 26px}.end-close{padding:12px 52px;border:1px solid #c3a45d;background:#153449;color:#f6edda;font-weight:900;cursor:pointer}.defeat .end-close{background:#4b171b;border-color:#b95a55}
+.result-screen{position:fixed;inset:0;z-index:80;background:radial-gradient(circle at 50% 0,#102c3a,#041017 62%,#02070b);color:#eaf0ef;overflow:auto;padding:28px 5vw 44px}.result-wrap{max-width:1280px;margin:auto}.result-head{text-align:center;margin-bottom:22px}.result-head h1{font-size:38px;margin:4px}.result-head.win h1{color:#72c7ff}.result-head.lose h1{color:#ff7777}.result-head p{color:#7f9299}.result-team{margin:12px 0 22px;border:1px solid #29434e;background:#071820}.result-team.enemy{border-color:#503039}.result-team-title{padding:10px 14px;font-weight:900;background:#0d2632;color:#78caff}.enemy .result-team-title{background:#281319;color:#ff7b82}.result-row{display:grid;grid-template-columns:54px minmax(170px,1.5fr) 70px 110px 100px 120px 120px;align-items:center;gap:10px;padding:10px 14px;border-top:1px solid #1b3038;font-size:12px}.result-row.header{color:#72868d;font-size:10px}.result-icon{width:42px;height:42px;border-radius:4px;overflow:hidden;background:#102630;display:grid;place-items:center;font-size:20px}.result-icon img{width:100%;height:100%;object-fit:cover}.result-player strong{display:block}.result-player small{color:#7d9096}.result-kda{font-weight:900}.result-dmg{font-weight:900;color:#e9c66e}.result-actions{display:flex;justify-content:center;gap:12px;margin-top:28px}.result-actions button{min-width:220px;padding:14px 20px;font-weight:900;cursor:pointer;border:1px solid #b69b5e;background:#173646;color:#f3eee1}.result-actions button.alt{background:#111c22;border-color:#49616a}
 </style>
 </head>
 <body>
@@ -264,7 +272,7 @@ const chars=[
 ["joguk","조국","임도현"],["mundolmaeng","문돌맹","이동기"],["nguyen","Nguyen Ngoc Tu","이재빈"],
 ["dwaemesa","돼메사","조시원"],["galio","갈리오","김정운"],["dage","다케스탄 출신","황재윤"]
 ].map(x=>({id:x[0],nickname:x[1],name:x[2]}));
-let mode="select", me=null, selected=[], party=[], chatMembers=[], replies=0, privateIndex=0, privateTargets=[], searching=false, queueSeconds=0, queueTimer=null, found=false, champOptions=[], teamPicks=[], chosenChamp=null, finalPool=[], enemyTeam=[], loadingSeconds=10, loadingTimer=null, battleState=null, battleTimer=null;
+let mode="select", me=null, selected=[], party=[], chatMembers=[], replies=0, privateIndex=0, privateTargets=[], searching=false, queueSeconds=0, queueTimer=null, found=false, champOptions=[], teamPicks=[], chosenChamp=null, finalPool=[], enemyTeam=[], loadingSeconds=10, loadingTimer=null, battleState=null, battleTimer=null, matchResult=null;
 
 const app=document.getElementById("app");
 const shuffle=a=>[...a].sort(()=>Math.random()-.5);
@@ -332,6 +340,16 @@ ${bs.structures.map(st=>{const p=screenPos(st.x,st.y||50);return `<div class="b2
 ${bs.units.filter(u=>u.kind==='champ').map(u=>unitV2Html(u)).join("")}
 <div class="b2-panel"><div class="b2-panel-head"><span>LIVE MATCH LOG</span><span>${formatBattleTime(bs.time)}</span></div><div class="b2-log">${bs.log.slice(-6).map(x=>`<div>${x}</div>`).join("")}</div><div class="b2-controls"><button class="${bs.speed===.5?'active':''}" onclick="setBattleSpeed(.5)">0.5×</button><button class="${bs.speed===1?'active':''}" onclick="setBattleSpeed(1)">1×</button><button class="${bs.speed===2?'active':''}" onclick="setBattleSpeed(2)">2×</button><button class="${bs.speed===4?'active':''}" onclick="setBattleSpeed(4)">4×</button><button class="${bs.speed===8?'active':''}" onclick="setBattleSpeed(8)">8×</button><button class="${bs.speed===16?'active':''}" onclick="setBattleSpeed(16)">16×</button><button class="${bs.speed===32?'active':''}" onclick="setBattleSpeed(32)">32×</button></div></div></div><aside class="b2-side right"><div class="b2-side-title">적 팀</div>${bs.enemy.map(u=>row(u,true)).join("")}</aside></div></div>`;
 }
+if(mode==="battleEnd"){
+ const win=matchResult?.winner==='team';
+ body=`<div class="end-overlay"><div class="end-emblem ${win?'':'defeat'}"><div class="end-word">${win?'승리':'패배'}</div><div class="end-sub">${win?'적 팀 넥서스를 파괴했습니다.':'우리 팀 넥서스가 파괴되었습니다.'}</div><button class="end-close" onclick="openResults()">닫기</button></div></div>`;
+}
+if(mode==="results"){
+ const win=matchResult?.winner==='team';
+ const rr=(u)=>`<div class="result-row"><div class="result-icon"><img src="assets/champions/${u.champ.id}_0.png" onerror="this.remove();this.parentElement.textContent='${u.icon}'"></div><div class="result-player"><strong>${u.nick}</strong><small>${u.champ.name}</small></div><div>Lv.${u.level}</div><div class="result-kda">${u.kills} / ${u.deaths} / ${u.assists}</div><div>${Math.floor(u.gold).toLocaleString()} G</div><div class="result-dmg">${Math.round(u.damageDealt).toLocaleString()}</div><div>${Math.round(u.damageTaken).toLocaleString()}</div></div>`;
+ const team=(title,arr,enemy=false)=>`<section class="result-team ${enemy?'enemy':''}"><div class="result-team-title">${title}</div><div class="result-row header"><div>챔피언</div><div>플레이어</div><div>레벨</div><div>K / D / A</div><div>골드</div><div>챔피언 피해량</div><div>받은 피해량</div></div>${arr.map(rr).join('')}</section>`;
+ body=`<div class="result-screen"><div class="result-wrap"><div class="result-head ${win?'win':'lose'}"><small>무작위 총력전 · 아수라장</small><h1>${win?'승리':'패배'}</h1><p>${formatBattleTime(matchResult.time)} · ${matchResult.teamKills} : ${matchResult.enemyKills}</p></div>${team('1팀 · 우리 팀',matchResult.team)}${team('2팀 · 적 팀',matchResult.enemy,true)}<div class="result-actions"><button onclick="playAgain()">한 번 더 하기</button><button class="alt" onclick="reselectTeam()">팀원 다시 선정하기</button></div></div></div>`;
+}
 if(mode==="party"){
 body=`<div class="ready"><div class="mark">✓</div><div><div class="eyebrow">PARTY READY</div><h2>파티가 구성되었습니다.</h2><p>5명이 게임에 참가합니다.</p></div></div>
 <div class="party">${party.map((c,i)=>`<div class="pm"><span class="pn">0${i+1}</span><div><strong>${c.nickname}</strong><small>${c.name}</small></div>${i===0?"<em>YOU</em>":""}</div>`).join("")}</div>
@@ -393,6 +411,19 @@ function startGame(){
   loadingSeconds=10; mode="loading"; render();
   loadingTimer=setInterval(()=>{loadingSeconds--; if(loadingSeconds<=0){clearInterval(loadingTimer); startBattle();} else render();},1000);
 }
+function createChampionUnit(team,index,champ,nick){
+ return {id:`${team}-c${index}`,kind:'champ',team,champ,nick,icon:champ.icon,x:team==='team'?8:92,y:40+index*5,maxHp:115,hp:115,level:3,gold:1400,xp:0,atk:team==='team'?8.8:8.6,range:5.2,speed:2.1+Math.random()*.25,attackCd:0,alive:true,respawn:0,laneBias:(index-2)*3,phase:Math.random()*6.28,kills:0,deaths:0,assists:0,damageDealt:0,damageTaken:0};
+}
+function createMinion(team,cannon=false){return {id:`m-${team}-${Math.random()}`,kind:'minion',team,nick:'미니언',x:team==='team'?7:93,y:46+Math.random()*8,maxHp:cannon?45:25,hp:cannon?45:25,atk:cannon?3.2:1.8,range:cannon?4:2.4,speed:1.45,attackCd:0,alive:true,laneBias:(Math.random()-.5)*6,phase:Math.random()*6.28}}
+function startBattle(){
+ const team=teamPicks.map((c,i)=>createChampionUnit('team',i,c,party[i].nickname));
+ const enemy=enemyTeam.map((e,i)=>createChampionUnit('enemy',i,e.champ,e.nick));
+ const structures=[
+ {id:'tn1',team:'team',type:'nexus',name:'넥서스',x:5,y:50,hp:100,alive:true},{id:'tt1',team:'team',type:'tower',name:'쌍둥이 포탑',x:10,y:45,hp:100,alive:true},{id:'tt2',team:'team',type:'tower',name:'쌍둥이 포탑',x:10,y:55,hp:100,alive:true},{id:'ti',team:'team',type:'inhib',name:'억제기',x:17,y:50,hp:100,alive:true},{id:'t2',team:'team',type:'tower',name:'2차 포탑',x:28,y:50,hp:100,alive:true},{id:'t1',team:'team',type:'tower',name:'1차 포탑',x:40,y:50,hp:100,alive:true},
+ {id:'e1',team:'enemy',type:'tower',name:'1차 포탑',x:60,y:50,hp:100,alive:true},{id:'e2',team:'enemy',type:'tower',name:'2차 포탑',x:72,y:50,hp:100,alive:true},{id:'ei',team:'enemy',type:'inhib',name:'억제기',x:83,y:50,hp:100,alive:true},{id:'et1',team:'enemy',type:'tower',name:'쌍둥이 포탑',x:90,y:45,hp:100,alive:true},{id:'et2',team:'enemy',type:'tower',name:'쌍둥이 포탑',x:90,y:55,hp:100,alive:true},{id:'en1',team:'enemy',type:'nexus',name:'넥서스',x:95,y:50,hp:100,alive:true}];
+ battleState={time:0,lastTs:performance.now(),lastUiSync:0,status:'경기 진행 중',speed:1,team,enemy,units:[...team,...enemy],structures,relics:[],fx:[],fxSeq:0,log:[],teamKills:0,enemyKills:0,nextWaveAt:45,waveCount:0,superTeam:false,superEnemy:false};
+ mode='battle';render();window.__battleRAF=requestAnimationFrame(battleFrame);
+}
 function formatBattleTime(t){const m=String(Math.floor(t/60)).padStart(2,"0"),s=String(Math.floor(t%60)).padStart(2,"0");return `${m}:${s}`}
 function unitV2Html(u){const p=screenPos(u.x,u.y);return `<div class="b2-token ${u.team==='enemy'?'enemy':''} ${u.alive?'':'dead'}" data-unit="${u.id}" style="left:${p.left}%;top:${p.top}%"><span class="token-portrait"><img src="assets/champions/${u.champ.id}_0.png" onerror="this.style.display='none';this.parentElement.textContent='${u.icon}'"></span><b>${u.nick}</b><span class="t-hp"><em style="width:${Math.max(0,u.hp/u.maxHp*100)}%"></em></span></div>`}
 function setBattleSpeed(v){if(battleState){battleState.speed=v;render()}}
@@ -415,9 +446,11 @@ function respawnSeconds(u){return Math.max(1,(u.level||1)*2+4)}
 function killLog(attacker,target){
  const bs=battleState, at=attacker.team==='team'?'blue-name':'red-name', tt=target.team==='team'?'blue-name':'red-name';
  if(attacker.team==='team')bs.teamKills++; else if(attacker.team==='enemy')bs.enemyKills++;
+ if(attacker.kind==='champ'){attacker.kills=(attacker.kills||0)+1; attacker.gold+=300;} target.deaths=(target.deaths||0)+1;
+ const allies=bs.units.filter(u=>u.kind==='champ'&&u.team===attacker.team&&u!==attacker&&u.alive&&Math.hypot(u.x-target.x,u.y-target.y)<14); allies.forEach(u=>u.assists=(u.assists||0)+1);
  bs.log.push(`[${formatBattleTime(bs.time)}] <span class="${at}">${attacker.nick||attacker.name||'포탑'}</span> → <span class="${tt}">${target.nick}</span> 처치`);
 }
-function dealDamage(attacker,target,dmg){if(!target.alive)return;target.hp-=dmg;if(target.hp<=0){target.hp=0;target.alive=false;if(target.kind==='champ'){target.respawn=respawnSeconds(target);addFx(target.x,target.y,'KO',attacker.team);killLog(attacker,target)}}else if(Math.random()<.035&&attacker.kind==='champ'){addFx(target.x,target.y,`-${Math.max(1,Math.round(dmg*12))}`,attacker.team)}}
+function dealDamage(attacker,target,dmg){if(!target.alive)return;if(attacker.kind==='champ')attacker.damageDealt=(attacker.damageDealt||0)+dmg*12;if(target.kind==='champ')target.damageTaken=(target.damageTaken||0)+dmg*12;target.hp-=dmg;if(target.hp<=0){target.hp=0;target.alive=false;if(target.kind==='champ'){target.respawn=respawnSeconds(target);addFx(target.x,target.y,'KO',attacker.team);killLog(attacker,target)}}else if(Math.random()<.035&&attacker.kind==='champ'){addFx(target.x,target.y,`-${Math.max(1,Math.round(dmg*12))}`,attacker.team)}}
 function damageStructure(st,dmg,attacker){
  const tempo=battleState.time>15*60?2.4:battleState.time>10*60?1.55:1;
  st.hp-=dmg*tempo;
@@ -451,7 +484,7 @@ function updateUnits(dt){const bs=battleState;const all=bs.units;for(const u of 
  u.y=Math.max(31,Math.min(69,u.y));
 }}
 function applyOvercharge(){const bs=battleState;if(bs.time>=40*60){for(const st of bs.structures.filter(s=>s.alive&&s.type==='tower')){st.hp-=1.2;if(st.hp<=0){st.hp=0;st.alive=false}}}}
-function checkEnd(){const bs=battleState;const tn=bs.structures.find(s=>s.id==='tn1'),en=bs.structures.find(s=>s.id==='en1');if(!tn.alive||!en.alive){bs.status=!en.alive?'우리 팀 승리':'적 팀 승리';return true}return false}
+function checkEnd(){const bs=battleState;const tn=bs.structures.find(s=>s.id==='tn1'),en=bs.structures.find(s=>s.id==='en1');if(!tn.alive||!en.alive){const winner=!en.alive?'team':'enemy';bs.status=winner==='team'?'우리 팀 승리':'적 팀 승리';matchResult={winner,time:bs.time,teamKills:bs.teamKills,enemyKills:bs.enemyKills,team:bs.team.map(u=>({...u})),enemy:bs.enemy.map(u=>({...u}))};mode='battleEnd';render();return true}return false}
 function battleFrame(ts){if(mode!=='battle'||!battleState)return;
  const bs=battleState;let raw=Math.min(.05,(ts-bs.lastTs)/1000);bs.lastTs=ts;let dt=Math.min(.8,raw*bs.speed);bs.time+=dt;
  while(bs.time>=bs.nextWaveAt){spawnWave();bs.nextWaveAt+=waveIntervalAt(bs.nextWaveAt)}
@@ -510,6 +543,9 @@ function dropSwap(e,targetType,targetIndex){e.preventDefault();e.stopPropagation
   chosenChamp=teamPicks[0];
   dragSource=null;render();
 }
+function openResults(){mode='results';render()}
+function playAgain(){battleState=null;matchResult=null;teamPicks=[];chosenChamp=null;finalPool=[];enemyTeam=[];goQueue()}
+function reselectTeam(){battleState=null;matchResult=null;selected=[];party=[];mode='method';render()}
 function reset(){clearInterval(queueTimer);clearInterval(loadingTimer);clearInterval(battleTimer);cancelAnimationFrame(window.__battleRAF);dragSource=null;mode="select";me=null;selected=[];party=[];chatMembers=[];replies=0;privateIndex=0;searching=false;queueSeconds=0;found=false;champOptions=[];teamPicks=[];chosenChamp=null;finalPool=[];render()}
 render();
 </script>
