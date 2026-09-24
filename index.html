@@ -607,6 +607,42 @@ button{font:inherit}.app{min-height:100vh;width:100%;max-width:1240px;margin:0 a
 }
 @media (max-width:430px){.battle-scoreboard{left:58px;right:58px;bottom:68px;height:min(58dvh,390px)}.mobile-score-toggle{right:60px;top:43px;padding:5px 8px;font-size:7px}}
 </style>
+
+<style id="v68-battle-polish">
+/* V68: high-quality original frozen bridge treatment, no external map image required */
+.b2-stage{background:
+ radial-gradient(ellipse at 18% 78%,rgba(31,96,151,.24),transparent 24%),
+ radial-gradient(ellipse at 82% 20%,rgba(122,30,61,.20),transparent 24%),
+ linear-gradient(135deg,#071827 0%,#03101a 46%,#07131f 100%)!important;}
+.b2-map{inset:0!important;background:
+ radial-gradient(circle at 9% 84%,rgba(87,183,255,.22),transparent 7%),
+ radial-gradient(circle at 91% 14%,rgba(255,74,104,.18),transparent 8%),
+ repeating-linear-gradient(135deg,rgba(120,184,221,.025) 0 2px,transparent 2px 22px)!important;overflow:hidden!important;}
+.b2-map:before{content:""!important;position:absolute!important;inset:-12%!important;background:
+ radial-gradient(ellipse at 50% 50%,transparent 0 27%,rgba(0,0,0,.22) 48%,rgba(0,0,0,.68) 78%),
+ linear-gradient(145deg,transparent 0 28%,rgba(22,45,61,.9) 28.3% 31%,transparent 31.3% 68.7%,rgba(18,39,55,.92) 69% 71.7%,transparent 72%)!important;filter:none!important;}
+.clean-bridge{left:-9%!important;top:38.5%!important;width:118%!important;height:30%!important;transform:rotate(-23deg)!important;border-top:8px solid #6c8998!important;border-bottom:8px solid #587584!important;background:
+ linear-gradient(180deg,rgba(177,210,223,.10),transparent 22%,transparent 76%,rgba(30,72,92,.28)),
+ repeating-linear-gradient(90deg,rgba(153,190,205,.10) 0 1px,transparent 1px 72px),
+ repeating-linear-gradient(0deg,rgba(153,190,205,.08) 0 1px,transparent 1px 48px),
+ linear-gradient(180deg,#304d5c,#203b49 48%,#19333f)!important;
+ box-shadow:0 0 0 3px #081219,0 0 28px rgba(83,161,202,.16),0 28px 70px #000b!important;}
+.clean-bridge:after{content:"";position:absolute;inset:13% 3%;border-top:1px solid rgba(175,216,231,.18);border-bottom:1px solid rgba(175,216,231,.14);background:linear-gradient(90deg,rgba(62,165,222,.11),transparent 34%,transparent 66%,rgba(218,69,90,.10));box-shadow:inset 0 0 35px rgba(172,218,235,.04)}
+
+/* PC combat status: dead-center at 6 o'clock, mirrored ally <-> enemy layout */
+.battle-scoreboard{position:absolute!important;left:50%!important;right:auto!important;bottom:18px!important;transform:translateX(-50%)!important;width:min(690px,52%)!important;height:210px!important;z-index:34!important;background:linear-gradient(180deg,rgba(3,15,25,.97),rgba(2,9,15,.98))!important;border:1px solid #365d73!important;box-shadow:0 14px 40px #000c,inset 0 1px rgba(131,190,219,.12)!important;overflow:hidden!important;font-family:Arial,"Noto Sans KR",sans-serif!important;}
+.battle-scoreboard-head{height:28px!important;padding:0 10px!important;display:flex!important;align-items:center!important;justify-content:center!important;border-bottom:1px solid #27485c!important;color:#c9dce7!important;font-size:10px!important;font-weight:900!important;letter-spacing:1.4px!important;box-sizing:border-box!important;position:relative!important}.score-close{display:none}
+.scoreboard-body{height:calc(100% - 28px);padding:5px 7px 6px;box-sizing:border-box;display:grid;grid-template-rows:repeat(5,1fr);gap:3px}
+.score-pair{display:grid;grid-template-columns:minmax(0,1fr) 28px minmax(0,1fr);align-items:center;min-height:0;background:linear-gradient(90deg,rgba(17,48,70,.56),rgba(7,20,31,.86) 44%,rgba(7,20,31,.86) 56%,rgba(64,20,28,.48));border:1px solid rgba(82,122,146,.20)}
+.score-half{display:grid;align-items:center;gap:5px;min-width:0;padding:2px 5px;box-sizing:border-box}.ally-half{grid-template-columns:minmax(108px,1fr) 52px 28px 31px}.enemy-half{grid-template-columns:31px 28px 52px minmax(108px,1fr)}
+.score-mid{text-align:center;color:#7391a1;font-size:11px}.score-champ{width:29px;height:29px;border-radius:50%;overflow:hidden;border:1px solid #469ee0;box-shadow:0 0 8px #2d87bf44;display:grid;place-items:center;font-size:9px}.score-champ.enemy{border-color:#dc5461;box-shadow:0 0 8px #c83c4c44}.score-champ img{width:100%;height:100%;object-fit:cover}.score-kda,.score-cs{font-size:9px;font-weight:900;text-align:center;color:#d9e6ec;white-space:nowrap}.score-cs{color:#9fb3bd}.score-items{display:grid;grid-template-columns:repeat(6,1fr);gap:2px;min-width:0}.score-item{width:100%!important;aspect-ratio:1/1;height:auto!important;max-width:24px;justify-self:center;display:grid;place-items:center;border:1px solid #324b5a!important;background:#07141d!important;color:#3a5360!important;font-size:8px!important;line-height:1!important;box-sizing:border-box}.score-item.filled{border-color:#a27f36!important;background:radial-gradient(circle at 35% 30%,#7d7040,#1a1b17 72%)!important;color:#f2d774!important;box-shadow:inset 0 0 5px #c99f3855!important}
+.mobile-score-toggle{display:none!important}
+@media (min-width:801px){.battle-scoreboard{display:block!important}}
+@media (max-width:800px){
+ .battle-scoreboard{display:none!important;left:58px!important;right:58px!important;bottom:70px!important;transform:none!important;width:auto!important;height:min(62dvh,430px)!important;z-index:96!important}.battle-scoreboard.open{display:block!important}.battle-scoreboard-head{height:32px!important}.score-close{display:block!important;position:absolute!important;right:6px!important;top:3px!important;border:0!important;background:transparent!important;color:#e4edf2!important;font-size:20px!important}.scoreboard-body{height:calc(100% - 32px);overflow-y:auto!important;-webkit-overflow-scrolling:touch!important;grid-template-rows:repeat(5,58px)!important}.score-pair{grid-template-columns:minmax(0,1fr) 18px minmax(0,1fr)!important}.score-half{gap:2px!important;padding:2px!important}.ally-half{grid-template-columns:minmax(66px,1fr) 36px 22px 27px!important}.enemy-half{grid-template-columns:27px 22px 36px minmax(66px,1fr)!important}.score-champ{width:25px;height:25px}.score-kda,.score-cs{font-size:6.5px!important}.score-items{gap:1px!important}.score-item{font-size:6px!important}.score-mid{font-size:8px!important}.mobile-score-toggle{display:block!important;position:absolute!important;right:62px!important;top:42px!important;z-index:95!important;border:1px solid #4f7184!important;background:#091a25e8!important;color:#d3e4ec!important;padding:5px 9px!important;font-size:8px!important;font-weight:900!important}
+}
+</style>
+
 </head>
 <body>
 <div class="app" id="app"></div>
@@ -710,7 +746,7 @@ if(mode==="loading"){
 body=`<div class="loading-screen"><div class="loading-inner"><div class="loading-kicker">무작위 총력전 · 아수라장</div><h2>게임을 불러오는 중</h2><div class="loading-vs"><div class="loading-team"><div class="loading-title">우리 팀</div>${teamPicks.map((c,i)=>`<div class="loading-card blue-card"><div class="loading-art"><img src="assets/champions/${championImageId(c.id)}_0.jpg" onerror="this.style.display='none';this.parentElement.innerHTML='<span>${c.icon}</span>'"></div><div class="loading-champ">${c.name}</div><div class="loading-nick">${party[i].nickname}</div></div>`).join("")}</div><div class="vs-mark">VS</div><div class="loading-team enemy-loading"><div class="loading-title">적 팀</div>${enemyTeam.map((e,i)=>`<div class="loading-card red-card"><div class="loading-art"><img src="assets/champions/${championImageId(e.champ.id)}_0.jpg" onerror="this.style.display='none';this.parentElement.innerHTML='<span>${e.champ.icon}</span>'"></div><div class="loading-champ">${e.champ.name}</div><div class="loading-nick">${e.nick}</div></div>`).join("")}</div></div><div class="loading-count">${loadingSeconds}</div><div class="loading-bar"><div style="width:${((10-loadingSeconds)/10)*100}%"></div></div><p>전장이 준비되고 있습니다...</p></div></div>`;
 }
 function battleItemSymbol(u,i){
- const pool=['⚔','◆','✦','◈','⬟','✧'];
+ const pool=['✦','◆','◈','⬟','◇','✧'];
  const role=(u?.champ?.roles||[])[0]||'Fighter';
  const off={Tank:1,Mage:2,Assassin:0,Marksman:3,Support:4,Fighter:0}[role]||0;
  return pool[(i+off)%pool.length];
@@ -719,16 +755,33 @@ function battleItemCount(u){
  const g=Math.max(0,u?.gold||0);
  return Math.max(1,Math.min(6,1+Math.floor(Math.max(0,g-1400)/2200)));
 }
-function scoreboardRowHtml(u,enemy=false){
- const itemCount=battleItemCount(u);
- return `<div class="score-mini-row ${enemy?'enemy':''}" data-score-unit="${u.id}">
-   <div class="score-mini-portrait"><img src="assets/champions/${championImageId(u.champ.id)}_0.jpg" onerror="this.style.display='none';this.parentElement.textContent='${u.icon}'"></div>
-   <div class="score-mini-main"><div class="score-mini-top"><b>${u.nick}</b><span class="score-mini-kda">${u.kills||0}/${u.deaths||0}/${u.assists||0}</span><span class="score-mini-cs">CS ${u.cs||0}</span></div>
-   <div class="score-mini-items">${[0,1,2,3,4,5].map(i=>`<i class="score-item ${i<itemCount?'filled':''}" data-item="${i}">${i<itemCount?battleItemSymbol(u,i):''}</i>`).join('')}</div></div>
+function scoreItemsHtml(u, enemy=false){
+ const cnt=battleItemCount(u);
+ return `<div class="score-items ${enemy?'enemy-items':''}">${[0,1,2,3,4,5].map(i=>`<i class="score-item ${i<cnt?'filled':''}" data-item="${i}">${i<cnt?battleItemSymbol(u,i):''}</i>`).join('')}</div>`;
+}
+function scorePortraitHtml(u, enemy=false){
+ return `<div class="score-champ ${enemy?'enemy':''}" data-score-unit="${u.id}"><img src="assets/champions/${championImageId(u.champ.id)}_0.jpg" onerror="this.style.display='none';this.parentElement.textContent='${u.icon}'"></div>`;
+}
+function scoreboardPairHtml(a,e){
+ return `<div class="score-pair" data-score-pair="${a.id}|${e.id}">
+   <div class="score-half ally-half">
+     ${scoreItemsHtml(a,false)}
+     <span class="score-kda" data-score-kda="${a.id}">${a.kills||0}/${a.deaths||0}/${a.assists||0}</span>
+     <span class="score-cs" data-score-cs="${a.id}">${a.cs||0}</span>
+     ${scorePortraitHtml(a,false)}
+   </div>
+   <div class="score-mid">↔</div>
+   <div class="score-half enemy-half">
+     ${scorePortraitHtml(e,true)}
+     <span class="score-cs" data-score-cs="${e.id}">${e.cs||0}</span>
+     <span class="score-kda" data-score-kda="${e.id}">${e.kills||0}/${e.deaths||0}/${e.assists||0}</span>
+     ${scoreItemsHtml(e,true)}
+   </div>
  </div>`;
 }
 function battleScoreboardHtml(bs){
- return `<div class="battle-scoreboard" id="battleScoreboard"><div class="battle-scoreboard-head"><span>전투 현황</span><button class="score-close" onclick="toggleBattleScoreboard(false)">×</button></div><div class="battle-scoreboard-teams"><section><h4>우리 팀</h4>${bs.team.map(u=>scoreboardRowHtml(u,false)).join('')}</section><section><h4>적 팀</h4>${bs.enemy.map(u=>scoreboardRowHtml(u,true)).join('')}</section></div></div><button class="mobile-score-toggle" onclick="toggleBattleScoreboard()">현황</button>`;
+ const rows=[0,1,2,3,4].map(i=>scoreboardPairHtml(bs.team[i],bs.enemy[i])).join('');
+ return `<div class="battle-scoreboard" id="battleScoreboard"><div class="battle-scoreboard-head"><span>전투 현황</span><button class="score-close" onclick="toggleBattleScoreboard(false)">×</button></div><div class="scoreboard-body">${rows}</div></div><button class="mobile-score-toggle" onclick="toggleBattleScoreboard()">현황</button>`;
 }
 function toggleBattleScoreboard(force){
  const p=document.getElementById('battleScoreboard');if(!p)return;
@@ -738,11 +791,18 @@ function toggleBattleScoreboard(force){
 function syncBattleScoreboard(){
  const bs=battleState;if(!bs)return;
  for(const u of bs.team.concat(bs.enemy)){
-   const row=document.querySelector(`[data-score-unit="${u.id}"]`);if(!row)continue;
-   const k=row.querySelector('.score-mini-kda');if(k)k.textContent=`${u.kills||0}/${u.deaths||0}/${u.assists||0}`;
-   const cs=row.querySelector('.score-mini-cs');if(cs)cs.textContent=`CS ${u.cs||0}`;
-   const cnt=battleItemCount(u);row.querySelectorAll('.score-item').forEach((el,i)=>{el.classList.toggle('filled',i<cnt);el.textContent=i<cnt?battleItemSymbol(u,i):''});
+   const k=document.querySelector(`[data-score-kda="${u.id}"]`);if(k)k.textContent=`${u.kills||0}/${u.deaths||0}/${u.assists||0}`;
+   const cs=document.querySelector(`[data-score-cs="${u.id}"]`);if(cs)cs.textContent=`${u.cs||0}`;
  }
+ // 아이템 슬롯은 골드에 따라 실시간 갱신한다.
+ const pairs=document.querySelectorAll('.score-pair');
+ pairs.forEach((pair,i)=>{
+   const units=[bs.team[i],bs.enemy[i]];
+   pair.querySelectorAll('.score-items').forEach((wrap,j)=>{
+     const u=units[j],cnt=battleItemCount(u);
+     wrap.querySelectorAll('.score-item').forEach((el,n)=>{el.classList.toggle('filled',n<cnt);el.textContent=n<cnt?battleItemSymbol(u,n):''});
+   });
+ });
 }
 if(mode==="battle"){
 const bs=battleState || {time:0,status:"전투 준비 중",team:[],enemy:[],log:[],speed:1,structures:[],relics:[],fx:[]};
@@ -1308,7 +1368,7 @@ function allowJaebinChat(){
 function denyJaebinChat(){const bs=battleState;if(!bs)return;bs.chat.push(`<span class="all-tag">[SYSTEM]</span> 이재빈의 전체 채팅을 막았습니다.`);bs.jaebinEventDone=true;bs.jaebinEventOpen=false;bs.paused=false;bs.status='경기 진행 중';bs.lastTs=performance.now();render();window.__battleRAF=requestAnimationFrame(battleFrame)}
 function checkEnd(){const bs=battleState;if(bs.endPending&&performance.now()>=bs.endPending.realAt){const winner=bs.endPending.winner;bs.status=winner==='team'?'우리 팀 승리':'적 팀 승리';if(winner==='team'){if(party.some(c=>c.id==='siljeom'))bs.chat.push(`<span class="all-tag">[전체]</span> <span class="ally-chat">실점:</span> 죽어 그냥 ㅋㅋ`);if(party.some(c=>c.id==='nguyen'))bs.chat.push(`<span class="all-tag">[전체]</span> <span class="ally-chat">Nguyen Ngoc Tu:</span> 나1가`);if(party.some(c=>c.id==='3patourwan'))for(let i=0;i<4;i++)bs.chat.push(`<span class="all-tag">[전체]</span> <span class="ally-chat">쓰리빠뚜르완:</span> ㅋ`);if(party.some(c=>c.id==='joguk'))bs.chat.push(`<span class="all-tag">[전체]</span> <span class="ally-chat">조국:</span> 븅`);if(party.some(c=>c.id==='molcho'))bs.chat.push(`<span class="all-tag">[팀원]</span> <span class="ally-chat">몰초:</span> 쉽네 쉬워`);}else{if(party.some(c=>c.id==='nguyen'))bs.chat.push(`<span class="all-tag">[전체]</span> <span class="ally-chat">Nguyen Ngoc Tu:</span> 근데 지고 자..?`);if(party.some(c=>c.id==='siljeom'))bs.chat.push(`<span class="all-tag">[전체]</span> <span class="ally-chat">실점:</span> 지고 자는 건 에바긴 해`);if(party.some(c=>c.id==='3patourwan'))bs.chat.push(`<span class="all-tag">[전체]</span> <span class="ally-chat">쓰리빠뚜르완:</span> 찐막?`);if(party.some(c=>c.id==='joguk'))bs.chat.push(`<span class="all-tag">[전체]</span> <span class="ally-chat">조국:</span> 고조할배찐막?`);if(bs.jaebinChatAttempted){const jaebinUnit=bs.team.find(u=>u.realName==='이재빈'||u.nick==='Nguyen Ngoc Tu');const champName=jaebinUnit?.champ?.name||'그 챔피언';const taunts=['이기고 자라 ㅋㅋㅋㅋㅋㅋㅋㅋㅋ',`${champName} 너는 진짜 접어라 ㅇㅇ`,'그 조합으로 쳐지네 ㅋㅋㅋㅋㅋㅋㅋㅋㅋㅋ','ez','븅신 ㅋㅋㅋㅋㅋㅋㅋㅋㅋㅋㅋㅋ'];bs.enemy.slice(0,5).forEach((u,i)=>bs.chat.push(`<span class="all-tag">[전체]</span> <span class="enemy-chat">${u.nick}:</span> ${taunts[i]}`));}}matchResult={winner,time:bs.time,teamKills:bs.teamKills,enemyKills:bs.enemyKills,team:bs.team.map(u=>({...u})),enemy:bs.enemy.map(u=>({...u})),chat:[...(bs.chat||[])]};mode='battleEnd';render();return true}return false}
 function battleFrame(ts){if(mode!=='battle'||!battleState)return;
- const bs=battleState;if(bs.paused){bs.lastTs=ts;return;}
+ const bs=battleState;if(bs.paused){bs.lastTs=ts;window.__battleRAF=requestAnimationFrame(battleFrame);return;}
  if(bs.endPending){bs.lastTs=ts;syncBattleDom();if(checkEnd())return;window.__battleRAF=requestAnimationFrame(battleFrame);return;}let raw=Math.min(.05,(ts-bs.lastTs)/1000);bs.lastTs=ts;let dt=Math.min(.8,raw*bs.speed);bs.time+=dt;
  if(!bs.akaliChatDone&&party.some(c=>c.id==='nguyen')&&bs.enemy.some(u=>u.champ?.id==='akali')&&bs.time>=bs.akaliChatAt){bs.chat.push(`<span class="all-tag">[전체]</span> <span class="ally-chat">Nguyen Ngoc Tu:</span> 아칼리 사기 챔피언 하면 재미있음?`);bs.akaliChatDone=true;}
  if(!bs.jaebinEventDone&&!bs.jaebinEventOpen&&party.some(c=>c.id==='nguyen')&&bs.time>=bs.jaebinEventAt){triggerJaebinEvent();return;}
@@ -1902,5 +1962,26 @@ render();
   .final-chat-left{width:560px!important;height:330px!important;}
   .final-chat-body,.final-chat-body .chat-line{font-size:18px!important;}
   .final-chat-body .tip{font-size:17px!important;}
+}
+</style>
+<style id="v69-pick-chat-align">
+/* V69 — desktop pick chat edges match the allied champion cards exactly */
+@media (min-width:1101px) and (max-width:1499px){
+  .final-chat-left{
+    left:20px!important;
+    right:auto!important;
+    width:390px!important; /* 430px side column - 20px padding on both sides */
+    height:330px!important;
+    box-sizing:border-box!important;
+  }
+}
+@media (min-width:1500px){
+  .final-chat-left{
+    left:20px!important;
+    right:auto!important;
+    width:460px!important; /* 500px side column - 20px padding on both sides */
+    height:330px!important;
+    box-sizing:border-box!important;
+  }
 }
 </style>
