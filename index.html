@@ -880,14 +880,18 @@ function bsTime(){return battleState?battleState.time:0}
 const XP_CUMULATIVE={3:0,4:478,5:988,6:1738,7:2518,8:3398,9:4378,10:5458,11:6638,12:7918,13:9298,14:10778,15:12358,16:14038,17:15818,18:17698};
 function levelFromXp(xp){let lv=3;for(let n=4;n<=18;n++){if(xp>=XP_CUMULATIVE[n])lv=n;else break}return lv}
 function championKillXp(level){return Math.round(42+Math.max(0,Math.min(15,(level||3)-3))*(948/15))}
-function grantMinionXp(minion){const bs=battleState;if(!bs)return;const nearby=bs.units.filter(u=>u.kind==='champ'&&u.alive&&u.team!==minion.team&&Math.hypot(u.x-minion.x,u.y-minion.y)<=14);if(!nearby.length)return;const base=minion.xpValue||32;const each=nearby.length===1?base*.95:(base*1.24/nearby.length);nearby.forEach(u=>u.xp+=each)}
+// 증바람식 경험치 완충: 뒤처진 팀은 경험치만 조금 더 빨리 따라오고, 앞선 팀의 전투력은 깎지 않는다.
+function teamAvgXp(team){const bs=battleState;if(!bs)return 0;const a=bs.units.filter(u=>u.kind==='champ'&&u.team===team);return a.length?a.reduce((sum,u)=>sum+(u.xp||0),0)/a.length:0}
+function teamXpCatchup(team){const own=teamAvgXp(team),opp=teamAvgXp(team==='team'?'enemy':'team'),gap=opp-own;if(gap<=180)return 1;return 1+Math.min(.35,(gap-180)/4200*.35)}
+function killXpCatchup(attacker,target){if(!attacker||attacker.kind!=='champ')return 1;const teamBoost=teamXpCatchup(attacker.team);const levelGap=(target.level||3)-(attacker.level||3);const levelBoost=levelGap>0?Math.min(.18,levelGap*.045):levelGap<0?Math.max(-.12,levelGap*.03):0;return Math.max(.88,Math.min(1.45,teamBoost+levelBoost))}
+function grantMinionXp(minion){const bs=battleState;if(!bs)return;const nearby=bs.units.filter(u=>u.kind==='champ'&&u.alive&&u.team!==minion.team&&Math.hypot(u.x-minion.x,u.y-minion.y)<=14);if(!nearby.length)return;const base=minion.xpValue||32;const team=nearby[0].team;const catchup=Math.min(1.28,teamXpCatchup(team));const each=(nearby.length===1?base*.95:(base*1.24/nearby.length))*catchup;nearby.forEach(u=>u.xp+=each)}
 
 function respawnSeconds(u){return Math.max(1,(u.level||1)*2+4)}
 function killLog(attacker,target){
  const bs=battleState, at=attacker.team==='team'?'blue-name':'red-name', tt=target.team==='team'?'blue-name':'red-name';
  if(attacker.kind==='champ'){
    if(attacker.team==='team')bs.teamKills++; else if(attacker.team==='enemy')bs.enemyKills++;
-   attacker.kills=(attacker.kills||0)+1; attacker.gold+=300; attacker.xp+=(target.kind==='champ'?championKillXp(target.level):0);
+   attacker.kills=(attacker.kills||0)+1; attacker.gold+=300; attacker.xp+=(target.kind==='champ'?championKillXp(target.level)*killXpCatchup(attacker,target):0);
  }
  target.deaths=(target.deaths||0)+1;
  const allies=bs.units.filter(u=>u.kind==='champ'&&u.team===attacker.team&&u!==attacker&&u.alive&&Math.hypot(u.x-target.x,u.y-target.y)<14); allies.forEach(u=>u.assists=(u.assists||0)+1);
@@ -926,7 +930,7 @@ function updateStructures(dt){const bs=battleState;for(const st of bs.structures
  }}
 function updateUnits(dt){const bs=battleState;syncNpcAugments();const all=bs.units;for(const u of all){
  if(!u.alive){if(u.kind==='champ'&&u.respawn>0){u.respawn-=dt;if(u.respawn<=0){u.alive=true;u.hp=u.maxHp*.72;u.x=u.team==='team'?8:92;u.y=50+u.laneBias;u.gold=Math.max(u.gold,1400);u.phase=Math.random()*6.28}}continue}
- u.gold+=6*dt;if(u.kind==='champ')u.xp+=5*dt;u.level=u.kind==='champ'?levelFromXp(u.xp):u.level;u.attackCd=Math.max(0,(u.attackCd||0)-dt);
+ u.gold+=6*dt;if(u.kind==='champ')u.xp+=5*teamXpCatchup(u.team)*dt;u.level=u.kind==='champ'?levelFromXp(u.xp):u.level;u.attackCd=Math.max(0,(u.attackCd||0)-dt);
  if(u===bs.team[0]&&!bs.augmentOpen&&!bs.jaebinEventOpen){for(const lv of [7,11,15]){if(u.level>=lv&&!bs.augmentDone[lv]){openAugment(lv);return}}}
  const enemyChamps=bs.units.filter(e=>e.alive&&e.kind==='champ'&&e.team!==u.team);
  const enemyMinions=bs.units.filter(e=>e.alive&&e.kind==='minion'&&e.team!==u.team);
