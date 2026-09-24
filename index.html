@@ -439,6 +439,9 @@ const playerRoleStats={
 };
 function roleSkillFor(stats,champ){const rs=(champ.roles&&champ.roles.length?champ.roles:["Fighter"]);return rs.reduce((a,r)=>a+(stats[r]??60),0)/rs.length}
 function enemyRoleStats(){const o={};["Fighter","Tank","Mage","Assassin","Marksman","Support"].forEach(r=>o[r]=64+Math.floor(Math.random()*13));return o}
+const SIGNATURE_CHAMPS={siljeom:"pyke",molcho:"swain",dwaemesa:"samira",joguk:"singed",nguyen:"kayle","3patourwan":"hwei",mundolmaeng:"teemo",galio:"galio",dakestan:"irelia"};
+const SIGNATURE_CHAT={siljeom:"돈 드리겠습니다~",molcho:"보여줄게",dwaemesa:"월월 감사합니다 월월",joguk:"왔다 내 사랑",nguyen:"케권이 횽이야","3patourwan":"흐에!!",mundolmaeng:"티모횽이야",galio:"야 든든하게 막아줄게",dakestan:"야 게임 끝났어"};
+let signatureRequests=[],signatureRequest=null,signatureChatDone=new Set(),signatureChatLog=[];
 let mode="select", me=null, selected=[], party=[], chatMembers=[], declinedMembers=[], replies=0, privateIndex=0, privateTargets=[], searching=false, queueSeconds=0, queueTimer=null, found=false, champOptions=[], teamPicks=[], chosenChamp=null, finalPool=[], enemyTeam=[], loadingSeconds=10, loadingTimer=null, loadingTransitionTimer=null, battleState=null, battleTimer=null, matchResult=null;
 
 const app=document.getElementById("app");
@@ -496,10 +499,12 @@ finalChatLine("molcho","캐리해줄게");
 finalChatLine("dwaemesa","원딜 ㅈㅂㅈㅂㅈㅂㅈㅂ");
 finalChatLine("mundolmaeng","블루윙 수원 블루윙");
 if(party.some(c=>c.id==="molcho") && party.some(c=>c.id==="dwaemesa")) finalChatLine("dwaemesa","병욱아 진짜 그거 골랐으면 캐리해야된다");
+signatureChatLog.forEach(x=>special.push(`<div class="chat-line"><strong>${x.name}:</strong> ${x.msg}</div>`));
+const sigPopup=signatureRequest?`<div class="chat-event-overlay"><div class="chat-event-card"><div class="event-mark">!</div><h2>${signatureRequest.member.name}가 ${signatureRequest.champ.name}를 원하고 있습니다.</h2><p>챔피언을 주시겠습니까?</p><div class="chat-event-actions"><button onclick="answerSignatureRequest(true)">예</button><button class="deny" onclick="answerSignatureRequest(false)">아니오</button></div></div></div>`:"";
 body=`<div class="final-screen"><div class="final-top"><div class="unused-pool" aria-label="남은 챔피언">${finalPool.map((c,i)=>`<div class="unused swap-zone" draggable="true" data-swap-type="pool" data-swap-index="${i}" ondragstart="dragStart(event,'pool',${i})" ondragover="allowDrop(event)" ondragenter="dragEnter(event)" ondragleave="dragLeave(event)" ondrop="dropSwap(event,'pool',${i})" ondragend="dragEnd(event)"><img src="assets/champions/${championImageId(c.id)}_0.jpg" onerror="this.remove();this.parentElement.textContent='${c.icon}'"></div>`).join("")}</div><div class="swap-hint">DRAG TO SWAP</div></div>
 <div class="final-main"><div class="final-team"><div class="side-title">우리 팀 · 선택한 챔피언</div>${party.map((c,i)=>`<div class="player-row swap-zone ${i===0?"you":""}" draggable="true" data-swap-type="team" data-swap-index="${i}" ondragstart="dragStart(event,'team',${i})" ondragover="allowDrop(event)" ondragenter="dragEnter(event)" ondragleave="dragLeave(event)" ondrop="dropSwap(event,'team',${i})" ondragend="dragEnd(event)"><div class="avatar"><img src="assets/champions/${championImageId(teamPicks[i].id)}_0.jpg" onerror="this.remove();this.parentElement.textContent='${teamPicks[i].icon}'"></div><div class="pick-meta"><strong>${teamPicks[i].name}</strong><small>${c.nickname}</small></div>${i===0?"<em>YOU</em>":""}</div>`).join("")}</div>
 <div class="final-center"><div class="final-label">YOUR CHAMPION</div><div class="hero-champ"><div class="hero-art"><img src="assets/champions/${championImageId(chosenChamp.id)}_0.jpg" onerror="this.remove();this.parentElement.textContent='${chosenChamp.icon}'"></div><h2>${chosenChamp.name}</h2></div><button class="game-start-btn" onclick="startGame()">준비 완료</button></div>
-<div class="final-enemy"><div class="enemy-list"><div class="side-title">상대 팀 · 챔피언 비공개</div>${[1,2,3,4,5].map(i=>`<div class="enemy-row"><div class="enemy-hidden">?</div><div class="pick-meta"><strong>적${i}</strong><small>챔피언 비공개</small></div></div>`).join("")}</div></div></div><div class="final-chat final-chat-left"><div class="final-chat-head">CHAT</div><div class="final-chat-body">${tip}${special.join("")}</div></div></div>`;
+<div class="final-enemy"><div class="enemy-list"><div class="side-title">상대 팀 · 챔피언 비공개</div>${[1,2,3,4,5].map(i=>`<div class="enemy-row"><div class="enemy-hidden">?</div><div class="pick-meta"><strong>적${i}</strong><small>챔피언 비공개</small></div></div>`).join("")}</div></div></div><div class="final-chat final-chat-left"><div class="final-chat-head">CHAT</div><div class="final-chat-body">${tip}${special.join("")}</div></div>${sigPopup}</div>`;
 }
 if(mode==="loading"){
 body=`<div class="loading-screen"><div class="loading-inner"><div class="loading-kicker">무작위 총력전 · 아수라장</div><h2>게임을 불러오는 중</h2><div class="loading-vs"><div class="loading-team"><div class="loading-title">우리 팀</div>${teamPicks.map((c,i)=>`<div class="loading-card blue-card"><div class="loading-art"><img src="assets/champions/${championImageId(c.id)}_0.jpg" onerror="this.style.display='none';this.parentElement.innerHTML='<span>${c.icon}</span>'"></div><div class="loading-champ">${c.name}</div><div class="loading-nick">${party[i].nickname}</div></div>`).join("")}</div><div class="vs-mark">VS</div><div class="loading-team enemy-loading"><div class="loading-title">적 팀</div>${enemyTeam.map((e,i)=>`<div class="loading-card red-card"><div class="loading-art"><img src="assets/champions/${championImageId(e.champ.id)}_0.jpg" onerror="this.style.display='none';this.parentElement.innerHTML='<span>${e.champ.icon}</span>'"></div><div class="loading-champ">${e.champ.name}</div><div class="loading-nick">${e.nick}</div></div>`).join("")}</div></div><div class="loading-count">${loadingSeconds}</div><div class="loading-bar"><div style="width:${((10-loadingSeconds)/10)*100}%"></div></div><p>전장이 준비되고 있습니다...</p></div></div>`;
@@ -745,10 +750,56 @@ function pickChampion(id){
   const chosen=champOptions.find(c=>c.id===id);
   if(!chosen)return;
   chosenChamp=chosen; teamPicks[0]=chosen;
-  const remaining=shuffle(champions.filter(c=>c.id!==chosen.id));
-  for(let i=1;i<5;i++) teamPicks[i]=remaining[i-1];
-  finalPool=remaining.slice(4,14);
-  mode="finalChamp"; render();
+  const used=new Set([chosen.id]);
+  // 내가 아닌 팀원은 자신의 시그니처 챔피언을 최우선으로 잡는다.
+  for(let i=1;i<5;i++){
+    const sig=SIGNATURE_CHAMPS[party[i].id];
+    const c=champions.find(x=>x.id===sig && !used.has(x.id));
+    if(c){teamPicks[i]=c;used.add(c.id)}
+  }
+  const remaining=shuffle(champions.filter(c=>!used.has(c.id)));
+  let ri=0;
+  for(let i=1;i<5;i++) if(!teamPicks[i]){teamPicks[i]=remaining[ri++];used.add(teamPicks[i].id)}
+  finalPool=remaining.slice(ri,ri+10);
+  signatureRequests=[];signatureRequest=null;signatureChatDone=new Set();signatureChatLog=[];
+  mode="finalChamp";
+  queueSignatureRequests();
+  render();
+}
+function signatureLocation(champId){
+  const ti=teamPicks.findIndex(c=>c&&c.id===champId); if(ti>=0)return {type:"team",index:ti};
+  const pi=finalPool.findIndex(c=>c&&c.id===champId); if(pi>=0)return {type:"pool",index:pi};
+  return null;
+}
+function queueSignatureRequests(){
+  signatureRequests=[];
+  for(let i=1;i<party.length;i++){
+    const member=party[i],sig=SIGNATURE_CHAMPS[member.id]; if(!sig||teamPicks[i]?.id===sig)continue;
+    const loc=signatureLocation(sig),champ=champions.find(c=>c.id===sig); if(loc&&champ)signatureRequests.push({memberIndex:i,member,champ,source:loc});
+  }
+  signatureRequest=signatureRequests.shift()||null;
+}
+function signatureReceived(i){
+  const member=party[i],sig=SIGNATURE_CHAMPS[member?.id];
+  if(!member||!sig||teamPicks[i]?.id!==sig||signatureChatDone.has(member.id))return;
+  signatureChatDone.add(member.id); signatureChatLog.push({name:member.nickname,msg:SIGNATURE_CHAT[member.id]});
+  if(member.id==="dwaemesa"){
+    const jd=party.find(x=>x.id==="3patourwan");
+    if(jd&&!signatureChatDone.has("samira-jd")){signatureChatDone.add("samira-jd");signatureChatLog.push({name:jd.nickname,msg:"믿고 있었다고 싸미라~"})}
+  }
+}
+function answerSignatureRequest(yes){
+  const r=signatureRequest;if(!r)return;
+  if(yes){
+    const loc=signatureLocation(r.champ.id);
+    if(loc){
+      const old=teamPicks[r.memberIndex];
+      if(loc.type==="team"){teamPicks[r.memberIndex]=teamPicks[loc.index];teamPicks[loc.index]=old}
+      else {teamPicks[r.memberIndex]=finalPool[loc.index];finalPool[loc.index]=old}
+      chosenChamp=teamPicks[0];signatureReceived(r.memberIndex);
+    }
+  }
+  signatureRequest=signatureRequests.shift()||null;render();
 }
 function startGame(){
   if(!chosenChamp)return;
@@ -1060,10 +1111,11 @@ function dropSwap(e,targetType,targetIndex){e.preventDefault();e.stopPropagation
     const t=finalPool[a.index];finalPool[a.index]=teamPicks[targetIndex];teamPicks[targetIndex]=t;
   }
   chosenChamp=teamPicks[0];
+  for(let i=1;i<party.length;i++) signatureReceived(i);
   dragSource=null;render();
 }
 function openResults(){mode='results';render()}
-function playAgain(){battleState=null;matchResult=null;teamPicks=[];chosenChamp=null;finalPool=[];enemyTeam=[];goQueue()}
+function playAgain(){battleState=null;matchResult=null;teamPicks=[];chosenChamp=null;finalPool=[];enemyTeam=[];signatureRequests=[];signatureRequest=null;signatureChatDone=new Set();signatureChatLog=[];goQueue()}
 function reselectTeam(){battleState=null;matchResult=null;selected=[];party=[];mode='method';render()}
 function reset(){clearInterval(queueTimer);clearInterval(loadingTimer);clearTimeout(loadingTransitionTimer);clearInterval(battleTimer);cancelAnimationFrame(window.__battleRAF);dragSource=null;mode="select";me=null;selected=[];party=[];chatMembers=[];replies=0;privateIndex=0;searching=false;queueSeconds=0;found=false;champOptions=[];teamPicks=[];chosenChamp=null;finalPool=[];render()}
 render();
