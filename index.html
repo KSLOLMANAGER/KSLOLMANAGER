@@ -141,6 +141,13 @@ button{font:inherit}.app{min-height:100vh;width:100%;max-width:1240px;margin:0 a
 .final-label{top:18px}
 
 
+/* Champion swapping + chat */
+.swap-zone{position:relative;transition:.15s ease}.swap-zone.drag-over{border-color:#d3b56b!important;box-shadow:0 0 0 2px #d3b56b55,inset 0 0 24px #c8a85a18;transform:translateY(-1px)}
+.swap-zone[draggable="true"]{cursor:grab}.swap-zone[draggable="true"]:active{cursor:grabbing}
+.unused-pool .unused{cursor:grab;transition:.15s ease}.unused-pool .unused:hover{border-color:#c5a761;transform:translateY(-2px);box-shadow:0 0 18px #c5a76122}
+.swap-hint{position:absolute;right:16px;bottom:10px;color:#71868d;font-size:8px;letter-spacing:1px;text-transform:uppercase}
+.final-chat-body{padding:10px 12px;overflow:auto;text-align:left;display:flex;flex-direction:column;align-items:flex-start;gap:7px}
+.chat-line{font-size:11px;line-height:1.5;color:#c6d0d2;text-align:left;max-width:100%}.chat-line.tip{color:#b5a36f}.chat-line .chat-tag{color:#738c95;margin-right:4px}.chat-line strong{color:#e2e7e8;font-weight:700}.chat-line.tip strong{color:#d2bd7c}
 /* Empty chat window: layout only, content will be added later */
 .final-center{display:flex;flex-direction:column;align-items:center;justify-content:flex-start;padding-top:48px;gap:14px}
 .final-chat{width:min(600px,92%);height:150px;border:1px solid #263e47;background:linear-gradient(180deg,#081820,#061119);box-shadow:inset 0 0 28px #0005;display:flex;flex-direction:column}
@@ -226,9 +233,13 @@ body=`<div class="champ-screen"><div class="champ-top"><div class="champ-timer">
 <div class="enemy-side"><div class="side-title">상대 팀</div>${[1,2,3,4,5].map(i=>`<div class="player-row"><div class="avatar">?</div><div><strong>상대 ${i}</strong><small>선택 중...</small></div></div>`).join("")}</div></div></div>`;
 }
 if(mode==="finalChamp"){
-body=`<div class="final-screen"><div class="final-top"><div class="picked-title"><small>무작위 총력전 · 아수라장</small><strong>챔피언 선택 완료</strong></div><div class="unused-pool" aria-label="남은 챔피언">${finalPool.map(c=>`<div class="unused">${c.icon}</div>`).join("")}</div></div>
-<div class="final-main"><div class="final-team"><div class="side-title">우리 팀 · 선택한 챔피언</div>${party.map((c,i)=>`<div class="player-row ${i===0?"you":""}"><div class="avatar">${teamPicks[i].icon}</div><div><strong>${c.nickname}</strong><small>${teamPicks[i].name}</small></div>${i===0?"<em>YOU</em>":""}</div>`).join("")}</div>
-<div class="final-center"><div class="final-label">YOUR CHAMPION</div><div class="hero-champ"><div class="hero-art">${chosenChamp.icon}</div><h2>${chosenChamp.name}</h2><p>${chosenChamp.title}</p></div><div class="final-chat"><div class="final-chat-head">CHAT</div><div class="final-chat-body"></div></div></div>
+const tip=`<div class="chat-line tip"><strong>[TIP]</strong> 팀원들의 챔피언을 바꿀 수 있습니다. 사람마다 맞는 챔피언과 챔피언의 유형이 있으므로 잘 선택하시기 바랍니다</div>`;
+const special=[];
+if(party.some(c=>c.id==="molcho")) special.push(`<div class="chat-line"><span class="chat-tag">[전체]</span><strong>몰초:</strong> 캐리해줄게</div>`);
+if(party.some(c=>c.id==="dwaemesa")) special.push(`<div class="chat-line"><span class="chat-tag">[전체]</span><strong>돼메사:</strong> 원딜 ㅈㅂㅈㅂㅈㅂㅈㅂ</div>`);
+body=`<div class="final-screen"><div class="final-top"><div class="picked-title"><small>무작위 총력전 · 아수라장</small><strong>챔피언 선택 완료</strong></div><div class="unused-pool" aria-label="남은 챔피언">${finalPool.map((c,i)=>`<div class="unused swap-zone" draggable="true" data-swap-type="pool" data-swap-index="${i}" ondragstart="dragStart(event,'pool',${i})" ondragover="allowDrop(event)" ondragenter="dragEnter(event)" ondragleave="dragLeave(event)" ondrop="dropSwap(event,'pool',${i})" ondragend="dragEnd(event)">${c.icon}</div>`).join("")}</div><div class="swap-hint">DRAG TO SWAP</div></div>
+<div class="final-main"><div class="final-team"><div class="side-title">우리 팀 · 선택한 챔피언</div>${party.map((c,i)=>`<div class="player-row swap-zone ${i===0?"you":""}" draggable="true" data-swap-type="team" data-swap-index="${i}" ondragstart="dragStart(event,'team',${i})" ondragover="allowDrop(event)" ondragenter="dragEnter(event)" ondragleave="dragLeave(event)" ondrop="dropSwap(event,'team',${i})" ondragend="dragEnd(event)"><div class="avatar">${teamPicks[i].icon}</div><div><strong>${c.nickname}</strong><small>${teamPicks[i].name}</small></div>${i===0?"<em>YOU</em>":""}</div>`).join("")}</div>
+<div class="final-center"><div class="final-label">YOUR CHAMPION</div><div class="hero-champ"><div class="hero-art">${chosenChamp.icon}</div><h2>${chosenChamp.name}</h2><p>${chosenChamp.title}</p></div><div class="final-chat"><div class="final-chat-head">CHAT</div><div class="final-chat-body">${tip}${special.join("")}</div></div></div>
 <div class="final-enemy"><div class="enemy-list"><div class="side-title">상대 팀 · 챔피언 비공개</div>${[1,2,3,4,5].map(i=>`<div class="enemy-row"><div class="enemy-hidden">?</div><strong>적${i}</strong></div>`).join("")}</div></div></div></div>`;
 }
 if(mode==="party"){
@@ -297,7 +308,29 @@ function finishGroup(){mode="party";render()}
 function toggle(id){selected=selected.includes(id)?selected.filter(x=>x!==id):selected.length<4?[...selected,id]:selected;render()}
 function startPrivate(){party=[me,...chars.filter(c=>selected.includes(c.id))];privateTargets=party.slice(1);privateIndex=0;mode="private";render();setTimeout(()=>{privateIndex=1;render()},1100)}
 function nextPrivate(){if(privateIndex<3){privateIndex++;render()}else{mode="party";render()}}
-function reset(){clearInterval(queueTimer);mode="select";me=null;selected=[];party=[];chatMembers=[];replies=0;privateIndex=0;searching=false;queueSeconds=0;found=false;champOptions=[];teamPicks=[];chosenChamp=null;finalPool=[];render()}
+let dragSource=null;
+function dragStart(e,type,index){dragSource={type,index}; if(e.dataTransfer){e.dataTransfer.effectAllowed="move";e.dataTransfer.setData("text/plain",`${type}:${index}`)}}
+function allowDrop(e){e.preventDefault(); if(e.dataTransfer)e.dataTransfer.dropEffect="move"}
+function dragEnter(e){e.preventDefault();e.currentTarget.classList.add("drag-over")}
+function dragLeave(e){e.currentTarget.classList.remove("drag-over")}
+function dragEnd(e){document.querySelectorAll(".drag-over").forEach(el=>el.classList.remove("drag-over"));dragSource=null}
+function dropSwap(e,targetType,targetIndex){e.preventDefault();e.stopPropagation();e.currentTarget.classList.remove("drag-over");
+  if(!dragSource)return;
+  const a=dragSource;
+  if(a.type===targetType && a.index===targetIndex){dragSource=null;return;}
+  if(a.type==="team" && targetType==="team"){
+    const t=teamPicks[a.index];teamPicks[a.index]=teamPicks[targetIndex];teamPicks[targetIndex]=t;
+  }else if(a.type==="pool" && targetType==="pool"){
+    const t=finalPool[a.index];finalPool[a.index]=finalPool[targetIndex];finalPool[targetIndex]=t;
+  }else if(a.type==="team" && targetType==="pool"){
+    const t=teamPicks[a.index];teamPicks[a.index]=finalPool[targetIndex];finalPool[targetIndex]=t;
+  }else if(a.type==="pool" && targetType==="team"){
+    const t=finalPool[a.index];finalPool[a.index]=teamPicks[targetIndex];teamPicks[targetIndex]=t;
+  }
+  chosenChamp=teamPicks[0];
+  dragSource=null;render();
+}
+function reset(){clearInterval(queueTimer);dragSource=null;mode="select";me=null;selected=[];party=[];chatMembers=[];replies=0;privateIndex=0;searching=false;queueSeconds=0;found=false;champOptions=[];teamPicks=[];chosenChamp=null;finalPool=[];render()}
 render();
 </script>
 </body>
