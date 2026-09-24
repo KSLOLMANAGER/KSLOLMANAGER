@@ -623,8 +623,8 @@ signatureChatLog.forEach(x=>special.push(`<div class="chat-line"><strong>${x.nam
 const sigPopup=signatureRequest?`<div class="chat-event-overlay"><div class="chat-event-card"><div class="event-mark">!</div><h2>${signatureRequest.member.name}가 ${signatureRequest.champ.name}를 원하고 있습니다.</h2><p>챔피언을 주시겠습니까?</p><div class="chat-event-actions"><button onclick="answerSignatureRequest(true)">예</button><button class="deny" onclick="answerSignatureRequest(false)">아니오</button></div></div></div>`:"";
 body=`<div class="final-screen"><div class="final-top"><div class="unused-pool" aria-label="남은 챔피언">${finalPool.map((c,i)=>`<div class="unused swap-zone ${isSignaturePick(me,c)?'my-signature':''}" draggable="true" data-swap-type="pool" data-swap-index="${i}" onclick="mobileSwapTap(event,'pool',${i})" ondragstart="dragStart(event,'pool',${i})" ondragover="allowDrop(event)" ondragenter="dragEnter(event)" ondragleave="dragLeave(event)" ondrop="dropSwap(event,'pool',${i})" ondragend="dragEnd(event)"><img src="assets/champions/${championImageId(c.id)}_0.jpg" onerror="this.remove();this.parentElement.textContent='${c.icon}'"></div>`).join("")}</div><div class="swap-hint">DRAG TO SWAP</div></div>
 <div class="final-main"><div class="final-team"><div class="side-title">우리 팀 · 선택한 챔피언</div>${party.map((c,i)=>`<div class="player-row swap-zone ${i===0?"you":""}" draggable="true" data-swap-type="team" data-swap-index="${i}" onclick="mobileSwapTap(event,'team',${i})" ondragstart="dragStart(event,'team',${i})" ondragover="allowDrop(event)" ondragenter="dragEnter(event)" ondragleave="dragLeave(event)" ondrop="dropSwap(event,'team',${i})" ondragend="dragEnd(event)"><div class="avatar"><img src="assets/champions/${championImageId(teamPicks[i].id)}_0.jpg" onerror="this.remove();this.parentElement.textContent='${teamPicks[i].icon}'"></div><div class="pick-meta"><strong>${teamPicks[i].name}</strong><small>${c.nickname}</small></div>${i===0?"<em>YOU</em>":""}</div>`).join("")}</div>
-<div class="final-center"><div class="final-label">YOUR CHAMPION</div><div class="hero-champ"><div class="hero-art"><img src="assets/champions/${championImageId(chosenChamp.id)}_0.jpg" onerror="this.remove();this.parentElement.textContent='${chosenChamp.icon}'"></div><h2>${chosenChamp.name}</h2></div><button class="game-start-btn" onclick="startGame()">준비 완료</button></div>
-<div class="final-enemy"><div class="enemy-list"><div class="side-title">상대 팀 · 챔피언 비공개</div>${[1,2,3,4,5].map(i=>`<div class="enemy-row"><div class="enemy-hidden">?</div><div class="pick-meta"><strong>적${i}</strong><small>챔피언 비공개</small></div></div>`).join("")}</div></div></div><div class="final-chat final-chat-left"><div class="final-chat-head">CHAT</div><div class="final-chat-body">${tip}${special.join("")}</div></div>${sigPopup}</div>`;
+<div class="final-center"><div class="final-label">YOUR CHAMPION</div><div class="hero-champ"><div class="hero-art"><img src="assets/champions/${championImageId(chosenChamp.id)}_0.jpg" onerror="this.remove();this.parentElement.textContent='${chosenChamp.icon}'"></div><h2>${chosenChamp.name}</h2></div><button class="game-start-btn desktop-ready" onclick="startGame()">준비 완료</button></div>
+<div class="final-enemy"><div class="enemy-list"><div class="side-title">상대 팀 · 챔피언 비공개</div>${[1,2,3,4,5].map(i=>`<div class="enemy-row"><div class="enemy-hidden">?</div><div class="pick-meta"><strong>적${i}</strong><small>챔피언 비공개</small></div></div>`).join("")}</div></div></div><div class="final-chat final-chat-left"><div class="final-chat-head">CHAT</div><div class="final-chat-body">${tip}${special.join("")}</div></div><button class="game-start-btn mobile-ready" onclick="startGame()">준비 완료</button>${sigPopup}</div>`;
 }
 if(mode==="loading"){
 body=`<div class="loading-screen"><div class="loading-inner"><div class="loading-kicker">무작위 총력전 · 아수라장</div><h2>게임을 불러오는 중</h2><div class="loading-vs"><div class="loading-team"><div class="loading-title">우리 팀</div>${teamPicks.map((c,i)=>`<div class="loading-card blue-card"><div class="loading-art"><img src="assets/champions/${championImageId(c.id)}_0.jpg" onerror="this.style.display='none';this.parentElement.innerHTML='<span>${c.icon}</span>'"></div><div class="loading-champ">${c.name}</div><div class="loading-nick">${party[i].nickname}</div></div>`).join("")}</div><div class="vs-mark">VS</div><div class="loading-team enemy-loading"><div class="loading-title">적 팀</div>${enemyTeam.map((e,i)=>`<div class="loading-card red-card"><div class="loading-art"><img src="assets/champions/${championImageId(e.champ.id)}_0.jpg" onerror="this.style.display='none';this.parentElement.innerHTML='<span>${e.champ.icon}</span>'"></div><div class="loading-champ">${e.champ.name}</div><div class="loading-nick">${e.nick}</div></div>`).join("")}</div></div><div class="loading-count">${loadingSeconds}</div><div class="loading-bar"><div style="width:${((10-loadingSeconds)/10)*100}%"></div></div><p>전장이 준비되고 있습니다...</p></div></div>`;
@@ -1302,6 +1302,68 @@ function reselectTeam(){battleState=null;matchResult=null;selected=[];party=[];m
 function reset(){clearInterval(queueTimer);clearInterval(loadingTimer);clearTimeout(loadingTransitionTimer);clearInterval(battleTimer);cancelAnimationFrame(window.__battleRAF);dragSource=null;mode="select";me=null;selected=[];party=[];chatMembers=[];replies=0;privateIndex=0;privateAnswered=false;searching=false;queueSeconds=0;found=false;champOptions=[];teamPicks=[];chosenChamp=null;finalPool=[];render()}
 render();
 </script>
+
+<style>
+/* ===== V58 MOBILE FINAL PICK ORDER ===== */
+.mobile-ready{display:none}
+@media (max-width:800px){
+  .final-screen{
+    position:fixed!important;inset:0!important;display:block!important;
+    height:100dvh!important;min-height:100dvh!important;overflow-y:auto!important;overflow-x:hidden!important;
+    -webkit-overflow-scrolling:touch!important;touch-action:pan-y!important;
+    padding:0 0 calc(28px + env(safe-area-inset-bottom))!important;
+  }
+  .final-top{
+    position:relative!important;top:auto!important;order:initial!important;
+    min-height:86px!important;padding:30px 10px 10px!important;
+    background:#061019!important;border-bottom:1px solid #264052!important;
+  }
+  .final-top:before{content:'대기 챔피언';position:absolute;left:12px;top:8px;color:#d8c27d;font-size:11px;font-weight:900;letter-spacing:1px}
+  .unused-pool{width:100%!important;max-width:100%!important;display:flex!important;gap:7px!important;overflow-x:auto!important;justify-content:flex-start!important;padding:2px 2px 7px!important;touch-action:pan-x pan-y!important}
+  .unused-pool .unused{width:50px!important;height:50px!important;flex:0 0 50px!important;border-radius:50%!important}
+  .swap-hint{display:none!important}
+
+  .final-main{display:block!important;padding:8px 10px 0!important;margin:0!important;overflow:visible!important}
+  .final-team{display:block!important;padding:28px 0 4px!important;position:relative!important}
+  .final-team:before{content:'팀원 챔피언';position:absolute;left:2px;top:5px;color:#d8c27d;font-size:11px;font-weight:900;letter-spacing:1px}
+  .final-team .side-title{display:none!important}
+  .final-team .player-row.you{display:none!important}
+  .final-team .player-row{height:68px!important;margin:0 0 7px!important;padding:7px 10px!important;gap:10px!important;touch-action:pan-y!important}
+  .final-team .avatar{width:50px!important;height:50px!important;flex:0 0 50px!important}
+  .final-team .pick-meta strong{font-size:15px!important}.final-team .pick-meta small{font-size:11px!important}
+  .final-enemy{display:none!important}
+
+  .final-center{display:flex!important;flex-direction:column!important;align-items:center!important;gap:8px!important;padding:30px 0 8px!important;position:relative!important;overflow:visible!important}
+  .final-center:before{content:'내 챔피언';position:absolute;left:2px;top:5px;color:#d8c27d;font-size:11px;font-weight:900;letter-spacing:1px}
+  .final-label{display:none!important}
+  .hero-champ{width:100%!important}.hero-champ .hero-art{width:min(84vw,340px)!important;height:min(38vh,300px)!important;min-width:0!important;min-height:190px!important;margin:0 auto!important}
+  .hero-champ h2{font-size:27px!important;margin:8px 0!important}
+  .desktop-ready{display:none!important}
+
+  .final-chat-left{
+    position:relative!important;left:auto!important;right:auto!important;top:auto!important;bottom:auto!important;
+    width:calc(100% - 20px)!important;height:180px!important;margin:12px 10px 14px!important;
+    z-index:5!important;box-sizing:border-box!important;
+  }
+  .final-chat-head{height:30px!important;flex-basis:30px!important;font-size:10px!important}
+  .final-chat-body{overflow-y:auto!important;-webkit-overflow-scrolling:touch!important;touch-action:pan-y!important;padding:8px 10px!important}
+  .final-chat-body .chat-line{font-size:11px!important;line-height:1.5!important}
+
+  .mobile-ready{
+    display:block!important;position:relative!important;left:auto!important;right:auto!important;top:auto!important;bottom:auto!important;transform:none!important;
+    width:calc(100% - 20px)!important;max-width:none!important;min-height:58px!important;
+    margin:0 10px calc(24px + env(safe-area-inset-bottom))!important;padding:16px 18px!important;
+    font-size:16px!important;z-index:6!important;pointer-events:auto!important;
+  }
+}
+@media (max-width:430px){
+  .final-top{padding-top:28px!important}.unused-pool .unused{width:46px!important;height:46px!important;flex-basis:46px!important}
+  .final-team .player-row{height:64px!important}.final-team .avatar{width:46px!important;height:46px!important;flex-basis:46px!important}
+  .hero-champ .hero-art{height:225px!important;min-height:185px!important}
+  .final-chat-left{height:170px!important}.mobile-ready{min-height:56px!important}
+}
+</style>
+
 </body>
 </html><style>
 /* ===== V33 PICK SCREEN SCALE-UP ===== */
@@ -1491,5 +1553,85 @@ render();
   .b2-panel{left:60px!important;right:60px!important;bottom:72px!important;height:62px!important;max-height:62px!important}.b2-panel-head{height:18px!important}.b2-log{height:42px!important;max-height:42px!important;font-size:6.5px!important}
   .match-all-chat{left:60px!important;right:60px!important;bottom:6px!important;height:60px!important;max-height:60px!important}.match-all-chat-head{height:18px!important}.match-all-chat-body{height:40px!important;max-height:40px!important;font-size:6.5px!important}
   .b2-speed-dock button{padding:3px 5px!important;font-size:6.5px!important}
+}
+</style>
+<style>
+/* V59 — mobile end-of-game chat enlargement */
+@media (max-width:700px){
+  .end-overlay{
+    display:flex!important;
+    flex-direction:column!important;
+    align-items:center!important;
+    justify-content:center!important;
+    gap:18px!important;
+    padding:18px 12px calc(18px + env(safe-area-inset-bottom))!important;
+    box-sizing:border-box!important;
+    overflow:hidden!important;
+  }
+  .end-emblem{
+    min-width:0!important;
+    width:min(90vw,430px)!important;
+    max-width:90vw!important;
+    padding:28px 18px 24px!important;
+    box-sizing:border-box!important;
+    flex:0 0 auto!important;
+  }
+  .end-word{font-size:48px!important;letter-spacing:7px!important}
+  .end-sub{font-size:12px!important;margin:7px 0 16px!important}
+  .end-close{padding:11px 42px!important;font-size:14px!important}
+  .end-chat{
+    position:relative!important;
+    left:auto!important;
+    right:auto!important;
+    bottom:auto!important;
+    transform:none!important;
+    width:min(94vw,560px)!important;
+    height:34dvh!important;
+    min-height:220px!important;
+    max-height:360px!important;
+    flex:0 1 360px!important;
+    z-index:95!important;
+    display:flex!important;
+    flex-direction:column!important;
+    box-sizing:border-box!important;
+    margin:0!important;
+  }
+  .end-chat .match-all-chat-head{
+    flex:0 0 38px!important;
+    height:38px!important;
+    padding:0 14px!important;
+    font-size:12px!important;
+    letter-spacing:1px!important;
+  }
+  .end-chat .match-all-chat-body{
+    flex:1 1 auto!important;
+    height:auto!important;
+    min-height:0!important;
+    max-height:none!important;
+    overflow-y:auto!important;
+    -webkit-overflow-scrolling:touch!important;
+    touch-action:pan-y!important;
+    padding:12px 14px!important;
+    font-size:13px!important;
+    line-height:1.65!important;
+  }
+  .result-chat-box{margin-top:22px!important}
+  .result-chat-head{font-size:13px!important;padding:12px 14px!important}
+  .result-chat-body{
+    min-height:180px!important;
+    max-height:34dvh!important;
+    overflow-y:auto!important;
+    -webkit-overflow-scrolling:touch!important;
+    touch-action:pan-y!important;
+    padding:14px 16px!important;
+    font-size:14px!important;
+    line-height:1.75!important;
+  }
+}
+@media (max-width:390px){
+  .end-overlay{gap:12px!important;padding-top:12px!important}
+  .end-emblem{padding:22px 14px 18px!important}
+  .end-word{font-size:42px!important}
+  .end-chat{height:36dvh!important;min-height:210px!important}
 }
 </style>
