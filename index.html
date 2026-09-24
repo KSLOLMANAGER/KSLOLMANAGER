@@ -852,17 +852,34 @@ function toggleBattleScoreboard(force){
 }
 function syncBattleScoreboard(){
  const bs=battleState;if(!bs)return;
+
+ // 상단 팀 킬 스코어는 별도 render 없이도 즉시 갱신한다.
+ const teamKillsEl=document.querySelector('[data-team-kills]');
+ const enemyKillsEl=document.querySelector('[data-enemy-kills]');
+ if(teamKillsEl)teamKillsEl.textContent=String(bs.teamKills||0);
+ if(enemyKillsEl)enemyKillsEl.textContent=String(bs.enemyKills||0);
+
+ // 전투 현황 K/D/A + CS를 battleState의 실제 값으로 매번 다시 덮어쓴다.
  for(const u of bs.team.concat(bs.enemy)){
-   const k=document.querySelector(`[data-score-kda="${u.id}"]`);if(k)k.textContent=`${u.kills||0}/${u.deaths||0}/${u.assists||0}`;
-   const cs=document.querySelector(`[data-score-cs="${u.id}"]`);if(cs)cs.textContent=`${u.cs||0}`;
+   document.querySelectorAll(`[data-score-kda="${u.id}"]`).forEach(k=>{
+     k.textContent=`${u.kills||0}/${u.deaths||0}/${u.assists||0}`;
+   });
+   document.querySelectorAll(`[data-score-cs="${u.id}"]`).forEach(cs=>{
+     cs.textContent=String(u.cs||0);
+   });
  }
+
  // 아이템 슬롯은 골드에 따라 실시간 갱신한다.
  const pairs=document.querySelectorAll('.score-pair');
  pairs.forEach((pair,i)=>{
    const units=[bs.team[i],bs.enemy[i]];
    pair.querySelectorAll('.score-items').forEach((wrap,j)=>{
-     const u=units[j],cnt=battleItemCount(u);
-     wrap.querySelectorAll('.score-item').forEach((el,n)=>{el.classList.toggle('filled',n<cnt);el.textContent=n<cnt?battleItemSymbol(u,n):''});
+     const u=units[j];if(!u)return;
+     const cnt=battleItemCount(u);
+     wrap.querySelectorAll('.score-item').forEach((el,n)=>{
+       el.classList.toggle('filled',n<cnt);
+       el.textContent=n<cnt?battleItemSymbol(u,n):'';
+     });
    });
  });
 }
@@ -871,7 +888,7 @@ const bs=battleState || {time:0,status:"전투 준비 중",team:[],enemy:[],log:
 const portrait=(u)=>`<div class="portrait"><img src="assets/champions/${championImageId(u.champ.id)}_0.jpg" onerror="this.style.display='none';this.parentElement.textContent='${u.icon}'"></div>`;
 const augSlots=(u)=>`<div class="unit-augments">${[0,1,2,3].map(i=>{const a=(u.augments||[])[i];return a?`<span class="unit-augment filled ${a.tier}" title="${a.name} · ${a.desc}"><img src="assets/augments/${a.tier}/${a.name}.jpg" alt="${a.name}" onerror="this.style.display='none';this.nextElementSibling.style.display='grid'"><i style="display:none">◆</i></span>`:`<span class="unit-augment" title="미선택"><i>+</i></span>`}).join('')}</div>`;
 const row=(u,right=false)=>`<div class="b2-unit ${u.alive?"":"dead"}" data-hud-unit="${u.id}">${right?`<div class="unit-info"><strong>${u.nick}</strong><small>${u.champ.name} · Lv.${u.level}</small><div class="b2-hp"><i style="width:${Math.max(0,u.hp/u.maxHp*100)}%"></i></div><div class="b2-gold">${Math.floor(u.gold).toLocaleString()} G</div>${augSlots(u)}</div>${portrait(u)}`:`${portrait(u)}<div class="unit-info"><strong>${u.nick}</strong><small>${u.champ.name} · Lv.${u.level}</small><div class="b2-hp"><i style="width:${Math.max(0,u.hp/u.maxHp*100)}%"></i></div><div class="b2-gold">${Math.floor(u.gold).toLocaleString()} G</div>${augSlots(u)}</div>`}</div>`;
-body=`<div class="battle-v2"><div class="b2-head"><div></div><div><div class="b2-score"><span class="blue">${bs.teamKills||0}</span> &nbsp; ⚔ &nbsp; <span class="red">${bs.enemyKills||0}</span></div><div class="b2-clock">${formatBattleTime(bs.time)}</div></div><div class="b2-right">${bs.status}</div></div><div class="b2-main"><aside class="b2-side"><div class="b2-side-title">우리 팀</div>${bs.team.map(u=>row(u,false)).join("")}</aside><div class="b2-stage"><div class="b2-map"><div class="clean-bridge"></div></div>
+body=`<div class="battle-v2"><div class="b2-head"><div></div><div><div class="b2-score"><span class="blue" data-team-kills>${bs.teamKills||0}</span> &nbsp; ⚔ &nbsp; <span class="red" data-enemy-kills>${bs.enemyKills||0}</span></div><div class="b2-clock">${formatBattleTime(bs.time)}</div></div><div class="b2-right">${bs.status}</div></div><div class="b2-main"><aside class="b2-side"><div class="b2-side-title">우리 팀</div>${bs.team.map(u=>row(u,false)).join("")}</aside><div class="b2-stage"><div class="b2-map"><div class="clean-bridge"></div></div>
 <div class="structure-track">${bs.structures.map(st=>`<div class="b2-structure ${st.team==='enemy'?'red':''} ${st.type} ${st.alive?'':'dead'}" data-structure="${st.id}" style="left:${st.x}%"><div class="sicon">${st.type==='nexus'?'◆':st.type==='inhib'?'✦':'▥'}</div><div class="sname">${st.name} · ${Math.max(0,Math.round(st.hp))}%</div></div>`).join("")}</div>
 ${bs.units.filter(u=>u.kind==='champ').map(u=>unitV2Html(u)).join("")}
 ${battleScoreboardHtml(bs)}
@@ -1469,6 +1486,7 @@ function killLog(attacker,target){
    }
  }
  syncBattleScoreboard();
+ requestAnimationFrame(()=>{if(mode==='battle'&&battleState===bs)syncBattleScoreboard();});
 }
 function dealDamage(attacker,target,dmg){if(!target.alive)return;const out=attacker.kind==='champ'?combatPerformanceMultiplier(attacker)*roleDamageMultiplier(attacker):1;const guard=target.kind==='champ'?Math.sqrt(Math.max(.20,combatPerformanceMultiplier(target))):1;dmg=dmg*out/guard;if(attacker.kind==='champ')attacker.damageDealt=(attacker.damageDealt||0)+dmg*12;if(target.kind==='champ')target.damageTaken=(target.damageTaken||0)+dmg*12;target.hp-=dmg;if(target.hp<=0){target.hp=0;target.alive=false;if(target.kind==='minion'){if(attacker.kind==='champ'){attacker.cs=(attacker.cs||0)+1;syncBattleScoreboard();}grantMinionXp(target);}if(target.kind==='champ'){target.respawn=respawnSeconds(target);addFx(target.x,target.y,'KO',attacker.team);killLog(attacker,target)}}else if(Math.random()<.035&&attacker.kind==='champ'){addFx(target.x,target.y,`-${Math.max(1,Math.round(dmg*12))}`,attacker.team)}}
 function damageStructure(st,dmg,attacker){
@@ -1775,7 +1793,7 @@ function syncStaticBattlePositions(){
  for(const st of battleState.structures){const el=document.querySelector(`[data-structure="${st.id}"]`);if(el){const p=screenPos(st.x,st.y||50);el.style.left=p.left+'%';el.style.top=p.top+'%'}}
  const rs=[...document.querySelectorAll('.b2-relic')];battleState.relics.forEach((r,i)=>{if(rs[i]){const p=screenPos(r.x,50);rs[i].style.left=p.left+'%';rs[i].style.top=p.top+'%'}})
 }
-function syncBattleDom(){const bs=battleState;const clock=document.querySelector('.b2-clock');if(clock)clock.textContent=formatBattleTime(bs.time);const right=document.querySelector('.b2-right');if(right)right.innerHTML=`<span>${bs.status}</span>`;
+function syncBattleDom(){const bs=battleState;syncBattleScoreboard();const clock=document.querySelector('.b2-clock');if(clock)clock.textContent=formatBattleTime(bs.time);const right=document.querySelector('.b2-right');if(right)right.innerHTML=`<span>${bs.status}</span>`;
  for(const u of bs.team.concat(bs.enemy)){const el=document.querySelector(`[data-unit="${u.id}"]`);if(!el)continue;const p=screenPos(u.x,u.y);el.style.left=p.left+'%';el.style.top=p.top+'%';el.classList.toggle('dead',!u.alive);const hp=el.querySelector('.t-hp em');if(hp)hp.style.width=Math.max(0,u.hp/u.maxHp*100)+'%'}
  for(const u of bs.team.concat(bs.enemy)){const hud=document.querySelector(`[data-hud-unit="${u.id}"]`);if(!hud)continue;hud.classList.toggle('dead',!u.alive);const hp=hud.querySelector('.b2-hp i');if(hp)hp.style.width=Math.max(0,Math.min(100,u.hp/u.maxHp*100))+'%';const info=hud.querySelector('.unit-info small');if(info)info.textContent=`${u.champ.name} · Lv.${u.level}`;const gold=hud.querySelector('.b2-gold');if(gold)gold.textContent=Math.floor(u.gold).toLocaleString()+' G'}
  for(const st of bs.structures){const el=document.querySelector(`[data-structure="${st.id}"]`);if(el){el.classList.toggle('dead',!st.alive);const n=el.querySelector('.sname');if(n)n.textContent=`${st.name} · ${Math.max(0,Math.round(st.hp))}%`}}
