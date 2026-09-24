@@ -416,7 +416,39 @@ button{font:inherit}.app{min-height:100vh;width:100%;max-width:1240px;margin:0 a
 
 /* V41: compact circular match champion tokens */
 @media(min-width:801px){.b2-token{width:34px;height:34px;border-radius:50%}.b2-token .token-portrait{width:30px;height:30px;border-radius:50%}.b2-token b{top:36px}.b2-token .t-hp{width:34px;bottom:-7px}}
+
+/* V47: party-ready actions align exactly with the party list */
+.party + .primary{display:block;max-width:860px;width:100%;margin:16px auto 0!important}
+.party-reselect{box-sizing:border-box}
+@media(max-width:900px){.party + .primary,.party-reselect{max-width:100%;width:100%}}
 </style>
+
+<style>
+/* ===== V48 MOBILE OPTIMIZATION ===== */
+@media(max-width:800px){
+  body{overflow-x:hidden}.app{max-width:none;padding:16px 12px calc(24px + env(safe-area-inset-bottom));min-height:100dvh}
+  .top{align-items:center;margin-bottom:22px;padding-bottom:14px}.eyebrow{font-size:8px;letter-spacing:2px}.top h1{font-size:22px}.section{align-items:flex-start;gap:11px;margin-bottom:16px}.section h2{font-size:20px}.section p{font-size:11px;line-height:1.5}
+  .grid{grid-template-columns:1fr 1fr;gap:8px}.card{min-height:116px;padding:12px}.nick{font-size:17px;margin-top:17px}.real{font-size:10px}.signature-label{font-size:9px!important;line-height:1.35;margin-top:6px}.check{right:9px;top:9px}
+  .calls{grid-template-columns:1fr 1fr;gap:8px}.call{min-height:145px;padding:15px}.call .ico{font-size:25px;margin:15px 0 10px}.call h3{font-size:17px}.call p{font-size:11px;line-height:1.45}
+  .member{padding:12px}.member .box{margin-right:10px}.primary{min-height:48px;padding:13px 12px}.back{min-height:42px}
+  .phonewrap{width:100%;max-width:430px!important}.phone{height:min(760px,calc(100dvh - 110px));display:flex;flex-direction:column}.head{height:62px!important;flex:0 0 62px!important;padding:8px 11px}.head strong{font-size:15px!important}.chat{min-height:0!important;flex:1;overflow-y:auto;padding:12px 10px}.msg{max-width:88%}.bubble{font-size:12px;padding:8px 10px}.input{height:48px;flex:0 0 48px}
+  .ready{align-items:flex-start;gap:12px;margin-bottom:16px}.mark{width:42px;height:42px;flex:0 0 42px}.ready h2{font-size:21px}.party{gap:7px}.pm{padding:12px}.party + .primary,.party-reselect{width:100%!important;max-width:100%!important}
+  .queue-shell{min-height:calc(100dvh - 110px)}.queue-top{height:48px;padding:0 12px;gap:12px}.queue-top .navitem{display:none}.queue-map{padding:18px 10px 4px}.queue-map h2{font-size:20px}.queue-slots{grid-template-columns:repeat(5,minmax(0,1fr));gap:4px;padding:18px 6px 12px}.qslot{height:205px;padding:10px 3px}.qslot .ring{top:43px;width:56px;height:56px}.qslot .silhouette{top:55px;font-size:27px}.qslot .role{font-size:6px;letter-spacing:0}.qslot .qname{font-size:9px;word-break:keep-all}.qslot .qreal{font-size:7px;text-align:center}.queue-bottom{min-height:100px;padding:10px}.queue-status{left:10px;bottom:8px;font-size:7px}
+  .champ-screen{height:100dvh;overflow:auto}.champ-top{height:auto;min-height:58px;padding:8px}.champ-body{display:block!important}.team-side{padding:8px!important}.enemy-side{display:none}.team-side .player-row{height:54px!important;margin-bottom:4px;padding:5px 7px!important}.team-side .player-row .avatar{width:40px!important;height:40px!important;flex:0 0 40px!important}.team-side .player-row strong{font-size:12px!important}.team-side .player-row small{font-size:9px!important}.champ-center{padding:8px!important}.champ-options{grid-template-columns:repeat(3,minmax(0,1fr))!important;gap:6px!important}.champ-card{height:205px!important}.champ-art{height:145px!important}.champ-name{font-size:13px!important}.champ-title{font-size:8px!important}
+  .loading-screen{padding:8px!important;overflow:hidden}.loading-inner{width:100%!important}.loading-inner h2{font-size:20px!important;margin:3px 0 7px!important}.loading-kicker{font-size:8px!important}.loading-vs{gap:4px!important}.loading-team,.loading-team.enemy-loading{gap:4px!important}.loading-card{height:min(24dvh,145px)!important}.loading-champ{font-size:8px!important;bottom:23px!important}.loading-nick{font-size:7px!important;bottom:8px!important}.vs-mark{height:38px!important}.vs-mark:after{font-size:8px!important;padding:0 5px!important}.loading-bar{height:8px!important;margin-top:8px!important}.loading-inner>p{font-size:9px!important}
+  .battle-v2{overflow:hidden}.b2-head{height:48px!important;flex-basis:48px!important;grid-template-columns:1fr 120px 1fr!important;padding:0 6px!important}.b2-score{font-size:18px!important}.b2-clock{font-size:10px!important;padding:4px 7px!important}.b2-right{font-size:7px!important}.b2-main{position:relative!important;display:block!important;min-height:0!important}.b2-stage{position:absolute!important;inset:0 58px!important}.b2-side{position:absolute!important;top:0;bottom:0;width:58px!important;padding:3px!important;z-index:22;background:#08131fe8!important;overflow:hidden}.b2-side:not(.right){left:0}.b2-side.right{right:0}.b2-unit{height:20%!important;min-height:0!important;margin:0!important;padding:3px 1px!important;display:flex!important;flex-direction:column!important;justify-content:center!important;gap:2px!important;text-align:center!important;border-bottom:1px solid #20303b!important}.b2-side.right .b2-unit{display:flex!important}.portrait,.b2-orb{width:30px!important;height:30px!important;flex:0 0 30px!important;margin:auto!important;border-radius:50%!important}.unit-info{width:100%;min-width:0}.b2-unit strong{display:block;font-size:7px!important;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.b2-unit small,.b2-gold{display:none!important}.b2-hp{height:3px!important;margin:2px 2px 0!important}.unit-augments{margin:2px 1px 0!important}.unit-augment{height:7px!important}.b2-token{width:22px!important;height:22px!important}.b2-token .token-portrait{width:20px!important;height:20px!important}.b2-token b{display:none!important}.b2-token .t-hp{width:22px!important;height:3px!important;bottom:-5px!important}.b2-structure .sicon{transform:scale(.72)!important}.b2-structure.nexus .sicon{transform:scale(.8)!important}.b2-structure .sname{display:none!important}
+  .b2-speed-dock{top:3px!important;max-width:calc(100% - 126px);overflow-x:auto;white-space:nowrap}.b2-speed-dock button{flex:0 0 auto;padding:4px 5px!important;font-size:7px!important}.b2-panel{left:64px!important;right:64px!important;bottom:6px!important;transform:none!important;width:auto!important}.b2-panel-head{padding:4px 6px!important;font-size:7px!important}.b2-log{height:54px!important;padding:4px 6px!important;font-size:7px!important;line-height:1.4!important}.b2-controls{display:none!important}.match-all-chat{left:64px!important;right:64px!important;bottom:74px!important;width:auto!important;max-height:70px!important}.match-all-chat-head{font-size:7px!important;padding:4px 6px!important}.match-all-chat-body{font-size:7px!important;line-height:1.35!important;padding:4px 6px!important;max-height:48px!important;overflow:auto!important}
+  .augment-modal{width:calc(100vw - 16px)!important;padding:14px 10px 16px!important}.augment-modal h2{font-size:19px!important}.augment-modal>p{font-size:9px!important;margin-bottom:10px!important}.augment-card{min-height:130px!important;padding:10px 10px 38px!important}.augment-reroll{bottom:7px!important;padding:6px 9px!important;font-size:9px!important}
+  .result-screen{padding:16px 8px 28px}.result-head{margin-bottom:12px}.result-head h1{font-size:29px}.result-team{overflow-x:auto}.result-row{min-width:720px;padding:8px 8px;gap:6px}.result-actions{position:sticky;bottom:0;background:#041017ee;padding:8px 0;margin-top:16px}.result-actions button{min-width:0;flex:1;padding:12px 8px;font-size:12px}
+}
+@media(max-width:430px){
+  .app{padding-left:9px;padding-right:9px}.grid{gap:6px}.card{min-height:108px;padding:10px}.nick{font-size:15px}.calls{grid-template-columns:1fr}.call{min-height:112px}.call .ico{margin:8px 0;font-size:22px}.queue-slots{gap:2px;padding-left:3px;padding-right:3px}.qslot{height:185px}.qslot .ring{width:48px;height:48px}.qslot .silhouette{font-size:23px}.qslot .qname{font-size:8px}.champ-options{grid-template-columns:repeat(2,minmax(0,1fr))!important}.champ-card{height:190px!important}.champ-art{height:132px!important}
+}
+@media(max-width:800px) and (orientation:landscape){
+  .battle-v2{height:100dvh!important}.b2-head{height:38px!important;flex-basis:38px!important}.b2-side{width:52px!important}.b2-stage{inset:0 52px!important}.b2-unit{padding:1px!important}.portrait,.b2-orb{width:24px!important;height:24px!important;flex-basis:24px!important}.match-all-chat{display:none!important}.b2-panel{left:58px!important;right:58px!important;bottom:3px!important}.b2-log{height:34px!important}.b2-panel-head{display:none!important}.b2-speed-dock{top:2px!important}.augment-modal{max-height:96dvh!important}.augment-cards{grid-template-columns:repeat(3,1fr)!important}.augment-card{min-height:120px!important}
+}
+</style>
+
 </head>
 <body>
 <div class="app" id="app"></div>
@@ -855,7 +887,7 @@ function startBattle(){
  const structures=[
  {id:'tn1',team:'team',type:'nexus',name:'넥서스',x:5,y:50,hp:100,alive:true},{id:'tt1',team:'team',type:'tower',name:'쌍둥이 포탑',x:9,y:50,hp:100,alive:true},{id:'tt2',team:'team',type:'tower',name:'쌍둥이 포탑',x:12,y:50,hp:100,alive:true},{id:'ti',team:'team',type:'inhib',name:'억제기',x:17,y:50,hp:100,alive:true},{id:'t2',team:'team',type:'tower',name:'2차 포탑',x:28,y:50,hp:100,alive:true},{id:'t1',team:'team',type:'tower',name:'1차 포탑',x:40,y:50,hp:100,alive:true},
  {id:'e1',team:'enemy',type:'tower',name:'1차 포탑',x:60,y:50,hp:100,alive:true},{id:'e2',team:'enemy',type:'tower',name:'2차 포탑',x:72,y:50,hp:100,alive:true},{id:'ei',team:'enemy',type:'inhib',name:'억제기',x:83,y:50,hp:100,alive:true},{id:'et1',team:'enemy',type:'tower',name:'쌍둥이 포탑',x:88,y:50,hp:100,alive:true},{id:'et2',team:'enemy',type:'tower',name:'쌍둥이 포탑',x:91,y:50,hp:100,alive:true},{id:'en1',team:'enemy',type:'nexus',name:'넥서스',x:95,y:50,hp:100,alive:true}];
- battleState={time:0,lastTs:performance.now(),lastUiSync:0,status:'경기 진행 중',speed:1,team,enemy,units:[...team,...enemy],structures,relics:[],fx:[],fxSeq:0,log:[],chat:[],teamKills:0,enemyKills:0,nextWaveAt:45,waveCount:0,superTeam:false,superEnemy:false,paused:false,jaebinEventAt:180+Math.random()*300,jaebinEventDone:false,jaebinEventOpen:false,jaebinEventResult:null,augmentOpen:false,augmentStage:null,augmentChoices:[],augments:[],augmentDone:{start:false,7:false,11:false,15:false},augmentTierByStage:{}};
+ battleState={time:0,lastTs:performance.now(),lastUiSync:0,status:'경기 진행 중',speed:1,team,enemy,units:[...team,...enemy],structures,relics:[],fx:[],fxSeq:0,log:[],chat:[],teamKills:0,enemyKills:0,nextWaveAt:45,waveCount:0,superTeam:false,superEnemy:false,paused:false,jaebinEventAt:180+Math.random()*300,jaebinEventDone:false,jaebinEventOpen:false,jaebinEventResult:null,augmentOpen:false,augmentStage:null,augmentChoices:[],augments:[],augmentDone:{start:false,7:false,11:false,15:false},augmentTierByStage:{},endPending:null};
  if(party.some(c=>c.id==='siljeom')) battleState.chat.push(`<span class="all-tag">[전체]</span> <span class="ally-chat">실점:</span> 안녕하세요~ 매너게임이요 ^^`);
  mode='battle';render();setTimeout(()=>{if(mode==='battle'&&battleState&&!battleState.augmentDone.start)openAugment('start')},120);window.__battleRAF=requestAnimationFrame(battleFrame);
 }
@@ -864,7 +896,16 @@ function unitV2Html(u){const p=screenPos(u.x,u.y);return `<div class="b2-token $
 function setBattleSpeed(v){if(battleState){battleState.speed=v;render()}}
 function living(arr){return arr.filter(u=>u.alive)}
 function nearestEnemy(u){const es=battleState.units.filter(e=>e.alive&&e.team!==u.team);return es.reduce((best,e)=>!best||Math.hypot(e.x-u.x,e.y-u.y)<Math.hypot(best.x-u.x,best.y-u.y)?e:best,null)}
-function nearestStructure(u){const ss=battleState.structures.filter(s=>s.alive&&s.team!==u.team);return ss.reduce((best,e)=>!best||Math.abs(e.x-u.x)<Math.abs(best.x-u.x)?e:best,null)}
+function structureTierOpen(team){
+ const bs=battleState, enemy=team==='team'?'enemy':'team';
+ const ids=enemy==='enemy'
+  ? [['e1'],['e2'],['ei'],['et1','et2'],['en1']]
+  : [['t1'],['t2'],['ti'],['tt1','tt2'],['tn1']];
+ for(const tier of ids){const alive=tier.map(id=>bs.structures.find(s=>s.id===id)).filter(s=>s&&s.alive);if(alive.length)return alive}
+ return [];
+}
+function isStructureTargetable(st,attackerTeam){return structureTierOpen(attackerTeam).some(s=>s.id===st.id)}
+function nearestStructure(u){const ss=structureTierOpen(u.team);return ss.reduce((best,e)=>!best||Math.abs(e.x-u.x)<Math.abs(best.x-u.x)?e:best,null)}
 function addFx(x,y,text,team){const bs=battleState;bs.fx.push({id:++bs.fxSeq,x,y,text,team,ttl:.65})}
 function moveOrganic(u,target,dt){
  const dx=target.x-u.x, dy=target.y-u.y, dist=Math.max(.001,Math.hypot(dx,dy));
@@ -903,9 +944,16 @@ function killLog(attacker,target){
 }
 function dealDamage(attacker,target,dmg){if(!target.alive)return;if(attacker.kind==='champ')attacker.damageDealt=(attacker.damageDealt||0)+dmg*12;if(target.kind==='champ')target.damageTaken=(target.damageTaken||0)+dmg*12;target.hp-=dmg;if(target.hp<=0){target.hp=0;target.alive=false;if(target.kind==='minion')grantMinionXp(target);if(target.kind==='champ'){target.respawn=respawnSeconds(target);addFx(target.x,target.y,'KO',attacker.team);killLog(attacker,target)}}else if(Math.random()<.035&&attacker.kind==='champ'){addFx(target.x,target.y,`-${Math.max(1,Math.round(dmg*12))}`,attacker.team)}}
 function damageStructure(st,dmg,attacker){
- const tempo=battleState.time>15*60?2.4:battleState.time>10*60?1.55:1;
- st.hp-=dmg*tempo;
- if(st.hp<=0){st.hp=0;st.alive=false;if(st.type==='inhib'){if(st.team==='team')battleState.superEnemy=true;else battleState.superTeam=true}}
+ const bs=battleState;if(!st||!st.alive||!attacker||!isStructureTargetable(st,attacker.team))return;
+ const tempo=bs.time>15*60?2.15:bs.time>10*60?1.45:1;
+ const nexusMod=st.type==='nexus'?.72:1;
+ st.hp-=dmg*tempo*nexusMod;
+ if(st.hp<=0){
+  st.hp=0;st.alive=false;
+  bs.log.push(`[${formatBattleTime(bs.time)}] ${st.team==='enemy'?'적':'우리'} ${st.name} 파괴`);
+  if(st.type==='inhib'){if(st.team==='team')bs.superEnemy=true;else bs.superTeam=true}
+  if(st.type==='nexus'&&!bs.endPending){bs.endPending={winner:st.team==='enemy'?'team':'enemy',realAt:performance.now()+900};bs.status='넥서스 파괴';}
+ }
 }
 function waveIntervalAt(t){
  if(t>=25*60)return 15;
@@ -1009,9 +1057,10 @@ function allowJaebinChat(){
  bs.jaebinEventDone=true;bs.jaebinEventOpen=false;bs.paused=false;bs.status='경기 진행 중';bs.lastTs=performance.now();render();window.__battleRAF=requestAnimationFrame(battleFrame);
 }
 function denyJaebinChat(){const bs=battleState;if(!bs)return;bs.chat.push(`<span class="all-tag">[SYSTEM]</span> 이재빈의 전체 채팅을 막았습니다.`);bs.jaebinEventDone=true;bs.jaebinEventOpen=false;bs.paused=false;bs.status='경기 진행 중';bs.lastTs=performance.now();render();window.__battleRAF=requestAnimationFrame(battleFrame)}
-function checkEnd(){const bs=battleState;const tn=bs.structures.find(s=>s.id==='tn1'),en=bs.structures.find(s=>s.id==='en1');if(!tn.alive||!en.alive){const winner=!en.alive?'team':'enemy';bs.status=winner==='team'?'우리 팀 승리':'적 팀 승리';if(winner==='team'){if(party.some(c=>c.id==='siljeom'))bs.chat.push(`<span class="all-tag">[전체]</span> <span class="ally-chat">실점:</span> 죽어 그냥 ㅋㅋ`);if(party.some(c=>c.id==='nguyen'))bs.chat.push(`<span class="all-tag">[전체]</span> <span class="ally-chat">Nguyen Ngoc Tu:</span> 나1가`);if(party.some(c=>c.id==='3patourwan'))for(let i=0;i<4;i++)bs.chat.push(`<span class="all-tag">[전체]</span> <span class="ally-chat">쓰리빠뚜르완:</span> ㅋ`);if(party.some(c=>c.id==='joguk'))bs.chat.push(`<span class="all-tag">[전체]</span> <span class="ally-chat">조국:</span> 븅`);if(party.some(c=>c.id==='molcho'))bs.chat.push(`<span class="all-tag">[팀원]</span> <span class="ally-chat">몰초:</span> 쉽네 쉬워`);}else{if(party.some(c=>c.id==='nguyen'))bs.chat.push(`<span class="all-tag">[전체]</span> <span class="ally-chat">Nguyen Ngoc Tu:</span> 수고하셨습니다 GG`);}matchResult={winner,time:bs.time,teamKills:bs.teamKills,enemyKills:bs.enemyKills,team:bs.team.map(u=>({...u})),enemy:bs.enemy.map(u=>({...u})),chat:[...(bs.chat||[])]};mode='battleEnd';render();return true}return false}
+function checkEnd(){const bs=battleState;if(bs.endPending&&performance.now()>=bs.endPending.realAt){const winner=bs.endPending.winner;bs.status=winner==='team'?'우리 팀 승리':'적 팀 승리';if(winner==='team'){if(party.some(c=>c.id==='siljeom'))bs.chat.push(`<span class="all-tag">[전체]</span> <span class="ally-chat">실점:</span> 죽어 그냥 ㅋㅋ`);if(party.some(c=>c.id==='nguyen'))bs.chat.push(`<span class="all-tag">[전체]</span> <span class="ally-chat">Nguyen Ngoc Tu:</span> 나1가`);if(party.some(c=>c.id==='3patourwan'))for(let i=0;i<4;i++)bs.chat.push(`<span class="all-tag">[전체]</span> <span class="ally-chat">쓰리빠뚜르완:</span> ㅋ`);if(party.some(c=>c.id==='joguk'))bs.chat.push(`<span class="all-tag">[전체]</span> <span class="ally-chat">조국:</span> 븅`);if(party.some(c=>c.id==='molcho'))bs.chat.push(`<span class="all-tag">[팀원]</span> <span class="ally-chat">몰초:</span> 쉽네 쉬워`);}else{if(party.some(c=>c.id==='nguyen'))bs.chat.push(`<span class="all-tag">[전체]</span> <span class="ally-chat">Nguyen Ngoc Tu:</span> 수고하셨습니다 GG`);}matchResult={winner,time:bs.time,teamKills:bs.teamKills,enemyKills:bs.enemyKills,team:bs.team.map(u=>({...u})),enemy:bs.enemy.map(u=>({...u})),chat:[...(bs.chat||[])]};mode='battleEnd';render();return true}return false}
 function battleFrame(ts){if(mode!=='battle'||!battleState)return;
- const bs=battleState;if(bs.paused){bs.lastTs=ts;return;}let raw=Math.min(.05,(ts-bs.lastTs)/1000);bs.lastTs=ts;let dt=Math.min(.8,raw*bs.speed);bs.time+=dt;
+ const bs=battleState;if(bs.paused){bs.lastTs=ts;return;}
+ if(bs.endPending){bs.lastTs=ts;syncBattleDom();if(checkEnd())return;window.__battleRAF=requestAnimationFrame(battleFrame);return;}let raw=Math.min(.05,(ts-bs.lastTs)/1000);bs.lastTs=ts;let dt=Math.min(.8,raw*bs.speed);bs.time+=dt;
  if(!bs.jaebinEventDone&&!bs.jaebinEventOpen&&party.some(c=>c.id==='nguyen')&&bs.time>=bs.jaebinEventAt){triggerJaebinEvent();return;}
  while(bs.time>=bs.nextWaveAt){spawnWave();bs.nextWaveAt+=waveIntervalAt(bs.nextWaveAt)}
  updateUnits(dt);updateStructures(dt);updateRelics(dt);applyOvercharge();
