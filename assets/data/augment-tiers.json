@@ -1,0 +1,849 @@
+{
+  "source": "OP.GG ARAM: Mayhem",
+  "updated": "2026-09-24",
+  "rankRules": {
+    "S": "1-5",
+    "A": "6-12",
+    "B": "13-22",
+    "C": "23+"
+  },
+  "champions": {
+    "garen": {
+      "patch": "16.19",
+      "rankings": [
+        "승리를 위한 회전",
+        "무한의 대검 업그레이드",
+        "꽁!",
+        "영혼 흡수",
+        "날쌘걸음",
+        "드롭킥",
+        "취약",
+        "치명적인 공격"
+      ]
+    },
+    "galio": {
+      "patch": "16.17",
+      "rankings": [
+        "탱크 엔진",
+        "천상의 신체",
+        "드롭킥",
+        "강타자",
+        "강철 같은 심장",
+        "거인",
+        "거석상의 용기",
+        "우당탕탕",
+        "불사르기 업그레이드"
+      ]
+    },
+    "gangplank": {
+      "patch": null,
+      "rankings": []
+    },
+    "gragas": {
+      "patch": null,
+      "rankings": []
+    },
+    "graves": {
+      "patch": null,
+      "rankings": []
+    },
+    "gwen": {
+      "patch": null,
+      "rankings": []
+    },
+    "gnar": {
+      "patch": null,
+      "rankings": []
+    },
+    "nami": {
+      "patch": null,
+      "rankings": []
+    },
+    "nasus": {
+      "patch": null,
+      "rankings": []
+    },
+    "naafiri": {
+      "patch": null,
+      "rankings": []
+    },
+    "nautilus": {
+      "patch": null,
+      "rankings": []
+    },
+    "nocturne": {
+      "patch": null,
+      "rankings": []
+    },
+    "nunu": {
+      "patch": null,
+      "rankings": []
+    },
+    "nidalee": {
+      "patch": null,
+      "rankings": []
+    },
+    "neeko": {
+      "patch": null,
+      "rankings": []
+    },
+    "nilah": {
+      "patch": null,
+      "rankings": []
+    },
+    "darius": {
+      "patch": null,
+      "rankings": []
+    },
+    "diana": {
+      "patch": null,
+      "rankings": []
+    },
+    "draven": {
+      "patch": null,
+      "rankings": []
+    },
+    "ryze": {
+      "patch": null,
+      "rankings": []
+    },
+    "rakan": {
+      "patch": null,
+      "rankings": []
+    },
+    "rammus": {
+      "patch": null,
+      "rankings": []
+    },
+    "lux": {
+      "patch": null,
+      "rankings": []
+    },
+    "rumble": {
+      "patch": null,
+      "rankings": []
+    },
+    "renata": {
+      "patch": null,
+      "rankings": []
+    },
+    "renekton": {
+      "patch": null,
+      "rankings": []
+    },
+    "reksai": {
+      "patch": null,
+      "rankings": []
+    },
+    "rengar": {
+      "patch": "16.19",
+      "rankings": [
+        "무한의 대검 업그레이드",
+        "밤의 추적",
+        "육중한 힘",
+        "영혼 흡수",
+        "광대 대학",
+        "이빨 요정",
+        "바늘에 실 끼우기",
+        "치명적인 공격"
+      ]
+    },
+    "lucian": {
+      "patch": null,
+      "rankings": []
+    },
+    "lulu": {
+      "patch": null,
+      "rankings": []
+    },
+    "leblanc": {
+      "patch": null,
+      "rankings": []
+    },
+    "leesin": {
+      "patch": null,
+      "rankings": []
+    },
+    "riven": {
+      "patch": null,
+      "rankings": []
+    },
+    "lissandra": {
+      "patch": null,
+      "rankings": []
+    },
+    "lillia": {
+      "patch": null,
+      "rankings": []
+    },
+    "masteryi": {
+      "patch": null,
+      "rankings": []
+    },
+    "maokai": {
+      "patch": null,
+      "rankings": []
+    },
+    "malzahar": {
+      "patch": null,
+      "rankings": []
+    },
+    "malphite": {
+      "patch": null,
+      "rankings": []
+    },
+    "mel": {
+      "patch": "16.19",
+      "rankings": [
+        "마법 미사일",
+        "노련한 저격수",
+        "유레카",
+        "마도사의 주스 상자",
+        "되풀이",
+        "보석 건틀릿",
+        "쌍둥이 불꽃",
+        "극악무도"
+      ]
+    },
+    "mordekaiser": {
+      "patch": null,
+      "rankings": []
+    },
+    "morgana": {
+      "patch": null,
+      "rankings": []
+    },
+    "drmundo": {
+      "patch": null,
+      "rankings": []
+    },
+    "missfortune": {
+      "patch": null,
+      "rankings": []
+    },
+    "milio": {
+      "patch": null,
+      "rankings": []
+    },
+    "bard": {
+      "patch": null,
+      "rankings": []
+    },
+    "varus": {
+      "patch": null,
+      "rankings": []
+    },
+    "vi": {
+      "patch": null,
+      "rankings": []
+    },
+    "veigar": {
+      "patch": null,
+      "rankings": []
+    },
+    "vayne": {
+      "patch": null,
+      "rankings": []
+    },
+    "vex": {
+      "patch": null,
+      "rankings": []
+    },
+    "belveth": {
+      "patch": null,
+      "rankings": []
+    },
+    "velkoz": {
+      "patch": null,
+      "rankings": []
+    },
+    "volibear": {
+      "patch": null,
+      "rankings": []
+    },
+    "braum": {
+      "patch": null,
+      "rankings": []
+    },
+    "briar": {
+      "patch": "16.19",
+      "rankings": [
+        "꽁!",
+        "영혼 흡수",
+        "굶주린 속박",
+        "죽음의 무도 업그레이드",
+        "선혈포식",
+        "신비한 주먹",
+        "끝없는 학살"
+      ]
+    },
+    "brand": {
+      "patch": "16.19",
+      "rankings": [
+        "타오르는 이자",
+        "지옥의 전도체",
+        "마법 미사일",
+        "극악무도",
+        "마도사의 주스 상자",
+        "되풀이",
+        "쌍둥이 불꽃",
+        "유레카"
+      ]
+    },
+    "vladimir": {
+      "patch": null,
+      "rankings": []
+    },
+    "blitzcrank": {
+      "patch": null,
+      "rankings": []
+    },
+    "viego": {
+      "patch": null,
+      "rankings": []
+    },
+    "viktor": {
+      "patch": null,
+      "rankings": []
+    },
+    "poppy": {
+      "patch": null,
+      "rankings": []
+    },
+    "samira": {
+      "patch": "16.17",
+      "rankings": [
+        "영혼 흡수",
+        "무한의 대검 업그레이드",
+        "치명적 미사일"
+      ]
+    },
+    "sion": {
+      "patch": null,
+      "rankings": []
+    },
+    "sylas": {
+      "patch": null,
+      "rankings": []
+    },
+    "shaco": {
+      "patch": null,
+      "rankings": []
+    },
+    "senna": {
+      "patch": "16.19",
+      "rankings": [
+        "치명적 미사일",
+        "상급 조준경 부착",
+        "무한의 대검 업그레이드"
+      ]
+    },
+    "seraphine": {
+      "patch": null,
+      "rankings": []
+    },
+    "sejuani": {
+      "patch": null,
+      "rankings": []
+    },
+    "sett": {
+      "patch": "16.19",
+      "rankings": [
+        "탱크 엔진",
+        "강타자",
+        "드롭킥",
+        "천상의 신체",
+        "강철 같은 심장",
+        "거인",
+        "보강",
+        "육중한 힘",
+        "날쌘걸음"
+      ]
+    },
+    "sona": {
+      "patch": null,
+      "rankings": []
+    },
+    "soraka": {
+      "patch": null,
+      "rankings": []
+    },
+    "shen": {
+      "patch": null,
+      "rankings": []
+    },
+    "shyvana": {
+      "patch": null,
+      "rankings": []
+    },
+    "smolder": {
+      "patch": "16.19",
+      "rankings": [
+        "치명적 미사일",
+        "취약",
+        "무한의 대검 업그레이드"
+      ]
+    },
+    "swain": {
+      "patch": "16.19",
+      "rankings": [
+        "마도사의 주스 상자",
+        "탱크 엔진",
+        "선혈포식",
+        "굶주린 속박",
+        "타오르는 이자",
+        "드롭킥",
+        "죽음의 순환"
+      ]
+    },
+    "skarner": {
+      "patch": null,
+      "rankings": []
+    },
+    "sivir": {
+      "patch": null,
+      "rankings": []
+    },
+    "xinzhao": {
+      "patch": null,
+      "rankings": []
+    },
+    "syndra": {
+      "patch": null,
+      "rankings": []
+    },
+    "singed": {
+      "patch": "16.19",
+      "rankings": [
+        "타오르는 이자",
+        "마도사의 주스 상자"
+      ]
+    },
+    "thresh": {
+      "patch": null,
+      "rankings": []
+    },
+    "ahri": {
+      "patch": null,
+      "rankings": []
+    },
+    "amumu": {
+      "patch": null,
+      "rankings": []
+    },
+    "aurelionsol": {
+      "patch": null,
+      "rankings": []
+    },
+    "ivern": {
+      "patch": null,
+      "rankings": []
+    },
+    "azir": {
+      "patch": null,
+      "rankings": []
+    },
+    "akali": {
+      "patch": null,
+      "rankings": []
+    },
+    "akshan": {
+      "patch": null,
+      "rankings": []
+    },
+    "aatrox": {
+      "patch": null,
+      "rankings": []
+    },
+    "aphelios": {
+      "patch": null,
+      "rankings": []
+    },
+    "alistar": {
+      "patch": null,
+      "rankings": []
+    },
+    "ambessa": {
+      "patch": null,
+      "rankings": []
+    },
+    "annie": {
+      "patch": null,
+      "rankings": []
+    },
+    "anivia": {
+      "patch": null,
+      "rankings": []
+    },
+    "ashe": {
+      "patch": "16.19",
+      "rankings": [
+        "치명적 미사일",
+        "상급 조준경 부착",
+        "작은 도움",
+        "치명적 리듬",
+        "양손잡이",
+        "능수능란",
+        "취약",
+        "무한의 대검 업그레이드"
+      ]
+    },
+    "yasuo": {
+      "patch": null,
+      "rankings": []
+    },
+    "ekko": {
+      "patch": null,
+      "rankings": []
+    },
+    "elise": {
+      "patch": null,
+      "rankings": []
+    },
+    "wukong": {
+      "patch": null,
+      "rankings": []
+    },
+    "aurora": {
+      "patch": null,
+      "rankings": []
+    },
+    "ornn": {
+      "patch": null,
+      "rankings": []
+    },
+    "orianna": {
+      "patch": null,
+      "rankings": []
+    },
+    "olaf": {
+      "patch": null,
+      "rankings": []
+    },
+    "yone": {
+      "patch": null,
+      "rankings": []
+    },
+    "yorick": {
+      "patch": null,
+      "rankings": []
+    },
+    "udyr": {
+      "patch": null,
+      "rankings": []
+    },
+    "urgot": {
+      "patch": null,
+      "rankings": []
+    },
+    "warwick": {
+      "patch": null,
+      "rankings": []
+    },
+    "yunara": {
+      "patch": null,
+      "rankings": []
+    },
+    "yuumi": {
+      "patch": null,
+      "rankings": []
+    },
+    "irelia": {
+      "patch": "16.19",
+      "rankings": [
+        "무법자의 투지",
+        "죽음의 무도 업그레이드"
+      ]
+    },
+    "evelynn": {
+      "patch": null,
+      "rankings": []
+    },
+    "ezreal": {
+      "patch": "16.19",
+      "rankings": [
+        "광휘의 검 업그레이드",
+        "마법 미사일",
+        "환영 무기",
+        "보석 건틀릿",
+        "믿음직한 무기",
+        "되풀이",
+        "쌍둥이 불꽃"
+      ]
+    },
+    "illaoi": {
+      "patch": null,
+      "rankings": []
+    },
+    "jarvaniv": {
+      "patch": null,
+      "rankings": []
+    },
+    "xayah": {
+      "patch": null,
+      "rankings": []
+    },
+    "zyra": {
+      "patch": null,
+      "rankings": []
+    },
+    "zac": {
+      "patch": null,
+      "rankings": []
+    },
+    "zaahen": {
+      "patch": null,
+      "rankings": []
+    },
+    "janna": {
+      "patch": null,
+      "rankings": []
+    },
+    "jax": {
+      "patch": null,
+      "rankings": []
+    },
+    "zed": {
+      "patch": null,
+      "rankings": []
+    },
+    "xerath": {
+      "patch": null,
+      "rankings": []
+    },
+    "zeri": {
+      "patch": null,
+      "rankings": []
+    },
+    "jayce": {
+      "patch": null,
+      "rankings": []
+    },
+    "zoe": {
+      "patch": null,
+      "rankings": []
+    },
+    "ziggs": {
+      "patch": null,
+      "rankings": []
+    },
+    "jhin": {
+      "patch": null,
+      "rankings": []
+    },
+    "zilean": {
+      "patch": null,
+      "rankings": []
+    },
+    "jinx": {
+      "patch": "16.19",
+      "rankings": [
+        "치명적 미사일",
+        "상급 조준경 부착",
+        "무한의 대검 업그레이드",
+        "치명적 리듬",
+        "양손잡이",
+        "영혼 흡수",
+        "치명적인 공격",
+        "감쇠 광선"
+      ]
+    },
+    "chogath": {
+      "patch": null,
+      "rankings": []
+    },
+    "karma": {
+      "patch": null,
+      "rankings": []
+    },
+    "camille": {
+      "patch": null,
+      "rankings": []
+    },
+    "kassadin": {
+      "patch": null,
+      "rankings": []
+    },
+    "karthus": {
+      "patch": null,
+      "rankings": []
+    },
+    "cassiopeia": {
+      "patch": null,
+      "rankings": []
+    },
+    "kaisa": {
+      "patch": null,
+      "rankings": []
+    },
+    "khazix": {
+      "patch": null,
+      "rankings": []
+    },
+    "katarina": {
+      "patch": null,
+      "rankings": []
+    },
+    "kalista": {
+      "patch": null,
+      "rankings": []
+    },
+    "kennen": {
+      "patch": null,
+      "rankings": []
+    },
+    "caitlyn": {
+      "patch": null,
+      "rankings": []
+    },
+    "kayn": {
+      "patch": null,
+      "rankings": []
+    },
+    "kayle": {
+      "patch": "16.18",
+      "rankings": [
+        "상급 조준경 부착",
+        "마법 명사수",
+        "마도사의 주스 상자",
+        "능수능란",
+        "광신자",
+        "최상급 조준경 부착",
+        "양손잡이"
+      ]
+    },
+    "kogmaw": {
+      "patch": null,
+      "rankings": []
+    },
+    "corki": {
+      "patch": null,
+      "rankings": []
+    },
+    "quinn": {
+      "patch": null,
+      "rankings": []
+    },
+    "ksante": {
+      "patch": null,
+      "rankings": []
+    },
+    "kled": {
+      "patch": "16.19",
+      "rankings": [
+        "강타자",
+        "탱크 엔진",
+        "드롭킥",
+        "끝없는 학살",
+        "강철 같은 심장",
+        "전환: 프리즘",
+        "죽음의 무도 업그레이드"
+      ]
+    },
+    "qiyana": {
+      "patch": null,
+      "rankings": []
+    },
+    "kindred": {
+      "patch": null,
+      "rankings": []
+    },
+    "taric": {
+      "patch": null,
+      "rankings": []
+    },
+    "talon": {
+      "patch": null,
+      "rankings": []
+    },
+    "taliyah": {
+      "patch": null,
+      "rankings": []
+    },
+    "tahmkench": {
+      "patch": null,
+      "rankings": []
+    },
+    "trundle": {
+      "patch": null,
+      "rankings": []
+    },
+    "tristana": {
+      "patch": null,
+      "rankings": []
+    },
+    "tryndamere": {
+      "patch": null,
+      "rankings": []
+    },
+    "twistedfate": {
+      "patch": null,
+      "rankings": []
+    },
+    "twitch": {
+      "patch": null,
+      "rankings": []
+    },
+    "teemo": {
+      "patch": "16.19",
+      "rankings": [
+        "타오르는 이자",
+        "되풀이",
+        "축소 엔진",
+        "마법 미사일",
+        "순수주의자 - 마법사",
+        "유레카",
+        "환영 무기",
+        "지옥의 전도체"
+      ]
+    },
+    "pyke": {
+      "patch": "16.18",
+      "rankings": [
+        "밤의 추적",
+        "축소 엔진",
+        "그림자 질주",
+        "되풀이",
+        "돌진",
+        "전환: 프리즘",
+        "이빨 요정",
+        "바늘에 실 끼우기"
+      ]
+    },
+    "pantheon": {
+      "patch": null,
+      "rankings": []
+    },
+    "fiddlesticks": {
+      "patch": null,
+      "rankings": []
+    },
+    "fiora": {
+      "patch": null,
+      "rankings": []
+    },
+    "fizz": {
+      "patch": null,
+      "rankings": []
+    },
+    "heimerdinger": {
+      "patch": null,
+      "rankings": []
+    },
+    "hecarim": {
+      "patch": null,
+      "rankings": []
+    },
+    "hwei": {
+      "patch": "16.18",
+      "rankings": [
+        "타오르는 이자",
+        "마법 미사일"
+      ]
+    },
+    "leona": {
+      "patch": null,
+      "rankings": []
+    }
+  }
+}
