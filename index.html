@@ -42,7 +42,11 @@ button{font:inherit}.app{min-height:100vh;width:100%;max-width:1240px;margin:0 a
 .findbtn.searching{background:#263c46;color:#c7d0cf;border-color:#58707b;cursor:default}
 .cancelbtn{border:0;background:none;color:#7f8b8d;font-size:11px;cursor:pointer}
 .queue-status{position:absolute;left:22px;bottom:17px;color:#66777b;font-size:9px;letter-spacing:1px}
-@media(max-width:800px){.queue-slots{grid-template-columns:repeat(5,130px);overflow-x:auto;justify-content:start}.qslot{height:240px}.queue-bottom{position:relative}.queue-shell{min-height:590px}}
+
+.game-start-btn{margin-top:18px;width:100%;padding:14px 18px;border:1px solid #c1a45e;background:linear-gradient(#c3a965,#90763d);color:#111;font-weight:1000;cursor:pointer;letter-spacing:.5px}
+.loading-screen{position:fixed;inset:0;z-index:40;background:radial-gradient(circle at 50% 45%,#173b4d 0,#07151d 45%,#02070a 100%);display:grid;place-items:center;color:#f2eee5}.loading-inner{width:min(1180px,92vw);text-align:center}.loading-kicker{font-size:10px;letter-spacing:3px;color:#a99562;font-weight:900}.loading-inner h2{font-size:34px;margin:10px 0 24px}.loading-vs{display:grid;grid-template-columns:1fr 110px 1fr;gap:22px;align-items:center}.loading-team{padding:18px;border:1px solid #304752;background:#08151ddd;box-shadow:0 15px 50px #0006}.loading-team.enemy-loading{border-color:#513535}.loading-title{font-size:10px;letter-spacing:2px;color:#9aa9ab;margin-bottom:12px}.loading-player{display:grid;grid-template-columns:36px 1fr auto;gap:10px;align-items:center;text-align:left;padding:9px 4px;border-top:1px solid #21353d;font-size:12px}.loading-player b{font-size:10px;color:#7c8a8d;font-weight:600}.loading-avatar{width:30px;height:30px;display:grid;place-items:center;border-radius:50%;background:#102c39;border:1px solid #5d7d88}.loading-avatar.hidden{background:#171d21;color:#647278}.vs-mark{font-size:30px;font-weight:1000;color:#c7ab68}.loading-count{font-size:42px;font-weight:1000;margin-top:22px;color:#ead8a8}.loading-bar{height:5px;background:#15272e;margin:10px auto;width:min(620px,80vw);border:1px solid #304650}.loading-bar div{height:100%;background:#bba05f;transition:width .3s}.loading-inner p{color:#75858a;font-size:11px}
+.battle-screen{position:fixed;inset:0;z-index:45;background:#061118;color:#e9eee9;display:flex;flex-direction:column;overflow:hidden}.battle-header{height:76px;border-bottom:1px solid #29404a;background:#08161ddd;display:grid;grid-template-columns:1fr auto 1fr;align-items:center;padding:0 24px;gap:18px}.battle-header h2{margin:3px 0 0;font-size:19px}.battle-clock{font-size:24px;font-weight:1000;color:#ddc783}.battle-status{text-align:right;color:#87989d;font-size:11px}.battle-main{flex:1;display:grid;grid-template-columns:280px 1fr 280px;min-height:0}.battle-roster{padding:18px 14px;background:#07141b;border-right:1px solid #203740}.battle-roster.right{border-right:0;border-left:1px solid #203740}.battle-side-title{font-size:10px;letter-spacing:2px;color:#8b9ca1;margin:0 0 12px;padding:0 6px}.battle-unit-row{position:relative;display:grid;grid-template-columns:42px 1fr 62px;gap:9px;align-items:center;padding:9px 7px;margin-bottom:7px;border:1px solid #223b45;background:#0b1c24}.battle-unit-row.dead{opacity:.38}.battle-unit-row strong{display:block;font-size:12px}.battle-unit-row small{display:block;font-size:9px;color:#738287;margin-top:3px}.mini-stone{width:34px;height:34px;border-radius:50%;display:grid;place-items:center;border:1px solid #6c8a91;background:radial-gradient(circle at 35% 30%,#6e8990,#0b171d 65%);font-size:17px}.enemy-stone{background:radial-gradient(circle at 35% 30%,#7d4d4d,#180f11 65%);border-color:#855050}.hp-mini{height:4px;background:#172b31;border:1px solid #29434a}.hp-mini i{display:block;height:100%;background:#72a779}.battle-field{position:relative;overflow:hidden;background:radial-gradient(circle at 50% 50%,#17313a 0,#0a1b22 48%,#061016 100%)}.lane{position:absolute;left:6%;right:6%;top:25%;height:50%;border:1px solid #36525a;border-radius:120px;background:linear-gradient(90deg,#0b2029,#17313a 50%,#0b2029);box-shadow:inset 0 0 80px #0008}.lane-line{position:absolute;left:3%;right:3%;top:50%;height:2px;background:repeating-linear-gradient(90deg,#52727b 0 18px,transparent 18px 34px);opacity:.55}.midline{position:absolute;left:50%;top:8%;bottom:8%;width:1px;background:#b79d5c66}.base{position:absolute;top:43%;width:82px;height:82px;border-radius:50%;display:grid;place-items:center;font-size:26px;z-index:2}.blue-base{left:22px;border:2px solid #4a8aa2;background:#0b2632;box-shadow:0 0 35px #2c789055}.red-base{right:22px;border:2px solid #9a5353;background:#2b1115;box-shadow:0 0 35px #a34d4d55}.battle-token{position:absolute;top:47%;transform:translate(-50%,-50%);z-index:4;width:54px;height:54px;border-radius:50%;display:grid;place-items:center;font-size:21px;border:2px solid #7ca6b0;background:radial-gradient(circle at 35% 28%,#8da9af,#10232b 65%);box-shadow:0 5px 18px #0009;transition:left .5s ease,filter .3s}.battle-token.enemy{border-color:#a96666;background:radial-gradient(circle at 35% 28%,#aa6e6e,#281315 65%)}.battle-token.fallen{filter:grayscale(1);opacity:.25}.battle-token b{position:absolute;top:58px;white-space:nowrap;font-size:8px;color:#b6c2c3}.token-hp{position:absolute;bottom:-9px;width:48px;height:4px;background:#18262a;border:1px solid #3c555b}.token-hp em{display:block;height:100%;background:#73a879}.battle-hint{position:absolute;bottom:16px;left:50%;transform:translateX(-50%);font-size:9px;color:#718489;white-space:nowrap}.battle-log{position:absolute;left:18px;bottom:42px;width:280px;padding:8px 10px;background:#071219c9;border:1px solid #263e46;font-size:9px;color:#9aa7aa;line-height:1.7}.battle-log div{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+@media(max-width:800px){.loading-vs{grid-template-columns:1fr}.vs-mark{display:none}.battle-main{grid-template-columns:190px 1fr 190px}.battle-roster{padding:10px 7px}.battle-unit-row{grid-template-columns:34px 1fr}.hp-mini{display:none}.battle-token{width:44px;height:44px}.battle-log{width:220px}.queue-slots{grid-template-columns:repeat(5,130px);overflow-x:auto;justify-content:start}.qslot{height:240px}.queue-bottom{position:relative}.queue-shell{min-height:590px}}
 
 .matchfound{position:fixed;inset:0;z-index:20;background:radial-gradient(circle at 50% 48%,#173d52 0,#071722 38%,#02080c 80%);display:grid;place-items:center;color:#f4f0e6}
 .matchfound:before{content:"";position:absolute;width:min(58vw,650px);height:min(58vw,650px);border-radius:50%;border:2px solid #b8974e;box-shadow:0 0 80px #177ca055,inset 0 0 50px #0a8dc055}
@@ -186,7 +190,7 @@ const chars=[
 ["joguk","조국","임도현"],["mundolmaeng","문돌맹","이동기"],["nguyen","Nguyen Ngoc Tu","이재빈"],
 ["dwaemesa","돼메사","조시원"],["galio","갈리오","김정운"],["dage","다케스탄 출신","황재윤"]
 ].map(x=>({id:x[0],nickname:x[1],name:x[2]}));
-let mode="select", me=null, selected=[], party=[], chatMembers=[], replies=0, privateIndex=0, privateTargets=[], searching=false, queueSeconds=0, queueTimer=null, found=false, champOptions=[], teamPicks=[], chosenChamp=null, finalPool=[];
+let mode="select", me=null, selected=[], party=[], chatMembers=[], replies=0, privateIndex=0, privateTargets=[], searching=false, queueSeconds=0, queueTimer=null, found=false, champOptions=[], teamPicks=[], chosenChamp=null, finalPool=[], enemyTeam=[], loadingSeconds=10, loadingTimer=null, battleState=null, battleTimer=null;
 
 const app=document.getElementById("app");
 const shuffle=a=>[...a].sort(()=>Math.random()-.5);
@@ -239,8 +243,15 @@ if(party.some(c=>c.id==="molcho")) special.push(`<div class="chat-line"><span cl
 if(party.some(c=>c.id==="dwaemesa")) special.push(`<div class="chat-line"><span class="chat-tag">[전체]</span><strong>돼메사:</strong> 원딜 ㅈㅂㅈㅂㅈㅂㅈㅂ</div>`);
 body=`<div class="final-screen"><div class="final-top"><div class="picked-title"><small>무작위 총력전 · 아수라장</small><strong>챔피언 선택 완료</strong></div><div class="unused-pool" aria-label="남은 챔피언">${finalPool.map((c,i)=>`<div class="unused swap-zone" draggable="true" data-swap-type="pool" data-swap-index="${i}" ondragstart="dragStart(event,'pool',${i})" ondragover="allowDrop(event)" ondragenter="dragEnter(event)" ondragleave="dragLeave(event)" ondrop="dropSwap(event,'pool',${i})" ondragend="dragEnd(event)">${c.icon}</div>`).join("")}</div><div class="swap-hint">DRAG TO SWAP</div></div>
 <div class="final-main"><div class="final-team"><div class="side-title">우리 팀 · 선택한 챔피언</div>${party.map((c,i)=>`<div class="player-row swap-zone ${i===0?"you":""}" draggable="true" data-swap-type="team" data-swap-index="${i}" ondragstart="dragStart(event,'team',${i})" ondragover="allowDrop(event)" ondragenter="dragEnter(event)" ondragleave="dragLeave(event)" ondrop="dropSwap(event,'team',${i})" ondragend="dragEnd(event)"><div class="avatar">${teamPicks[i].icon}</div><div><strong>${c.nickname}</strong><small>${teamPicks[i].name}</small></div>${i===0?"<em>YOU</em>":""}</div>`).join("")}</div>
-<div class="final-center"><div class="final-label">YOUR CHAMPION</div><div class="hero-champ"><div class="hero-art">${chosenChamp.icon}</div><h2>${chosenChamp.name}</h2><p>${chosenChamp.title}</p></div><div class="final-chat"><div class="final-chat-head">CHAT</div><div class="final-chat-body">${tip}${special.join("")}</div></div></div>
+<div class="final-center"><div class="final-label">YOUR CHAMPION</div><div class="hero-champ"><div class="hero-art">${chosenChamp.icon}</div><h2>${chosenChamp.name}</h2><p>${chosenChamp.title}</p></div><div class="final-chat"><div class="final-chat-head">CHAT</div><div class="final-chat-body">${tip}${special.join("")}</div></div><button class="game-start-btn" onclick="startGame()">게임 시작하기</button></div>
 <div class="final-enemy"><div class="enemy-list"><div class="side-title">상대 팀 · 챔피언 비공개</div>${[1,2,3,4,5].map(i=>`<div class="enemy-row"><div class="enemy-hidden">?</div><strong>적${i}</strong></div>`).join("")}</div></div></div></div>`;
+}
+if(mode==="loading"){
+body=`<div class="loading-screen"><div class="loading-inner"><div class="loading-kicker">무작위 총력전 · 아수라장</div><h2>전투 준비 중</h2><div class="loading-vs"><div class="loading-team"><div class="loading-title">우리 팀</div>${teamPicks.map((c,i)=>`<div class="loading-player"><span class="loading-avatar">${c.icon}</span><span>${party[i].nickname}</span><b>${c.name}</b></div>`).join("")}</div><div class="vs-mark">VS</div><div class="loading-team enemy-loading"><div class="loading-title">적 팀</div>${enemyTeam.map((e,i)=>`<div class="loading-player"><span class="loading-avatar hidden">?</span><span>${e.nick}</span><b>${e.champ.name}</b></div>`).join("")}</div></div><div class="loading-count">${loadingSeconds}</div><div class="loading-bar"><div style="width:${((10-loadingSeconds)/10)*100}%"></div></div><p>전장이 준비되고 있습니다...</p></div></div>`;
+}
+if(mode==="battle"){
+const bs=battleState || {team:[],enemy:[],log:[]};
+body=`<div class="battle-screen"><div class="battle-header"><div><div class="eyebrow">AUGMENT ARENA · ARAM</div><h2>무작위 총력전 · 아수라장</h2></div><div class="battle-clock">${formatBattleTime(bs.time)}</div><div class="battle-status">${bs.status}</div></div><div class="battle-main"><aside class="battle-roster left"><div class="battle-side-title">우리 팀</div>${bs.team.map(u=>`<div class="battle-unit-row ${u.alive?"":"dead"}"><span class="mini-stone team-stone">${u.icon}</span><div><strong>${u.nick}</strong><small>${u.champ.name}</small></div><span class="hp-mini"><i style="width:${Math.max(0,u.hp)}%"></i></span></div>`).join("")}</aside><div class="battle-field"><div class="base blue-base">◆</div><div class="base red-base">◆</div><div class="lane"><div class="lane-line"></div>${bs.team.map(u=>unitHtml(u,'team')).join("")}${bs.enemy.map(u=>unitHtml(u,'enemy')).join("")}<div class="midline"></div></div><div class="battle-hint">바둑알 전투 관전 모드 · 유닛이 자동으로 이동하고 교전합니다</div><div class="battle-log">${bs.log.slice(-6).map(x=>`<div>${x}</div>`).join("")}</div></div><aside class="battle-roster right"><div class="battle-side-title">적 팀</div>${bs.enemy.map(u=>`<div class="battle-unit-row ${u.alive?"":"dead"}"><span class="mini-stone enemy-stone">?</span><div><strong>${u.nick}</strong><small>${u.champ.name}</small></div><span class="hp-mini"><i style="width:${Math.max(0,u.hp)}%"></i></span></div>`).join("")}</aside></div></div>`;
 }
 if(mode==="party"){
 body=`<div class="ready"><div class="mark">✓</div><div><div class="eyebrow">PARTY READY</div><h2>파티가 구성되었습니다.</h2><p>5명이 게임에 참가합니다.</p></div></div>
@@ -274,22 +285,15 @@ function stopQueue(){
   searching=false;found=false;clearInterval(queueTimer);render();
 }
 const champions=[
-{id:"janna",name:"잔나",title:"폭풍의 분노",icon:"🌪️"},{id:"kog",name:"코그모",title:"심연의 아귀",icon:"🟢"},
-{id:"ksante",name:"크산테",title:"나주마의 긍지",icon:"🛡️"},{id:"thresh",name:"쓰레쉬",title:"지옥의 간수",icon:"⛓️"},
-{id:"jinx",name:"징크스",title:"폭파 전문가",icon:"💥"},{id:"malph",name:"말파이트",title:"거석의 파편",icon:"🪨"},
-{id:"lux",name:"럭스",title:"광명의 소녀",icon:"✨"},{id:"brand",name:"브랜드",title:"타오르는 복수",icon:"🔥"},
-{id:"garen",name:"가렌",title:"데마시아의 힘",icon:"⚔️"},{id:"sona",name:"소나",title:"현의 명인",icon:"🎵"},
-{id:"milio",name:"밀리오",title:"포근한 불꽃",icon:"🔥"},{id:"ashe",name:"애쉬",title:"서리 궁수",icon:"🏹"},
-{id:"teemo",name:"티모",title:"날쌘 정찰병",icon:"🍄"},{id:"velkoz",name:"벨코즈",title:"공허의 눈",icon:"👁️"},
-{id:"urgot",name:"우르곳",title:"살상 병기",icon:"⚙️"},{id:"naafiri",name:"나피리",title:"백야의 추적자",icon:"🐺"},
-{id:"veigar",name:"베이가",title:"악의 작은 지배자",icon:"🪄"}
+{id:"janna",name:"잔나",title:"폭풍의 분노",icon:"🌪️"},{id:"kog",name:"코그모",title:"심연의 아귀",icon:"🟢"},{id:"ksante",name:"크산테",title:"나주마의 긍지",icon:"🛡️"},{id:"thresh",name:"쓰레쉬",title:"지옥의 간수",icon:"⛓️"},{id:"jinx",name:"징크스",title:"폭파 전문가",icon:"💥"},{id:"malph",name:"말파이트",title:"거석의 파편",icon:"🪨"},{id:"lux",name:"럭스",title:"광명의 소녀",icon:"✨"},{id:"brand",name:"브랜드",title:"타오르는 복수",icon:"🔥"},{id:"garen",name:"가렌",title:"데마시아의 힘",icon:"⚔️"},{id:"sona",name:"소나",title:"현의 명인",icon:"🎵"},{id:"milio",name:"밀리오",title:"포근한 불꽃",icon:"🔥"},{id:"ashe",name:"애쉬",title:"서리 궁수",icon:"🏹"},{id:"teemo",name:"티모",title:"날쌘 정찰병",icon:"🍄"},{id:"velkoz",name:"벨코즈",title:"공허의 눈",icon:"👁️"},{id:"urgot",name:"우르곳",title:"살상 병기",icon:"⚙️"},{id:"naafiri",name:"나피리",title:"백야의 추적자",icon:"🐺"},{id:"veigar",name:"베이가",title:"악의 작은 지배자",icon:"🪄"},
+{id:"ahri",name:"아리",title:"구미호",icon:"🦊"},{id:"akali",name:"아칼리",title:"섀도우 아트",icon:"🥷"},{id:"darius",name:"다리우스",title:"녹서스의 실력자",icon:"🪓"},{id:"vayne",name:"베인",title:"어둠 사냥꾼",icon:"🏹"},{id:"yuumi",name:"유미",title:"마법 고양이",icon:"🐱"},{id:"ekko",name:"에코",title:"시간의 소년",icon:"⏱️"},{id:"kennen",name:"케넨",title:"폭풍의 심장",icon:"⚡"},{id:"nami",name:"나미",title:"파도 소환사",icon:"🌊"},{id:"sett",name:"세트",title:"오른팔",icon:"👊"},{id:"ornn",name:"오른",title:"불의 대장장이",icon:"🔨"},{id:"morgana",name:"모르가나",title:"타락한 천사",icon:"🪽"},{id:"ezreal",name:"이즈리얼",title:"무모한 탐험가",icon:"🎯"},{id:"leona",name:"레오나",title:"여명의 빛",icon:"☀️"},{id:"samira",name:"사미라",title:"사막의 장미",icon:"🌹"},{id:"swain",name:"스웨인",title:"녹서스의 대장군",icon:"🦅"},{id:"rengar",name:"렝가",title:"추적하는 포식자",icon:"🐯"},{id:"tristana",name:"트리스타나",title:"요들 사수",icon:"💣"},{id:"zilean",name:"질리언",title:"시간의 수호자",icon:"⏳"},{id:"braum",name:"브라움",title:"프렐요드의 심장",icon:"🛡️"},{id:"karthus",name:"카서스",title:"죽음을 노래하는 자",icon:"💀"},{id:"caitlyn",name:"케이틀린",title:"필트오버의 보안관",icon:"🔫"},{id:"rakan",name:"라칸",title:"매혹하는 자",icon:"🪶"},{id:"xayah",name:"자야",title:"저항의 발톱",icon:"🪶"}
 ];
 function acceptMatch(){
   found=false; searching=false; queueSeconds=0;
   const pool=shuffle(champions);
   champOptions=pool.slice(0,3);
   teamPicks=[null,null,null,null,null];
-  chosenChamp=null; finalPool=[]; mode="champSelect"; render();
+  chosenChamp=null; finalPool=[]; enemyTeam=[]; mode="champSelect"; render();
 }
 function pickChampion(id){
   const chosen=champOptions.find(c=>c.id===id);
@@ -299,6 +303,32 @@ function pickChampion(id){
   for(let i=1;i<5;i++) teamPicks[i]=remaining[i-1];
   finalPool=remaining.slice(4,14);
   mode="finalChamp"; render();
+}
+function startGame(){
+  if(!chosenChamp)return;
+  clearInterval(loadingTimer); clearInterval(battleTimer);
+  const protectedIds=new Set(teamPicks.map(c=>c.id).concat(finalPool.map(c=>c.id)));
+  const enemyPool=shuffle(champions.filter(c=>!protectedIds.has(c.id)));
+  const enemyNames=shuffle(["원종나기","똥카게","회주잖아","발전병","Inkubus","Eternal Alomi","축구고트메시","한국기","돼지궁뎅이","아벌"]).slice(0,5);
+  enemyTeam=enemyNames.map((nick,i)=>({nick,champ:enemyPool[i]}));
+  loadingSeconds=10; mode="loading"; render();
+  loadingTimer=setInterval(()=>{loadingSeconds--; if(loadingSeconds<=0){clearInterval(loadingTimer); startBattle();} else render();},1000);
+}
+function formatBattleTime(t){const m=String(Math.floor(t/60)).padStart(2,"0"),s=String(t%60).padStart(2,"0");return `${m}:${s}`}
+function unitHtml(u,side){const x=Math.max(3,Math.min(97,u.x));return `<div class="battle-token ${side} ${u.alive?"":"fallen"}" style="left:${x}%"><span>${u.icon}</span><b>${u.nick}</b><i class="token-hp"><em style="width:${Math.max(0,u.hp)}%"></em></i></div>`}
+function startBattle(){
+  battleState={time:0,status:"전투 진행 중",team:teamPicks.map((c,i)=>({id:"t"+i,nick:party[i].nickname,champ:c,icon:c.icon,x:12+i*2,hp:100,alive:true,atk:3.5+Math.random()*2})),enemy:enemyTeam.map((e,i)=>({id:"e"+i,nick:e.nick,champ:e.champ,icon:e.champ.icon,x:88-i*2,hp:100,alive:true,atk:3.5+Math.random()*2})),log:["전투가 시작되었습니다."]};
+  mode="battle"; render(); clearInterval(battleTimer); battleTimer=setInterval(stepBattle,650);
+}
+function stepBattle(){
+  if(mode!=="battle"||!battleState)return;
+  const bs=battleState; bs.time++;
+  const livingT=bs.team.filter(u=>u.alive), livingE=bs.enemy.filter(u=>u.alive);
+  if(!livingT.length||!livingE.length){bs.status=livingT.length?"우리 팀 승리":"적 팀 승리"; render(); clearInterval(battleTimer); return;}
+  [...livingT,...livingE].forEach(u=>{const enemies=u.id[0]==="t"?livingE:livingT;if(!enemies.length)return;const target=enemies.reduce((a,b)=>Math.abs(b.x-u.x)<Math.abs(a.x-u.x)?b:a);const dist=Math.abs(target.x-u.x);if(dist>9)u.x+=(u.id[0]==="t"?1.4:-1.4);else {target.hp-=u.atk; if(target.hp<=0){target.hp=0;target.alive=false;bs.log.push(`${u.nick}이(가) ${target.nick}을(를) 쓰러뜨렸습니다.`);}}});
+  if(bs.time%8===0){bs.log.push("양 팀이 전장에서 교전 중입니다.")}
+  if(bs.time>90){bs.status="전투가 길어지고 있습니다"}
+  render();
 }
 function choose(id){me=chars.find(c=>c.id===id);render()}
 function goMethod(){mode="method";render()}
@@ -330,7 +360,7 @@ function dropSwap(e,targetType,targetIndex){e.preventDefault();e.stopPropagation
   chosenChamp=teamPicks[0];
   dragSource=null;render();
 }
-function reset(){clearInterval(queueTimer);dragSource=null;mode="select";me=null;selected=[];party=[];chatMembers=[];replies=0;privateIndex=0;searching=false;queueSeconds=0;found=false;champOptions=[];teamPicks=[];chosenChamp=null;finalPool=[];render()}
+function reset(){clearInterval(queueTimer);clearInterval(loadingTimer);clearInterval(battleTimer);dragSource=null;mode="select";me=null;selected=[];party=[];chatMembers=[];replies=0;privateIndex=0;searching=false;queueSeconds=0;found=false;champOptions=[];teamPicks=[];chosenChamp=null;finalPool=[];render()}
 render();
 </script>
 </body>
