@@ -5937,6 +5937,251 @@ voltaAssignAIStates=function(side,carrierName,force=false){
  }
 };
 
+
+/* ==============================================================
+   V115 — FUTSAL SHAPE / RESTART / KEEPER / COMBINATION ENGINE
+   - positional discipline first: rest-defense + role zones
+   - real restart states (kickoff / kick-in / corner / free-kick)
+   - game clock freezes while a restart is being prepared
+   - foul / yellow / second-yellow / straight-red
+   - counterattack forward bias + one-two / pivo wall passes
+   - keeper catch / punch / parry + team reset after a catch
+   - GOAL!!! overlay and proper centre restart after every goal
+   ============================================================== */
+const VOLTA_V115={
+ VERSION:'V115-FUTSAL-SHAPE-RESTARTS',
+ TEAM_SEPARATION_M:2.15,
+ RESTART_READY_M:1.55,
+ RESTART_FORCE_MS:5200,
+ GOAL_FX_MS:1900,
+ KEEPER_RESET_MS:1250,
+ COUNTER_MS:2200,
+ RED_PENALTY_SEC:120
+};
+function voltaV115AdvX(side,adv){return side==='home'?adv:100-adv}
+function voltaV115ClampAdv(side,x,min,max){const a=voltaClamp(voltaV113Forward(side,x),min,max);return voltaV115AdvX(side,a)}
+function voltaV115RoleLane(side,p){return voltaV113RoleInfo(side,p).lane||0}
+function voltaV115RoleBase(side,p,attackK=.5){
+ const r=voltaV113RoleInfo(side,p),lane=r.lane||0;let d,a,y;
+ if(r.role==='GK'){d=7.2;a=12.2;y=50}
+ else if(r.role==='FIXO'){d=21;a=35;y=50+lane*17}
+ else if(r.role==='ALA'){d=37;a=59;y=50+lane*29}
+ else {d=52;a=74;y=50+lane*12}
+ return {x:voltaV115AdvX(side,d+(a-d)*voltaClamp(attackK,0,1)),y:voltaClamp(y,13,87)};
+}
+voltaV113BasePoint=voltaV115RoleBase;
+
+function voltaV115ConstrainTarget(side,p,target,ai,base){
+ const r=voltaV113RoleInfo(side,p),st=ai?.state||'HOLD';let min=4,max=96,yMin=8,yMax=92;
+ if(st==='KICKER')return {x:voltaClamp(target.x,4,96),y:voltaClamp(target.y,4,96)};
+ if(r.role==='GK'){min=4;max=19;yMin=27;yMax=73}
+ else if(r.role==='FIXO'){
+  min=13;max=(st==='OVERLAP'?67:(st==='PRESS'?55:50));yMin=12;yMax=88;
+ }else if(r.role==='ALA'){min=25;max=(st==='FAR_POST'?91:82);yMin=9;yMax=91}
+ else {min=38;max=91;yMin=18;yMax=82}
+ let adv=voltaClamp(voltaV113Forward(side,target.x),min,max),y=voltaClamp(target.y,yMin,yMax);
+ // defenders stay attached to their own lane unless they are explicitly overlapping or emergency pressing.
+ if(r.role==='FIXO'&&!['OVERLAP','PRESS','KICKER','KICK_SUPPORT'].includes(st))y=voltaClamp(y,base.y-17,base.y+17);
+ return {x:voltaV115AdvX(side,adv),y};
+}
+
+voltaV113IntentTarget=function(side,p,ai,base){
+ const s=voltaMatchState,dir=voltaV113SideDir(side),ball=s.board.ball,r=voltaV113RoleInfo(side,p),pt=s.board.playerPos?.[side]?.[p.name]||base,owner=s.ballState?.ownerName,ownerPt=owner?s.board.playerPos?.[s.ballState.ownerSide]?.[owner]:ball;
+ let tx=base.x,ty=base.y,st=ai?.state||'HOLD';
+ if(ai?.receiveTarget){tx=ai.receiveTarget.x;ty=ai.receiveTarget.y}
+ else switch(st){
+  case 'CARRY': tx=pt.x+dir*(r.role==='PIVO'?3.0:2.1);ty=pt.y+(base.y-pt.y)*.10;break;
+  case 'GK_CARRY': tx=voltaV115AdvX(side,13.5);ty=voltaClamp(50+(ball.y-50)*.28,32,68);break;
+  case 'GK_SUPPORT': tx=voltaV115AdvX(side,14);ty=voltaClamp(50+((ownerPt?.y??50)-50)*.34,29,71);break;
+  case 'SHOW': tx=base.x+dir*3.5;ty=base.y+(ball.y-base.y)*.12;break;
+  case 'FIXO_SUPPORT': tx=base.x+dir*3.0;ty=base.y+(ball.y-base.y)*.10;break;
+  case 'REST_DEFENSE': tx=base.x-dir*2.0;ty=base.y+(ball.y-base.y)*.08;break;
+  case 'SUPPORT': tx=base.x+dir*2.5;ty=base.y+(ball.y-base.y)*.12;break;
+  case 'WIDE_SHOW': tx=base.x+dir*5.0;ty=50+(r.lane||1)*31;break;
+  case 'ROTATE': tx=base.x+dir*5.5;ty=50-(r.lane||1)*25;break;
+  case 'RUN': tx=base.x+dir*12;ty=50+(r.lane||1)*25;break;
+  case 'ONE_TWO_RUN': tx=pt.x+dir*11;ty=voltaClamp(base.y+(ball.y-base.y)*.12,11,89);break;
+  case 'OVERLAP': tx=base.x+dir*16;ty=50+(r.lane||1)*31;break;
+  case 'FAR_POST': tx=voltaV115AdvX(side,88);ty=(ownerPt?.y??50)<50?74:26;break;
+  case 'PIVO_SHOW': tx=base.x-dir*2;ty=voltaClamp(50+(ball.y-50)*.12,37,63);break;
+  case 'PIVO_PIN': tx=voltaV115AdvX(side,80);ty=voltaClamp(50+(ball.y-50)*.08,38,62);break;
+  case 'PRESS': tx=ball.x-dir*1.0;ty=ball.y;break;
+  case 'MID_BLOCK': tx=base.x-dir*2;ty=base.y+(ball.y-base.y)*.18;break;
+  case 'SCREEN': tx=base.x-dir*1.5;ty=voltaClamp(50+(ball.y-50)*.22,28,72);break;
+  case 'MARK':case 'TRACK':{
+   const q=s.board.playerPos?.[voltaOpponentSide(side)]?.[ai.targetName];if(q){tx=base.x*.55+(q.x-dir*2.0)*.45;ty=base.y*.50+q.y*.50}break;
+  }
+  case 'COVER': tx=base.x-dir*2.5;ty=base.y*.68+ball.y*.32;break;
+  case 'BACKCOURT': tx=base.x-dir*1.5;ty=base.y;break;
+  case 'RESET_BUILD': tx=base.x+dir*(r.role==='FIXO'?2:r.role==='ALA'?3:0);ty=base.y;break;
+  case 'KICKER':case 'KICK_SUPPORT': if(Number.isFinite(ai?.targetX)){tx=ai.targetX;ty=ai.targetY}break;
+  case 'GK_HOLD':{
+   const action=s.playAction,shotAgainst=action?.kind==='SHOT'&&voltaOpponentSide(action.side)===side,ownGoal=voltaV115AdvX(side,5),ballAdv=voltaV113Forward(side,ball?.x??50),closeK=voltaClamp((36-ballAdv)/30,0,1);
+   tx=voltaV115AdvX(side,7.0+closeK*3.0);ty=voltaClamp(50+((ball?.y??50)-50)*(.42+closeK*.14),27,73);
+   if(shotAgainst){ty=voltaClamp(action.keeperDiveY??action.end?.y??ty,23,77);tx=voltaV115AdvX(side,7.2)}break;
+  }
+ }
+ if(Number.isFinite(ai?.targetX)){tx=ai.targetX;ty=ai.targetY}
+ const target=voltaV115ConstrainTarget(side,p,{x:voltaClamp(tx,4,96),y:voltaClamp(ty,6,94)},ai,base);
+ return target;
+};
+
+voltaV113SeparateTeam=function(side){
+ const s=voltaMatchState,ps=s?.teams?.[side]?.players||[],pts=s?.board?.playerPos?.[side]||{},min=VOLTA_V115.TEAM_SEPARATION_M;
+ for(let i=0;i<ps.length;i++)for(let j=i+1;j<ps.length;j++){
+  const a=pts[ps[i].name],b=pts[ps[j].name];if(!a||!b)continue;let dxM=(b.x-a.x)*VOLTA_V113.PITCH_M_X,dyM=(b.y-a.y)*VOLTA_V113.PITCH_M_Y,d=Math.hypot(dxM,dyM);if(d>=min||d<.001)continue;
+  const push=(min-d)*.11,ux=dxM/d,uy=dyM/d;a.x=voltaClamp(a.x-(ux*push)/VOLTA_V113.PITCH_M_X,4,96);a.y=voltaClamp(a.y-(uy*push)/VOLTA_V113.PITCH_M_Y,6,94);b.x=voltaClamp(b.x+(ux*push)/VOLTA_V113.PITCH_M_X,4,96);b.y=voltaClamp(b.y+(uy*push)/VOLTA_V113.PITCH_M_Y,6,94);
+ }
+};
+
+// Team shape first, individual chase second. At least one FIXO always remains behind the ball.
+voltaAssignAIStates=function(side,carrierName,force=false){
+ const s=voltaMatchState;if(!s||!s.teams?.[side])return;const other=voltaOpponentSide(side),atk=s.teams[side].players,def=s.teams[other].players,ball=s.board?.ball||{x:50,y:50};
+ const carrier=atk.find(p=>p.name===carrierName)||atk.find(p=>p.name===s.ballState?.ownerName)||null,cpt=carrier?s.board.playerPos?.[side]?.[carrier.name]:ball,cRole=carrier?voltaV113RoleInfo(side,carrier):{role:'',lane:0},cAdv=voltaV113Forward(side,cpt?.x??50),mem=s.teamMemory?.[side]||{};
+ const fixos=atk.filter(p=>voltaV113RoleInfo(side,p).role==='FIXO'),alas=atk.filter(p=>voltaV113RoleInfo(side,p).role==='ALA'),counter=(mem.counterUntil||0)>voltaV113Now(),ballLane=(cpt?.y??50)<50?-1:1;
+ // During a keeper catch both teams first recover their shape instead of swarming the ball.
+ if(s.keeperHold&&voltaV113Now()<s.keeperHold.until){
+  for(const p of atk){const r=voltaV113RoleInfo(side,p);let st=p.position==='GK'?'GK_CARRY':'RESET_BUILD';if(side!==s.keeperHold.side)st=p.position==='GK'?'GK_HOLD':'BACKCOURT';voltaV113SetIntent(side,p,st,{reason:'keeper catch reset',minCommit:650,maxCommit:1050},true)}
+  for(const p of def){const r=voltaV113RoleInfo(other,p);let st=p.position==='GK'?'GK_CARRY':'RESET_BUILD';if(other!==s.keeperHold.side)st=p.position==='GK'?'GK_HOLD':'BACKCOURT';voltaV113SetIntent(other,p,st,{reason:'keeper catch reset',minCommit:650,maxCommit:1050},true)}
+  return;
+ }
+ let overlapName=mem.overlapName&&mem.overlapUntil>voltaV113Now()?mem.overlapName:null;
+ if(!overlapName&&carrier&&cRole.role==='ALA'&&cAdv>46&&cAdv<72&&s.teams[side].tactics?.mentality==='attacking'&&Math.random()<.09){const same=fixos.find(p=>Math.sign(voltaV113RoleInfo(side,p).lane||1)===Math.sign(cRole.lane||1));if(same){overlapName=same.name;mem.overlapName=same.name;mem.overlapUntil=voltaV113Now()+1800}}
+ for(const p of atk){
+  if(carrier&&p.name===carrier.name){voltaV113SetIntent(side,p,p.position==='GK'?'GK_CARRY':'CARRY',{reason:'ball carrier',minCommit:450,maxCommit:760},true);continue}
+  const r=voltaV113RoleInfo(side,p);
+  if(r.role==='GK'){voltaV113SetIntent(side,p,'GK_SUPPORT',{reason:'keeper build-up outlet',minCommit:850,maxCommit:1400},force);continue}
+  if(r.role==='FIXO'){
+   let st=counter?(Math.sign(r.lane||1)===ballLane?'FIXO_SUPPORT':'REST_DEFENSE'):(p.name===overlapName?'OVERLAP':'REST_DEFENSE');if(carrier?.position==='GK')st='SHOW';else if(!counter&&st!=='OVERLAP'&&fixos.length===1)st='FIXO_SUPPORT';else if(!counter&&st!=='OVERLAP'&&cRole.role!=='FIXO'&&Math.sign(r.lane||1)===Math.sign(cRole.lane||1))st='FIXO_SUPPORT';
+   voltaV113SetIntent(side,p,st,{reason:counter?'counter rest-defence':st==='OVERLAP'?'controlled overlap':'rest defence / rear support',minCommit:850,maxCommit:1550},force);continue;
+  }
+  if(r.role==='PIVO'){voltaV113SetIntent(side,p,counter?'PIVO_PIN':(cAdv>59?'PIVO_PIN':'PIVO_SHOW'),{reason:counter?'counter high outlet':'pivot reference',minCommit:850,maxCommit:1450},force);continue}
+  if(r.role==='ALA'){
+   let st=counter?(Math.sign(r.lane||1)===ballLane?'SUPPORT':'RUN'):'SUPPORT';if(!counter){if(carrier?.position==='GK')st='WIDE_SHOW';else if(cRole.role==='ALA')st=cAdv>64?'FAR_POST':'ROTATE';else if(cRole.role==='FIXO')st=Math.sign(r.lane||1)===Math.sign(cRole.lane||1)?'SUPPORT':'RUN';else if(cRole.role==='PIVO')st=cAdv>66?'FAR_POST':'SUPPORT'}
+   voltaV113SetIntent(side,p,st,{reason:counter?'counter width / forward run':'lane width / rotation',minCommit:800,maxCommit:1450},force);continue;
+  }
+ }
+ // Defending side. Prefer PIVO/ALA pressure; FIXO only steps in its own defensive zone.
+ const dBallAdv=voltaV113Forward(other,ball.x),danger=dBallAdv<43,defField=def.filter(p=>p.position!=='GK'),candidates=defField.map(p=>{const pt=s.board.playerPos?.[other]?.[p.name],r=voltaV113RoleInfo(other,p),d=pt?voltaV113DistM(pt,ball):99,bias=r.role==='FIXO'?(danger?1.5:6):r.role==='PIVO'?-1.4:0;return {p,r,pt,cost:d+bias}}).filter(x=>x.pt).sort((a,b)=>a.cost-b.cost);
+ let presser=candidates[0]?.p||null;if(presser&&voltaV113RoleInfo(other,presser).role==='FIXO'&&!danger){presser=candidates.find(x=>x.r.role!=='FIXO')?.p||presser}
+ const defFixos=def.filter(p=>voltaV113RoleInfo(other,p).role==='FIXO'),pressFixo=presser&&voltaV113RoleInfo(other,presser).role==='FIXO'?presser:null;
+ let coverFixo=defFixos.find(p=>p.name!==pressFixo?.name)||defFixos[0]||null;
+ const threats=atk.filter(p=>p.position!=='GK').slice().sort((a,b)=>{const ap=s.board.playerPos?.[side]?.[a.name],bp=s.board.playerPos?.[side]?.[b.name];return voltaV113Forward(side,bp?.x||50)-voltaV113Forward(side,ap?.x||50)});
+ for(const p of def){
+  const r=voltaV113RoleInfo(other,p);if(r.role==='GK'){voltaV113SetIntent(other,p,'GK_HOLD',{reason:'goal angle',minCommit:760,maxCommit:1200},force);continue}
+  if(p.name===presser?.name){voltaV113SetIntent(other,p,'PRESS',{targetName:carrier?.name||null,reason:'front pressure',minCommit:620,maxCommit:980},force);continue}
+  if(r.role==='FIXO'){const st=p.name===coverFixo?.name?'COVER':'REST_DEFENSE';voltaV113SetIntent(other,p,st,{targetName:threats[0]?.name||carrier?.name||null,reason:'fixo line protection',minCommit:850,maxCommit:1450},force);continue}
+  if(r.role==='ALA'){const target=threats.find(x=>voltaV113RoleInfo(side,x).role==='ALA'&&Math.sign(voltaV113RoleInfo(side,x).lane||1)===Math.sign(r.lane||1))||threats[0];voltaV113SetIntent(other,p,'TRACK',{targetName:target?.name||carrier?.name||null,reason:'lane track',minCommit:820,maxCommit:1350},force);continue}
+  voltaV113SetIntent(other,p,'SCREEN',{targetName:carrier?.name||null,reason:'screen central pass',minCommit:780,maxCommit:1280},force);
+ }
+};
+
+const voltaV114EnsureTelemetryBase=voltaV113EnsureTelemetry;
+voltaV113EnsureTelemetry=function(){const t=voltaV114EnsureTelemetryBase();if(t){t.corners=t.corners||{home:0,away:0};t.freeKicks=t.freeKicks||{home:0,away:0};t.oneTwos=t.oneTwos||{home:0,away:0};t.cards=t.cards||{home:{yellow:0,red:0},away:{yellow:0,red:0}};t.keeperActions=t.keeperActions||{home:{catch:0,punch:0,parry:0},away:{catch:0,punch:0,parry:0}};t.counterPasses=t.counterPasses||{home:{forward:0,lateral:0,back:0},away:{forward:0,lateral:0,back:0}}}return t};
+const voltaV114EngineInitBase=voltaV113EngineInit;
+voltaV113EngineInit=function(){voltaV114EngineInitBase();const s=voltaMatchState;if(!s)return;s.engine.version=VOLTA_V115.VERSION;s.oneTwo=null;s.keeperHold=null;s.goalFx=null;s.keeperFx=null;s.sentOff={home:[],away:[]};s.redPenalty={home:null,away:null};s.teamMemory.home.counterUntil=0;s.teamMemory.away.counterUntil=0;voltaV113EnsureTelemetry()};
+
+const voltaV114StartPossessionBase=voltaStartPossession;
+voltaStartPossession=function(side,carrierName=null){const s=voltaMatchState,prev=s?.board?.possession;voltaV114StartPossessionBase(side,carrierName);if(!s||!s.teamMemory?.[side])return;const carrier=voltaGetPlayer(side,s.ballState?.ownerName);if(prev&&prev!==side&&carrier&&carrier.position!=='GK'&&!s.setPiece){s.teamMemory[side].counterUntil=voltaV113Now()+VOLTA_V115.COUNTER_MS;s.teamMemory[side].counterFrom=s.board.ball?.x??50;s.highlight='⚡ 공을 탈취했습니다. 빠른 전환!'} };
+
+const voltaV114RecordPassBase=voltaV113RecordPass;
+voltaV113RecordPass=function(side,from,to,start,end){const s=voltaMatchState,m=s?.teamMemory?.[side]||{},counter=(m.counterUntil||0)>voltaV113Now(),dir=voltaV113SideDir(side),progress=(end.x-start.x)*dir;voltaV114RecordPassBase(side,from,to,start,end);if(counter){const t=voltaV113EnsureTelemetry(),bucket=progress>3?'forward':progress<-2?'back':'lateral';t.counterPasses[side][bucket]++}};
+
+const voltaV114PassOptionsBase=voltaV113PassOptions;
+voltaV113PassOptions=function(side,carrier){const arr=voltaV114PassOptionsBase(side,carrier),s=voltaMatchState,m=s?.teamMemory?.[side]||{},counter=(m.counterUntil||0)>voltaV113Now(),adv=voltaV113Forward(side,s?.board?.playerPos?.[side]?.[carrier.name]?.x??50),pressure=voltaV113PressureAt(side,s?.board?.playerPos?.[side]?.[carrier.name]||s.board.ball);for(const o of arr){if(counter){if(o.forward>5)o.score+=28+Math.min(22,o.forward*.85);else if(o.forward<-1)o.score-=62;else o.score+=8;if(o.to.position==='GK'&&pressure<.80)o.score-=50}else if(adv>62&&o.forward<-3&&pressure<.60)o.score-=8;if(o.to.position==='GK'&&adv>65&&pressure<.65)o.score-=8}return arr.sort((a,b)=>b.score-a.score)};
+
+function voltaV115ArmOneTwo(side,from,to){const s=voltaMatchState;if(!s||!from||!to||from.position==='GK'||to.position==='GK')return;const a=s.board.playerPos?.[side]?.[from.name],b=s.board.playerPos?.[side]?.[to.name];if(!a||!b||voltaV113DistM(a,b)>10.5)return;const p=to.position==='FW'?.33:.18;if(Math.random()>p)return;s.oneTwo={side,runner:from.name,wall:to.name,until:voltaV113Now()+1750};voltaV113SetIntent(side,from,'ONE_TWO_RUN',{reason:'one-two return run',minCommit:1000,maxCommit:1600},true)}
+function voltaV115TryOneTwo(side,carrier){const s=voltaMatchState,ot=s?.oneTwo;if(!ot||ot.side!==side||ot.wall!==carrier.name||voltaV113Now()>ot.until){if(ot&&voltaV113Now()>ot.until)s.oneTwo=null;return false}const runner=voltaGetPlayer(side,ot.runner);if(!runner){s.oneTwo=null;return false}const rp=s.board.playerPos?.[side]?.[runner.name],cp=s.board.playerPos?.[side]?.[carrier.name];if(!rp||!cp){s.oneTwo=null;return false}const dir=voltaV113SideDir(side),target={x:voltaClamp(rp.x+dir*4.2,5,95),y:rp.y},risk=voltaV113LanePressure(side,cp,target);if(risk>.72)return false;s.oneTwo=null;const t=voltaV113EnsureTelemetry();if(t)t.oneTwos[side]++;voltaLog(`🔁 ${carrier.name} ↔ ${runner.name}, 원투패스로 압박을 벗겨냅니다!`,'attack');return voltaV113StartPass(side,carrier,runner,{target})}
+
+function voltaV115RestartAnchor(side,p,type,kickerName,spot,attackingSide){
+ const r=voltaV113RoleInfo(side,p),lane=r.lane||0,isAtk=side===attackingSide,dir=voltaV113SideDir(side);if(p.name===kickerName)return {x:spot.x,y:spot.y};
+ if(type==='KICKOFF'){
+  let adv=r.role==='GK'?7.5:r.role==='FIXO'?23:r.role==='ALA'?38:44,y=r.role==='GK'?50:r.role==='FIXO'?50+lane*17:r.role==='ALA'?50+lane*27:50;
+  if(!isAtk&&r.role==='PIVO')adv=41;return {x:voltaV115AdvX(side,adv),y:voltaClamp(y,15,85)};
+ }
+ if(isAtk){
+  if(r.role==='GK')return voltaV115RoleBase(side,p,.2);
+  if(r.role==='FIXO')return {x:voltaV115AdvX(side,30+(lane>0?2:0)),y:50+lane*18};
+  if(r.role==='ALA'){if(type==='CORNER')return {x:voltaV115AdvX(side,lane<0?77:70),y:50+lane*24};return {x:voltaClamp(spot.x+dir*(7+(lane>0?4:0)),5,95),y:voltaClamp(50+lane*24,14,86)}}
+  return {x:voltaV115AdvX(side,type==='CORNER'?84:72),y:type==='CORNER'?(spot.y<50?35:65):50};
+ }
+ if(r.role==='GK')return {x:voltaV115AdvX(side,6.8),y:voltaClamp(50+(spot.y-50)*.18,32,68)};
+ if(r.role==='FIXO')return {x:voltaV115AdvX(side,19),y:50+lane*16};
+ if(r.role==='ALA')return {x:voltaV115AdvX(side,34),y:50+lane*25};
+ return {x:voltaV115AdvX(side,44),y:50};
+}
+function voltaV115ApplyRestartShape(sp){const s=voltaMatchState;if(!s||!sp)return;for(const side of ['home','away'])for(const p of s.teams[side].players){const q=voltaV115RestartAnchor(side,p,sp.type,side===sp.side?sp.kickerName:null,sp.spot,sp.side);voltaV113SetIntent(side,p,p.name===sp.kickerName&&side===sp.side?'KICKER':'KICK_SUPPORT',{targetX:q.x,targetY:q.y,reason:`${sp.type} shape`,minCommit:1000,maxCommit:1800},true)}}
+function voltaV115RestartReady(sp){const s=voltaMatchState;if(!s)return false;for(const side of ['home','away'])for(const p of s.teams[side].players){const ai=s.aiStates?.[side]?.[p.name],pt=s.board.playerPos?.[side]?.[p.name];if(!ai||!pt||!Number.isFinite(ai.targetX))continue;if(voltaV113DistM(pt,{x:ai.targetX,y:ai.targetY})>VOLTA_V115.RESTART_READY_M)return false}return true}
+function voltaV115MakeSetPiece(type,side,kicker,spot,extra={}){const s=voltaMatchState,now=voltaV113Now();s.playAction=null;s.setPiece={type,side,kickerName:kicker.name,spot:{...spot},startedAt:now,readyAt:now+(extra.readyMs||850),forceAt:now+VOLTA_V115.RESTART_FORCE_MS,...extra};s.board.possession=side;s.board.ball={...spot};s.board.ballTarget={...spot};s.ballState={ownerSide:null,ownerName:null,state:'setpiece',targetName:null};voltaV115ApplyRestartShape(s.setPiece);return s.setPiece}
+
+voltaV113StartKickoff=function(side,label='킥오프'){const s=voltaMatchState,field=s.teams[side].players.filter(p=>p.position!=='GK'),kicker=field.find(p=>p.position==='FW')||field.find(p=>p.position==='MF')||field[0];if(!kicker)return voltaStartPossession(side);const sp=voltaV115MakeSetPiece('KICKOFF',side,kicker,{x:50,y:50},{readyMs:s.goalFx?VOLTA_V115.GOAL_FX_MS:950,label});if(!(s.goalFx&&voltaV113Now()<s.goalFx.until))voltaSetCaption(`${label} — 양 팀이 자기 위치로 돌아갑니다.`,'normal');return sp};
+voltaV113StartKickIn=function(side,x,y,reason='터치라인 아웃'){const s=voltaMatchState,spot={x:voltaClamp(x,7,93),y:y<50?4.5:95.5},kicker=voltaV113NearestPlayer(side,spot,p=>p.position!=='GK');if(!kicker)return voltaStartPossession(side);const sp=voltaV115MakeSetPiece('KICK_IN',side,kicker,spot,{readyMs:750,reason});const t=voltaV113EnsureTelemetry();if(t){t.kickIns[side]++;s.stats[side].kickIns=(s.stats[side].kickIns||0)+1}voltaLog(`↪ ${reason}. ${kicker.name}의 킥인 — 시간이 멈추고 대형을 잡습니다.`,'normal');return sp};
+voltaV113StartGoalClearance=function(side){const s=voltaMatchState,gk=s.teams[side].players.find(p=>p.position==='GK');if(!gk)return voltaStartPossession(side);const spot={x:voltaV115AdvX(side,9),y:50},sp=voltaV115MakeSetPiece('GOAL_CLEARANCE',side,gk,spot,{readyMs:850});const t=voltaV113EnsureTelemetry();if(t){t.goalClearances[side]=(t.goalClearances[side]||0)+1;t.gkTouches[side]=(t.gkTouches[side]||0)+1;s.stats[side].gkTouches=(s.stats[side].gkTouches||0)+1}voltaLog(`🧤 ${gk.name}, 골클리어런스. 양 팀이 대형을 잡습니다.`,'normal');return sp};
+function voltaV115StartCorner(side,y,reason='수비에 맞고 골라인 아웃'){const s=voltaMatchState,spot={x:voltaV115AdvX(side,95.5),y:y<50?4.5:95.5},kicker=voltaV113NearestPlayer(side,spot,p=>p.position!=='GK');if(!kicker)return false;const sp=voltaV115MakeSetPiece('CORNER',side,kicker,spot,{readyMs:900,reason});const t=voltaV113EnsureTelemetry();if(t)t.corners[side]++;s.stats[side].corners=(s.stats[side].corners||0)+1;voltaLog(`🚩 코너킥! ${kicker.name}이(가) 올릴 준비를 합니다.`,'attack');return sp}
+function voltaV115StartFreeKick(side,spot,opt={}){const s=voltaMatchState,ten=!!opt.tenMeter;if(ten)spot={x:voltaV115AdvX(side,75),y:50};spot={x:voltaClamp(spot.x,8,92),y:voltaClamp(spot.y,12,88)};const kicker=voltaPickWeighted(s.teams[side].players.filter(p=>p.position!=='GK'),p=>p.stats.shooting*.48+p.stats.passing*.30+p.hidden.judgement*.22);if(!kicker)return false;const sp=voltaV115MakeSetPiece(ten?'TEN_METER':'FREE_KICK',side,kicker,spot,{readyMs:950,direct:ten||opt.direct});const t=voltaV113EnsureTelemetry();if(t)t.freeKicks[side]++;s.stats[side].freeKicks=(s.stats[side].freeKicks||0)+1;voltaLog(ten?`🎯 10m 직접 프리킥 — ${kicker.name}이(가) 준비합니다.`:`⚽ 프리킥 — ${kicker.name}이(가) 재개합니다.`,'foul');return sp}
+
+voltaV113HandleSetPiece=function(now){const s=voltaMatchState,sp=s?.setPiece;if(!sp)return false;if(now<sp.readyAt)return true;if(!voltaV115RestartReady(sp)&&now<sp.forceAt)return true;const side=sp.side,kicker=voltaGetPlayer(side,sp.kickerName);if(!kicker){s.setPiece=null;voltaStartPossession(side);return false}
+ if(sp.type==='GOAL_CLEARANCE'){s.setPiece=null;s.ballState={ownerSide:side,ownerName:kicker.name,state:'controlled',targetName:null};s.board.possession=side;voltaAssignAIStates(side,kicker.name,true);voltaV113ScheduleDecision(600);return false}
+ if(sp.type==='KICK_IN'&&now-sp.startedAt>3900&&Math.random()<.08){s.setPiece=null;const other=voltaOpponentSide(side);voltaLog('⏱ 4초 킥인 규정 위반! 공격권이 넘어갑니다.','turnover');voltaV113StartKickIn(other,sp.spot.x,sp.spot.y,'4초 규정 위반');return true}
+ if(sp.type==='TEN_METER'){s.setPiece=null;return voltaV113StartShot(side,kicker,{setPiece:true,tenMeter:true})}
+ if(sp.type==='FREE_KICK'){const geom=voltaV114GoalGeom(side,sp.spot),direct=sp.direct||(geom.dist<10.5&&kicker.stats.shooting>58&&Math.random()<.62);if(direct){s.setPiece=null;return voltaV113StartShot(side,kicker,{setPiece:true})}}
+ let opts=voltaV113PassOptions(side,kicker).filter(o=>o.to.name!==kicker.name);if(sp.type==='KICKOFF')opts=opts.sort((a,b)=>Math.abs(a.forward)-Math.abs(b.forward)||b.score-a.score);if(sp.type==='CORNER')opts=opts.sort((a,b)=>{const ar=voltaV113RoleInfo(side,a.to).role,br=voltaV113RoleInfo(side,b.to).role;return (br==='PIVO'?2:br==='ALA'?1:0)-(ar==='PIVO'?2:ar==='ALA'?1:0)||b.score-a.score});const plan=opts[0];s.setPiece=null;if(plan)return voltaV113StartPass(side,kicker,plan.to,{target:plan.target,setPiece:sp.type});voltaStartPossession(side,kicker.name);return false};
+
+function voltaV115SendOff(side,p,reason){const s=voltaMatchState,team=s.teams[side];if(!p||p.sentOff)return;p.sentOff=true;s.sentOff=s.sentOff||{home:[],away:[]};s.sentOff[side].push({name:p.name,reason,time:s.time,position:p.position});team.players=team.players.filter(x=>x.name!==p.name);if(s.board.playerPos?.[side])delete s.board.playerPos[side][p.name];if(s.aiStates?.[side])delete s.aiStates[side][p.name];s.redPenalty=s.redPenalty||{home:null,away:null};s.redPenalty[side]={until:s.time+VOLTA_V115.RED_PENALTY_SEC,position:p.position,name:p.name};voltaMatchStat(side,'red');const t=voltaV113EnsureTelemetry();if(t)t.cards[side].red++;voltaLog(`🟥 ${p.name} 퇴장! ${reason||'위험한 반칙'} — 2분간 수적 열세입니다.`,'danger')}
+function voltaV115Card(side,p,severity){if(!p)return;const s=voltaMatchState;let straight=severity>.90||Math.random()<.018,yellow=severity>.58||Math.random()<.16;if(straight){voltaV115SendOff(side,p,'심한 반칙');return}if(yellow){p.yellowCards=(p.yellowCards||0)+1;voltaMatchStat(side,'yellow');const t=voltaV113EnsureTelemetry();if(t)t.cards[side].yellow++;if(p.yellowCards>=2){voltaLog(`🟨 두 번째 경고 — ${p.name}`,'foul');voltaV115SendOff(side,p,'경고 누적');return}voltaLog(`🟨 ${p.name} 경고.`,'foul')}}
+function voltaV115CheckRedPenalty(){const s=voltaMatchState;if(!s)return;for(const side of ['home','away']){const pen=s.redPenalty?.[side];if(!pen||s.time<pen.until)continue;const team=s.teams[side],bench=team.bench||[],idx=bench.findIndex(p=>(p.condition||0)>=20);if(idx>=0&&team.players.length<VOLTA_V114.TEAM_SIZE){const p=bench.splice(idx,1)[0];p.position=pen.position==='GK'?'DF':pen.position;p.appeared=true;team.players.push(p);const b=voltaV113BasePoint(side,p,.1);s.board.playerPos[side][p.name]={x:b.x,y:b.y,vx:0,vy:0};voltaLog(`✅ 2분 퇴장 페널티 종료 — ${p.name} 투입, 다시 6명이 됩니다.`,'normal')}else voltaLog('⏱ 퇴장 페널티 2분이 지났지만 투입 가능한 교체 선수가 없습니다.','normal');s.redPenalty[side]=null}}
+
+voltaV113MaybeFoul=function(attackingSide){const s=voltaMatchState,defSide=voltaOpponentSide(attackingSide),carrier=voltaGetPlayer(attackingSide,s.ballState?.ownerName),cpt=carrier&&s.board.playerPos?.[attackingSide]?.[carrier.name];if(!carrier||!cpt)return false;const tackler=voltaV113NearestPlayer(defSide,cpt,p=>p.position!=='GK'),tpt=tackler&&s.board.playerPos?.[defSide]?.[tackler.name];if(!tackler||!tpt)return false;const dist=voltaV113DistM(tpt,cpt);if(dist>2.35)return false;const press=s.teams[defSide].tactics?.pressing==='high'?1.35:s.teams[defSide].tactics?.pressing==='low'?.72:1,carrierDrib=(carrier.hidden?.dribbling||50)/100,tackle=(tackler.stats?.physical||50)/100;const chance=.075*press*voltaClamp(1.35-dist/3.2,.45,1.2)*(1+carrierDrib*.25);if(Math.random()>chance)return false;s.fouls[defSide]=(s.fouls[defSide]||0)+1;voltaMatchStat(defSide,'fouls');const severity=voltaClamp(Math.random()*.72+(press>1?0.10:0)+(tackle-carrierDrib)*.12,0,1);voltaLog(`${tackler.name}의 반칙! ${defSide==='home'?s.homeName:s.awayName} 누적 ${s.fouls[defSide]}번째 파울.`,'foul');voltaV115Card(defSide,tackler,severity);const ten=s.fouls[defSide]>=6;voltaV115StartFreeKick(attackingSide,cpt,{tenMeter:ten,direct:!ten&&voltaV114GoalGeom(attackingSide,cpt).dist<9});return true};
+voltaDoFoul=function(attackingSide){return voltaV113MaybeFoul(attackingSide)};
+
+const voltaV114ShotModelBase=voltaV113ShotModel;
+voltaV113ShotModel=function(side,shooter,opt={}){const m=voltaV114ShotModelBase(side,shooter,opt),s=voltaMatchState,keeper=m.keeper,saveQ=keeper?((keeper.stats.keeper||50)*.70+(keeper.hidden?.concentration||50)*.30):50;if(m.outcome==='SAVE'){const catchP=voltaClamp(.42+(saveQ-55)/130+(m.distGoal>8?.10:-.05),.30,.68),r=Math.random();m.keeperAction=r<catchP?'CATCH':r<catchP+.20?'PUNCH':'PARRY'}return m};
+voltaV113StartShot=function(side,shooter,opt={}){const s=voltaMatchState;if(!s||s.playAction||!shooter)return false;const model=voltaV113ShotModel(side,shooter,opt),start={...s.board.ball},dist=voltaV113DistM(start,model.end),now=voltaV113Now(),dur=voltaClamp(350+dist*9,370,670)/Math.sqrt(s.speed||1);voltaMatchStat(side,'shots');if(!['MISS','WOODWORK'].includes(model.outcome))voltaMatchStat(side,'onTarget');if(model.outcome==='WOODWORK')voltaMatchStat(side,'woodwork');s.playAction={kind:'SHOT',side,actor:shooter.name,outcome:model.outcome,keeper:model.keeper?.name||'',keeperDiveY:model.keeperDiveY,keeperAction:model.keeperAction||null,distGoal:model.distGoal,start,end:model.end,startedAt:now,endAt:now+dur,setPiece:!!opt.setPiece,tenMeter:!!opt.tenMeter};s.ballState={ownerSide:null,ownerName:null,state:'shot',targetName:null};s.board.ballTarget={...model.end};s.keeperFx={side:voltaOpponentSide(side),name:model.keeper?.name||'',type:'DIVE',until:now+dur+180};voltaSetCaption(`${shooter.name} 슈팅!`,'shot');const tel=voltaV113EnsureTelemetry();if(tel)tel.actions.shot++;return true};
+
+function voltaV115BeginKeeperCatch(side,gk){const s=voltaMatchState,now=voltaV113Now();voltaStartPossession(side,gk?.name||null);s.keeperHold={side,keeperName:gk?.name||null,until:now+VOLTA_V115.KEEPER_RESET_MS};s.keeperFx={side,name:gk?.name||'',type:'CATCH',until:now+1000};voltaAssignAIStates(side,gk?.name||null,true);voltaV113ScheduleDecision(VOLTA_V115.KEEPER_RESET_MS+120)}
+
+voltaV113ResolveAction=function(now=voltaV113Now()){const s=voltaMatchState,a=s?.playAction;if(!a||now<a.endAt)return false;s.playAction=null;
+ if(a.kind==='PASS'){
+  const from=voltaGetPlayer(a.side,a.from),to=voltaGetPlayer(a.side,a.to);if(a.success&&to){voltaMatchStat(a.side,'passesCompleted');s.lastPasser=s.lastPasser||{};s.lastPasser[a.side]=from||null;s.board.ball={...a.plannedEnd};s.ballState={ownerSide:a.side,ownerName:to.name,state:'controlled',targetName:null};s.board.possession=a.side;s.flow=s.flow||{side:a.side,phase:'build',passes:0,carrier:to.name,age:0};s.flow.side=a.side;s.flow.carrier=to.name;s.flow.passes=(s.flow.passes||0)+1;s.flow.age=0;voltaV113RecordPass(a.side,from||to,to,a.start,a.plannedEnd);voltaV115ArmOneTwo(a.side,from,to);voltaAssignAIStates(a.side,to.name,false);voltaV113ScheduleDecision(470)}
+  else{if(voltaV113MaybeOutAfterPass(a))return true;const other=voltaOpponentSide(a.side),inter=voltaGetPlayer(other,a.interceptor)||voltaV113NearestPlayer(other,a.end,p=>p.position!=='GK');voltaLog(`${a.from}의 패스를 ${inter?.name||'상대 수비'}가 끊어냅니다. 역습 전환!`,'turnover');voltaStartPossession(other,inter?.name||null)}
+ }else if(a.kind==='DRIBBLE'){
+  const carrier=voltaGetPlayer(a.side,a.actor),other=voltaOpponentSide(a.side),def=voltaGetPlayer(other,a.defender);if(a.success&&carrier){s.momentum[a.side]=voltaClamp(s.momentum[a.side]+1.5,-100,100);voltaAssignAIStates(a.side,carrier.name,false);voltaV113ScheduleDecision(400)}else{const pt=carrier?s.board.playerPos[a.side][carrier.name]:s.board.ball;if(Math.abs(pt?.y-50)>30&&Math.random()<.34){voltaV113StartKickIn(other,pt.x,pt.y,'드리블 경합 끝에 터치라인 아웃');return true}voltaLog(`${def?.name||'수비수'}이(가) 돌파를 막고 역습으로 전환합니다.`,'turnover');voltaStartPossession(other,def?.name||null)}
+ }else if(a.kind==='SHOT'){
+  const side=a.side,other=voltaOpponentSide(side),sh=voltaGetPlayer(side,a.actor),gk=voltaGetPlayer(other,a.keeper);s.flow=null;
+  if(a.outcome==='GOAL'){
+   s.score[side]++;voltaMatchStat(side,'goals');if(sh){sh.matchGoals=(sh.matchGoals||0)+1;sh.rating=(sh.rating||6.5)+.85}const passer=s.lastPasser?.[side];if(passer&&sh&&passer.name!==sh.name){passer.matchAssists=(passer.matchAssists||0)+1;passer.rating=(passer.rating||6.5)+.32}s.goalFx={active:true,side,scorer:sh?.name||a.actor,until:now+VOLTA_V115.GOAL_FX_MS};voltaLog(`⚽ GOAL!!! ${sh?.name||a.actor}! ${s.homeName} ${s.score.home} : ${s.score.away} ${s.awayName}`,'goal');s.momentum[side]=voltaClamp(s.momentum[side]+10,-100,100);s.momentum[other]=voltaClamp(s.momentum[other]-10,-100,100);if(s.redPenalty?.[other])s.redPenalty[other].until=Math.min(s.redPenalty[other].until,s.time);voltaV113StartKickoff(other,'실점 후 중앙 킥오프');
+  }else if(a.outcome==='SAVE'){
+   voltaMatchStat(other,'saves');if(gk){gk.matchSaves=(gk.matchSaves||0)+1;gk.rating=(gk.rating||6.5)+.18}const ka=a.keeperAction||'CATCH',tel=voltaV113EnsureTelemetry();if(tel&&tel.keeperActions?.[other])tel.keeperActions[other][ka.toLowerCase()]++;
+   if(ka==='CATCH'){voltaLog(`🧤 CATCH! ${gk?.name||'GK'}가 공을 품에 안습니다. 양 팀이 다시 대형을 잡습니다.`,'save');voltaV115BeginKeeperCatch(other,gk)}
+   else if(ka==='PUNCH'){voltaLog(`🥊 ${gk?.name||'GK'}가 펀칭으로 쳐냅니다!`,'save');s.keeperFx={side:other,name:gk?.name||'',type:'PUNCH',until:now+900};if(Math.random()<.46)voltaV115StartCorner(side,a.end.y,'GK 펀칭 후 골라인 아웃');else voltaStartPossession(Math.random()<.42?side:other)}
+   else{voltaLog(`🧤 ${gk?.name||'GK'}가 쳐냈습니다! 세컨드볼 경합.`,'save');s.keeperFx={side:other,name:gk?.name||'',type:'PARRY',until:now+850};if(Math.random()<.28)voltaV115StartCorner(side,a.end.y,'GK 선방 후 골라인 아웃');else voltaStartPossession(Math.random()<.52?side:other)}
+  }else if(a.outcome==='BLOCK'){voltaMatchStat(other,'blocks');voltaLog(`${sh?.name||a.actor}의 슈팅이 수비 블록에 걸립니다.`,'shot');if((a.distGoal||99)<11&&Math.random()<.38)voltaV115StartCorner(side,a.end.y,'수비 블록 후 골라인 아웃');else voltaStartPossession(Math.random()<.38?side:other)}
+  else if(a.outcome==='WOODWORK'){voltaLog(`🥅 ${sh?.name||a.actor}의 슈팅이 골대를 강타하고 나갑니다.`,'shot');voltaV113StartGoalClearance(other)}
+  else{voltaLog(`${sh?.name||a.actor}의 슈팅이 골문을 벗어납니다.`,'shot');voltaV113StartGoalClearance(other)}
+ }
+ if(s.engine?.pendingHalftime&&!s.playAction&&!s.setPiece){voltaV113EnterHalftime();return true}return true};
+
+voltaV113Decision=function(){const s=voltaMatchState;if(!s||s.finished||s.halftime?.active||s.tacticalTimeout?.active||s.setPiece||s.playAction)return;const now=voltaV113Now();if(s.keeperHold){if(now<s.keeperHold.until){voltaV113ScheduleDecision(250);return}s.keeperHold=null}
+ const side=s.ballState?.ownerSide||s.board.possession,carrier=side?voltaGetPlayer(side,s.ballState?.ownerName):null;if(!side||!carrier){voltaStartPossession(voltaChoosePossession());return}voltaAssignAIStates(side,carrier.name,false);if(voltaV113MaybeFoul(side)){voltaV113ScheduleDecision(650);return}if(voltaV115TryOneTwo(side,carrier))return;
+ const pt=s.board.playerPos[side][carrier.name],pressure=voltaV113PressureAt(side,pt),opts=voltaV113PassOptions(side,carrier),best=opts[0],m=s.teamMemory[side]||{},counter=(m.counterUntil||0)>now;if(carrier.position==='GK'){const plan=opts[0];if(plan){voltaV113StartPass(side,carrier,plan.to,{target:plan.target});return}voltaV113ScheduleDecision(350);return}
+ const sh=voltaV114ShotChance(side,carrier,pt,pressure);if(sh.chance>0&&Math.random()<sh.chance){voltaV113StartShot(side,carrier);return}
+ if(counter){const fwd=opts.find(o=>o.forward>4&&o.recvPress<.78&&o.laneRisk<.82);if(fwd){voltaV113StartPass(side,carrier,fwd.to,{target:fwd.target});return}const flat=opts.find(o=>o.forward>=-1&&o.to.position!=='GK');const cDrib=(carrier.hidden.dribbling*.55+carrier.stats.speed*.25+carrier.hidden.judgement*.20)-pressure*18;if(cDrib>48&&pressure<.76){voltaV113StartDribble(side,carrier);return}if(flat){voltaV113StartPass(side,carrier,flat.to,{target:flat.target});return}}
+ if(best&&(pressure>.50||(m.recycle||0)>=3||Math.random()<.66)){voltaV113StartPass(side,carrier,best.to,{target:best.target});return}const dribQ=(carrier.hidden.dribbling*.55+carrier.stats.speed*.25+carrier.hidden.judgement*.20)-pressure*22;if(voltaV113Forward(side,pt.x)<84&&dribQ>55&&Math.random()<.28){voltaV113StartDribble(side,carrier);return}if(best){voltaV113StartPass(side,carrier,best.to,{target:best.target});return}voltaV113ScheduleDecision(320)};
+
+// Freeze match clock for all dead-ball restarts. The visual loop keeps running so players visibly take their positions.
+voltaMatchTick=function(){const s=voltaMatchState;if(!s||s.finished)return;const now=voltaV113Now();if(s.tacticalTimeout?.active){voltaSyncLiveDom();return}if(s.aiTimeoutUntil&&now<s.aiTimeoutUntil){voltaSyncLiveDom();return}else if(s.aiTimeoutUntil&&now>=s.aiTimeoutUntil){s.aiTimeoutUntil=0;s.tacticalTimeout=null;voltaLog('▶ 상대 작전타임 종료 · 경기 재개','timeout')}if(s.halftime?.active){voltaSyncLiveDom();return}if(s.playAction&&now>=s.playAction.endAt)voltaV113ResolveAction(now);if(s.timeoutPending&&!s.playAction&&!s.setPiece){voltaV114OpenTimeout(s.timeoutPending.side,true);return}if(s.engine?.pendingHalftime){s.time=1200;if(!s.playAction){if(s.setPiece){s.setPiece=null;s.ballState={ownerSide:null,ownerName:null,state:'dead',targetName:null}}voltaV113EnterHalftime();return}voltaSyncLiveDom();return}if(s.setPiece){voltaV113HandleSetPiece(now);voltaSyncLiveDom();return}
+ const simDt=VOLTA_V113.SIM_SEC_PER_TICK*(s.speed||1);if(s.time<1200&&s.time+simDt>=1200){s.time=1200;if(s.playAction){s.engine.pendingHalftime=true;voltaSyncLiveDom();return}else{voltaV113EnterHalftime();return}}else if(s.time>=1200)s.time=Math.min(2400,s.time+simDt);else s.time+=simDt;voltaFatigueTick('home',simDt);voltaFatigueTick('away',simDt);voltaV115CheckRedPenalty();if(!s.playAction&&now>=(s.engine?.nextDecisionAt||0))voltaV113Decision();voltaMaybeTimeout();if(s.time>=2400&&!s.playAction&&!s.setPiece){voltaFinishMatch();return}voltaSyncLiveDom()};
+
+const voltaV114PitchHtmlBase=voltaPitchHtml;
+voltaPitchHtml=function(){const s=voltaMatchState,sp=s?.setPiece;const labels={KICK_IN:'↪ KICK-IN',GOAL_CLEARANCE:'🧤 GOAL CLEARANCE',KICKOFF:'⚽ KICK-OFF',CORNER:'🚩 CORNER KICK',FREE_KICK:'⚽ FREE KICK',TEN_METER:'🎯 10m FREE KICK'},badge=`<div id="voltaSetpieceBadge" class="volta-setpiece-badge" style="display:${sp?'block':'none'}">${sp?(labels[sp.type]||sp.type):''}</div>`,goal=`<div id="voltaGoalFx" class="volta-goal-fx" style="display:none"><b>GOAL!!!</b><span></span></div>`;return `<div class="volta-match-pitch-wrap"><canvas id="voltaMatchCanvas" width="900" height="560"></canvas>${badge}${goal}${voltaV113HalftimeHtml()}${voltaV114TimeoutHtml()}</div>`};
+function voltaV115UpdateOverlays(){const s=voltaMatchState;if(!s)return;const fx=document.getElementById('voltaGoalFx');if(fx){const on=s.goalFx&&voltaV113Now()<s.goalFx.until;fx.style.display=on?'grid':'none';if(on){const b=fx.querySelector('b'),sp=fx.querySelector('span');if(b)b.textContent='GOAL!!!';if(sp)sp.textContent=`${s.goalFx.scorer} · ${s.score.home} : ${s.score.away}`}}const bd=document.getElementById('voltaSetpieceBadge');if(bd){const labels={KICK_IN:'↪ KICK-IN',GOAL_CLEARANCE:'🧤 GOAL CLEARANCE',KICKOFF:'⚽ KICK-OFF',CORNER:'🚩 CORNER KICK',FREE_KICK:'⚽ FREE KICK',TEN_METER:'🎯 10m FREE KICK'};bd.style.display=s.setPiece?'block':'none';bd.textContent=s.setPiece?(labels[s.setPiece.type]||s.setPiece.type):''}}
+const voltaV114SyncDomCurrent=voltaSyncLiveDom;
+voltaSyncLiveDom=function(){const r=voltaV114SyncDomCurrent();try{voltaV115UpdateOverlays()}catch(e){}return r};
+
+const voltaV114DrawCanvasCurrent=voltaDrawMatchCanvas;
+voltaDrawMatchCanvas=function(now=voltaV113Now()){voltaV114DrawCanvasCurrent(now);const s=voltaMatchState,fx=s?.keeperFx;if(!fx||now>fx.until)return;const cv=document.getElementById('voltaMatchCanvas'),pt=s.board.playerPos?.[fx.side]?.[fx.name];if(!cv||!pt)return;const ctx=cv.getContext('2d'),q=voltaCanvasPos(cv,pt.x,pt.y);ctx.save();ctx.font='900 13px Segoe UI, Malgun Gothic, sans-serif';ctx.textAlign='center';ctx.fillStyle=fx.type==='CATCH'?'#ffe57a':'#d8f2ff';ctx.strokeStyle='rgba(0,0,0,.75)';ctx.lineWidth=4;const txt=fx.type==='DIVE'?'🧤 DIVE':fx.type==='CATCH'?'🧤 CATCH!':fx.type==='PUNCH'?'🥊 PUNCH!':'🧤 PARRY!';ctx.strokeText(txt,q.x,q.y-30);ctx.fillText(txt,q.x,q.y-30);ctx.restore()};
+
+
 </script>
 
 <style id="v114-6v6">
@@ -5944,5 +6189,13 @@ voltaAssignAIStates=function(side,carrierName,force=false){
 .volta-timeout-overlay{position:absolute;inset:6px;z-index:24;display:grid;place-items:center;padding:14px;background:rgba(4,9,12,.92);backdrop-filter:blur(4px);border-radius:7px}.volta-timeout-card{width:min(790px,96%);max-height:96%;overflow:auto;padding:20px;border:1px solid #596873;background:linear-gradient(180deg,#18232c,#0c1319);box-shadow:0 22px 70px #000d}.volta-timeout-card h2{margin:4px 0 4px;font-size:25px}.v114-tac-note{margin:0 0 13px;color:#9eafb9;font-size:10px;line-height:1.55}
 .v114-tac-layout{display:grid;grid-template-columns:minmax(270px,.9fr) minmax(320px,1.1fr);gap:15px;align-items:start}.volta-timeout-pitch{position:relative;min-height:330px;border:2px solid #9bbca2;background:linear-gradient(90deg,#245f3b,#2d7046);overflow:hidden}.volta-timeout-pitch:before{content:'';position:absolute;inset:4%;border:1px solid #c8dfcd}.volta-timeout-pitch .v114-midline{position:absolute;left:4%;right:4%;top:50%;border-top:1px solid #c8dfcd}.v114-tac-player{position:absolute;transform:translate(-50%,-50%);width:92px;padding:7px 6px;border:2px solid #eef5f0;border-radius:8px;background:#196eaa;color:#fff;text-align:center;box-shadow:0 5px 12px #0008;z-index:2}.v114-tac-player.GK{background:#b18a27}.v114-tac-player b{display:block;font-size:10px}.v114-tac-player span{display:block;margin-top:2px;font-size:8px;opacity:.9}.v114-tac-player i{display:block;height:3px;margin-top:4px;background:#0005;border-radius:4px;overflow:hidden}.v114-tac-player i u{display:block;height:100%;background:#65da77}.v114-role-editor{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:10px}.v114-role-editor label{display:grid;grid-template-columns:1fr auto;gap:2px 7px;align-items:center;padding:6px 7px;border:1px solid #2d3a43;background:#10171d}.v114-role-editor label b{font-size:9px}.v114-role-editor label span{font-size:8px;color:#8fa0aa}.v114-role-editor select{grid-column:1/-1;width:100%;padding:5px;background:#0c1318;border:1px solid #40505b;color:#e4ebef}.v114-tac-sub{display:grid;grid-template-columns:1fr 1fr auto;gap:5px}.v114-tac-sub select{min-width:0;padding:6px;background:#0c1318;border:1px solid #40505b;color:#e4ebef}.v114-tac-sub button{padding:6px 10px;border:1px solid #2d8953;background:#1c633a;color:#fff;font-weight:900}.v114-no-bench{color:#82919b;font-size:9px}.v114-halftime{width:min(820px,96%)!important}.v114-halftime .v114-tac-layout{margin-top:14px}
 @media(max-width:780px){.v114-tac-layout{grid-template-columns:1fr}.volta-timeout-pitch{min-height:270px}.v114-role-editor{grid-template-columns:1fr}.v114-tac-sub{grid-template-columns:1fr}.volta-timeout-btn{order:4;margin-left:0!important}}
+</style>
+<style id="v115-futsal-engine">
+.volta-goal-fx{position:absolute;inset:6px;z-index:23;place-items:center;align-content:center;pointer-events:none;background:radial-gradient(circle at 50% 50%,rgba(227,179,65,.20),rgba(4,9,12,.08) 42%,rgba(4,9,12,0) 70%);animation:v115GoalBg .34s ease-out}
+.volta-goal-fx b{display:block;font-size:clamp(42px,8vw,92px);font-weight:1000;letter-spacing:3px;color:#fff4bb;text-shadow:0 0 8px #fff,0 0 24px #e3b341,0 4px 18px #000;animation:v115GoalPop .62s cubic-bezier(.18,.86,.22,1.22)}
+.volta-goal-fx span{display:block;margin-top:7px;padding:5px 12px;border-radius:999px;background:rgba(8,12,10,.72);border:1px solid rgba(227,179,65,.6);font-size:13px;font-weight:900;color:#f6df9d;text-shadow:0 2px 5px #000}
+@keyframes v115GoalPop{0%{transform:scale(.55);opacity:0}55%{transform:scale(1.12);opacity:1}100%{transform:scale(1)}}
+@keyframes v115GoalBg{0%{opacity:0}100%{opacity:1}}
+.volta-setpiece-badge{z-index:22!important;min-width:130px;text-align:center;font-weight:1000!important;letter-spacing:.6px!important;box-shadow:0 5px 18px #0008}
 </style>
 
