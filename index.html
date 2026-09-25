@@ -1062,6 +1062,192 @@ const VOLTA_LEAGUES=[
  {grade:'S',name:'GOAT 리그',unlock:'K 해외 리그 우승',teams:[
   {name:'GOAT',players:['호날두','메시','지단','말디니','야신']}]}
 ];
+
+const VOLTA_PLAYER_PRESETS={
+ '박성진':{shooting:72,speed:68,passing:78,physical:76,keeper:24},
+ '이동기':{shooting:74,speed:88,passing:72,physical:63,keeper:18},
+ '김병욱':{shooting:78,speed:70,passing:75,physical:70,keeper:22},
+ '황재윤':{shooting:80,speed:82,passing:69,physical:74,keeper:20},
+ '이재빈':{shooting:76,speed:79,passing:81,physical:61,keeper:18},
+ '임도현':{shooting:67,speed:72,passing:84,physical:79,keeper:25},
+ '정다운':{shooting:71,speed:76,passing:82,physical:73,keeper:21},
+ '조시원':{shooting:82,speed:77,passing:68,physical:58,keeper:20},
+ '김정운':{shooting:69,speed:65,passing:74,physical:82,keeper:55},
+ '이동근':{shooting:61,speed:68,passing:65,physical:67,keeper:30},
+ '강산하':{shooting:55,speed:72,passing:62,physical:71,keeper:20},
+ '박광수':{shooting:64,speed:60,passing:66,physical:75,keeper:25},
+ '김영웅':{shooting:42,speed:55,passing:61,physical:70,keeper:72}
+};
+const VOLTA_GRADE_BASE={G:56,F:62,E:68,D:73,C:78,B:83,A:88,S:94};
+const VOLTA_COACH_STYLES={
+ '신진원':{name:'공격형',attack:1.07,defense:.96,build:1.00,press:1.03},
+ '문제영':{name:'밸런스형',attack:1.01,defense:1.01,build:1.01,press:1.00},
+ '차정수':{name:'수비형',attack:.96,defense:1.08,build:1.00,press:.98},
+ '이추노':{name:'압박형',attack:1.02,defense:1.00,build:.98,press:1.08},
+ '성기준':{name:'점유형',attack:1.00,defense:1.00,build:1.08,press:.98}
+};
+const VOLTA_TACTIC_LABELS={mentality:{defensive:'수비적',balanced:'균형',attacking:'공격적'},pressing:{low:'낮음',normal:'보통',high:'높음'},passing:{short:'짧은 패스',balanced:'균형',fast:'빠른 전개'},focus:{center:'중앙',wide:'측면',pivo:'피보 중심'}};
+let voltaMatchState=null,voltaMatchTimer=null;
+function voltaHash(str){let h=2166136261>>>0;for(const ch of String(str||'')){h^=ch.charCodeAt(0);h=Math.imul(h,16777619)}return h>>>0}
+function voltaClamp(v,a,b){return Math.max(a,Math.min(b,v))}
+function voltaDerivedStats(p){
+ const s=p.stats||p;const seed=voltaHash(p.name||'player');
+ const n=(shift)=>((seed>>shift)%11)-5;
+ return {dribbling:voltaClamp(Math.round(s.speed*.48+s.shooting*.20+s.passing*.20+s.physical*.12+n(0)),20,99),judgement:voltaClamp(Math.round(s.passing*.52+s.physical*.18+s.shooting*.18+s.speed*.12+n(3)),20,99),workrate:voltaClamp(Math.round(s.speed*.38+s.physical*.42+s.passing*.20+n(6)),20,99),concentration:voltaClamp(Math.round(s.passing*.30+s.physical*.35+s.keeper*.20+s.shooting*.15+n(9)),20,99),finishing:voltaClamp(Math.round(s.shooting*.66+s.speed*.12+s.passing*.12+s.physical*.10+n(12)),20,99)}
+}
+function voltaProfile(name,leagueGrade='G',hero=false){
+ const preset=VOLTA_PLAYER_PRESETS[name];
+ let stats;
+ if(preset)stats={...preset};
+ else{
+   const base=VOLTA_GRADE_BASE[leagueGrade]||56,seed=voltaHash(name),d=(n)=>((seed>>(n*3))%11)-5;
+   stats={shooting:voltaClamp(base+d(0),30,98),speed:voltaClamp(base+d(1),30,98),passing:voltaClamp(base+d(2),30,98),physical:voltaClamp(base+d(3),30,98),keeper:voltaClamp(base-28+d(4),12,90)};
+ }
+ const condition=hero?78:74;
+ const p={name,hero,stats,condition};p.hidden=voltaDerivedStats(p);return p;
+}
+function voltaEnsureRosterProfiles(){
+ if(!voltaSave)return;
+ const grade=voltaLeague()?.grade||'G';
+ voltaSave.roster=(voltaSave.roster||[]).map((p,i)=>{
+   if(p.stats&&p.hidden)return p;
+   const q=voltaProfile(p.name,grade,!!p.hero);return {...p,...q,hero:!!p.hero,condition:Number.isFinite(p.condition)?p.condition:q.condition};
+ });
+ if(!voltaSave.tactics)voltaSave.tactics={mentality:'balanced',pressing:'normal',passing:'balanced',focus:'center'};
+}
+function voltaStatValue(name,key){return VOLTA_PLAYER_PRESETS[name]?.[key]??'-'}
+function voltaAssignPositions(players){
+ const list=players.map(p=>({...p,hidden:p.hidden||voltaDerivedStats(p)}));
+ let gk=list.reduce((a,b)=>(b.stats.keeper>a.stats.keeper?b:a),list[0]);
+ const out=list.filter(x=>x.name!==gk.name);
+ out.sort((a,b)=>((b.stats.physical+b.hidden.workrate+b.hidden.judgement)-(a.stats.physical+a.hidden.workrate+a.hidden.judgement)));
+ const fixo=out.shift();
+ out.sort((a,b)=>((b.stats.speed+b.stats.passing+b.hidden.dribbling)-(a.stats.speed+a.stats.passing+a.hidden.dribbling)));
+ const ala1=out.shift(),ala2=out.shift(),pivo=out.shift();
+ return [{...gk,position:'GK'},{...fixo,position:'FIXO'},{...ala1,position:'ALA'},{...ala2,position:'ALA'},{...pivo,position:'PIVO'}];
+}
+function voltaConditionMult(p){const c=Number(p.condition)||70;return c>=90?1.08:c>=80?1.04:c>=60?1:c>=40?.95:.90}
+function voltaMoraleMult(){const m=Number(voltaSave?.teamMorale)||65;return m>=90?1.05:m>=70?1.02:m>=50?1:m>=30?.97:.93}
+function voltaTacticMods(t){
+ const m={attack:1,defense:1,build:1,press:1,risk:1};
+ if(t.mentality==='attacking'){m.attack*=1.08;m.defense*=.94;m.risk*=1.10}else if(t.mentality==='defensive'){m.attack*=.94;m.defense*=1.08;m.risk*=.92}
+ if(t.pressing==='high'){m.press*=1.10;m.defense*=1.03;m.risk*=1.06}else if(t.pressing==='low'){m.press*=.94;m.defense*=.98;m.risk*=.95}
+ if(t.passing==='short'){m.build*=1.08;m.attack*=.98}else if(t.passing==='fast'){m.build*=.97;m.attack*=1.06;m.risk*=1.07}
+ if(t.focus==='pivo')m.attack*=1.04; else if(t.focus==='wide')m.build*=1.03;
+ return m;
+}
+function voltaTeamMetrics(players,tactics,coachName,moraleMult=1){
+ const pos=voltaAssignPositions(players),field=pos.filter(p=>p.position!=='GK'),gk=pos[0];
+ const eff=(p,v)=>v*voltaConditionMult(p)*moraleMult;
+ const avg=(arr,fn)=>arr.reduce((s,x)=>s+fn(x),0)/Math.max(1,arr.length);
+ let attack=avg(field,p=>eff(p,p.stats.shooting*.35+p.stats.speed*.20+p.stats.passing*.15+p.hidden.dribbling*.15+p.hidden.finishing*.15));
+ let defense=avg(field,p=>eff(p,p.stats.physical*.30+p.stats.speed*.20+p.hidden.judgement*.20+p.hidden.workrate*.15+p.hidden.concentration*.15));
+ let build=avg(field,p=>eff(p,p.stats.passing*.45+p.hidden.judgement*.25+p.stats.speed*.15+p.stats.physical*.15));
+ let keeper=eff(gk,gk.stats.keeper*.70+gk.hidden.concentration*.20+gk.hidden.judgement*.10);
+ let organization=avg(pos,p=>eff(p,p.hidden.judgement*.35+p.hidden.workrate*.30+p.hidden.concentration*.35));
+ const tm=voltaTacticMods(tactics||{mentality:'balanced',pressing:'normal',passing:'balanced',focus:'center'}),cm=VOLTA_COACH_STYLES[coachName]||VOLTA_COACH_STYLES['문제영'];
+ attack*=tm.attack*cm.attack;defense*=tm.defense*cm.defense;build*=tm.build*cm.build;organization*=cm.press;
+ return {attack,defense,build,keeper,organization,press:tm.press*cm.press,risk:tm.risk,positions:pos};
+}
+function voltaOpponentPlayers(team,grade){
+ const arr=(team?.players||[]).map((name,i)=>voltaProfile(name,grade,false));
+ if(arr.length){let best=arr.reduce((a,b)=>b.stats.keeper>a.stats.keeper?b:a,arr[0]);best.stats.keeper=voltaClamp((VOLTA_GRADE_BASE[grade]||56)+8,40,98);best.hidden=voltaDerivedStats(best)}
+ return arr;
+}
+function voltaEnemyTactics(grade,teamName){
+ const h=voltaHash(teamName);const arr=['defensive','balanced','attacking'],press=['low','normal','high'],pass=['short','balanced','fast'],focus=['center','wide','pivo'];
+ return {mentality:arr[h%3],pressing:press[(h>>3)%3],passing:pass[(h>>6)%3],focus:focus[(h>>9)%3]};
+}
+function voltaFormatClock(sec){sec=Math.max(0,Math.min(2400,Math.floor(sec)));const half=sec<1200?'전반':'후반';const inHalf=sec<1200?sec:sec-1200;return `${half} ${String(Math.floor(inHalf/60)).padStart(2,'0')}:${String(inHalf%60).padStart(2,'0')}`}
+function voltaPickWeighted(players,key){const weights=players.map(p=>Math.max(1,key(p)));const sum=weights.reduce((a,b)=>a+b,0);let r=Math.random()*sum;for(let i=0;i<players.length;i++){r-=weights[i];if(r<=0)return players[i]}return players[players.length-1]}
+function voltaLog(text,type='normal'){const s=voltaMatchState;if(!s)return;s.logs.push({time:voltaFormatClock(s.time),text,type});if(s.logs.length>80)s.logs.shift();s.highlight=text}
+function voltaMatchStat(side,key,inc=1){voltaMatchState.stats[side][key]=(voltaMatchState.stats[side][key]||0)+inc}
+function voltaPossession(side){voltaMatchState.stats[side].possessions++}
+function voltaOpponentSide(side){return side==='home'?'away':'home'}
+function voltaDoFoul(attackingSide){
+ const s=voltaMatchState,def=voltaOpponentSide(attackingSide),defTeam=s.teams[def],attTeam=s.teams[attackingSide];
+ const foulChance=.055*defTeam.metrics.press*(defTeam.metrics.risk||1);
+ if(Math.random()>foulChance)return false;
+ s.fouls[def]++;voltaMatchStat(def,'fouls');
+ const tackler=voltaPickWeighted(defTeam.players,p=>p.stats.physical+p.hidden.workrate);
+ voltaLog(`${tackler.name}의 반칙! ${def==='home'?s.homeName:s.awayName}의 ${s.fouls[def]}번째 누적 파울입니다.`,'foul');
+ if(Math.random()<.12){voltaMatchStat(def,'yellow');voltaLog(`🟨 ${tackler.name}에게 경고가 주어집니다.`,'foul')}
+ if(s.fouls[def]>=6){
+   voltaLog(`⚠️ ${def==='home'?s.homeName:s.awayName}의 6번째 누적 파울! 10m 직접 프리킥입니다.`,'danger');
+   voltaDoShot(attackingSide,true,true);return true;
+ }
+ if(Math.random()<.32){voltaDoShot(attackingSide,true,false);return true}
+ return true;
+}
+function voltaDoRestart(side){const s=voltaMatchState,team=s.teams[side];const avgConc=team.players.reduce((a,p)=>a+p.hidden.concentration,0)/5;if(Math.random()<Math.max(.01,(65-avgConc)/900)){voltaLog(`4초 안에 재개하지 못했습니다. 공격권이 넘어갑니다.`,'turnover');return voltaOpponentSide(side)}return side}
+function voltaDoShot(side,setPiece=false,tenMeter=false){
+ const s=voltaMatchState,other=voltaOpponentSide(side),atk=s.teams[side],def=s.teams[other];
+ const shooter=voltaPickWeighted(atk.players.filter(p=>p.position!=='GK'),p=>p.stats.shooting+p.hidden.finishing+(p.position==='PIVO'?18:0));
+ const keeper=def.players.find(p=>p.position==='GK')||def.players[0];
+ const qualityRoll=Math.random();let quality=qualityRoll<.16?'매우 어려움':qualityRoll<.44?'어려움':qualityRoll<.82?'보통':'결정적';
+ if(setPiece)quality=tenMeter?'결정적':'보통';
+ const q={"매우 어려움":.65,"어려움":.82,"보통":1,"결정적":1.22}[quality];
+ const momentum=1+(s.momentum[side]/100)*.06;
+ const threat=(shooter.stats.shooting*.45+shooter.hidden.finishing*.30+shooter.hidden.judgement*.10+shooter.stats.physical*.05+shooter.stats.speed*.10)*voltaConditionMult(shooter)*q*momentum;
+ const save=(keeper.stats.keeper*.68+keeper.hidden.concentration*.20+keeper.hidden.judgement*.12)*voltaConditionMult(keeper);
+ voltaMatchStat(side,'shots');
+ const onTargetChance=voltaClamp(.40+(threat-55)/120, .28,.83);
+ const onTarget=Math.random()<onTargetChance;
+ if(!onTarget){
+   if(Math.random()<.22){voltaMatchStat(side,'woodwork');voltaLog(`🥅 ${shooter.name}의 슈팅이 골대를 강타합니다!`,'shot');s.momentum[side]=voltaClamp(s.momentum[side]+4,-100,100)}else voltaLog(`${shooter.name}의 슈팅이 골문을 벗어납니다.`,'shot');return;
+ }
+ voltaMatchStat(side,'onTarget');
+ const goalProb=voltaClamp(.19+(threat-save)/150+(quality==='결정적'?.11:0)+(tenMeter?.08:0),.06,.62);
+ if(Math.random()<goalProb){
+   s.score[side]++;voltaMatchStat(side,'goals');shooter.matchGoals=(shooter.matchGoals||0)+1;shooter.rating=(shooter.rating||6.5)+.8;
+   voltaLog(`⚽ 골!! ${shooter.name}이(가) 득점합니다! ${s.homeName} ${s.score.home} : ${s.score.away} ${s.awayName}`,'goal');
+   s.momentum[side]=voltaClamp(s.momentum[side]+12,-100,100);s.momentum[other]=voltaClamp(s.momentum[other]-12,-100,100);
+ }else{
+   const miss=Math.random();if(miss<.62){voltaMatchStat(other,'saves');keeper.rating=(keeper.rating||6.5)+.18;voltaLog(`🧤 ${shooter.name}의 슈팅! ${keeper.name}이(가) 막아냅니다.`,'save')}else{voltaMatchStat(other,'blocks');voltaLog(`${shooter.name}의 슈팅이 수비에 블록됩니다.`,'shot')}
+ }
+}
+function voltaAttackSequence(side){
+ const s=voltaMatchState,other=voltaOpponentSide(side),atk=s.teams[side],def=s.teams[other];voltaPossession(side);
+ if(voltaDoFoul(side))return;
+ if(Math.random()<.035){const newSide=voltaDoRestart(side);if(newSide!==side){s.momentum[side]-=2;return}}
+ const passer=voltaPickWeighted(atk.players.filter(p=>p.position!=='GK'),p=>p.stats.passing+p.hidden.judgement);
+ const passScore=passer.stats.passing*.55+passer.hidden.judgement*.25+atk.metrics.build*.20-def.metrics.press*5+(Math.random()*24-12);
+ if(passScore<55){voltaMatchStat(side,'passes');voltaLog(`${passer.name}의 패스가 끊깁니다.`,'turnover');s.momentum[side]=voltaClamp(s.momentum[side]-2,-100,100);return}
+ voltaMatchStat(side,'passes');voltaMatchStat(side,'passesCompleted');
+ const useDribble=Math.random()<.38;let chance=atk.metrics.attack*.52+atk.metrics.build*.20+atk.metrics.organization*.12+s.momentum[side]*.08+(Math.random()*24-12);
+ if(useDribble){
+   const dribbler=voltaPickWeighted(atk.players.filter(p=>p.position!=='GK'),p=>p.hidden.dribbling+p.stats.speed);const defender=voltaPickWeighted(def.players.filter(p=>p.position!=='GK'),p=>p.stats.physical+p.hidden.workrate);
+   const duel=dribbler.hidden.dribbling+dribbler.stats.speed*.35+Math.random()*25-(defender.stats.physical+defender.hidden.workrate*.35+Math.random()*25);
+   if(duel>0){chance+=8;voltaLog(`${dribbler.name}이(가) ${defender.name}을(를) 제치고 전진합니다!`,'attack')}else{voltaLog(`${defender.name}이(가) ${dribbler.name}의 돌파를 막아냅니다.`,'turnover');return}
+ }
+ const trailing=(side==='home'?s.score.home<s.score.away:s.score.away<s.score.home);if(trailing&&s.time>2100)chance+=10;
+ if(chance>57&&Math.random()<.44){voltaDoShot(side,false,false)}else if(Math.random()<.18){voltaLog(`${passer.name}을(를) 중심으로 공격을 전개하지만 슈팅까지 이어지지 않습니다.`,'normal')}
+}
+function voltaChoosePossession(){const s=voltaMatchState,a=s.teams.home.metrics,b=s.teams.away.metrics;let hs=a.build+a.organization*.35+s.momentum.home*.10+Math.random()*28,as=b.build+b.organization*.35+s.momentum.away*.10+Math.random()*28;return hs>=as?'home':'away'}
+function voltaMaybeTimeout(){const s=voltaMatchState;for(const side of ['home','away']){const half=s.time<1200?0:1;if(s.time%1200>880&&!s.timeouts[side][half]){const behind=side==='home'?s.score.home<s.score.away:s.score.away<s.score.home;if(behind&&Math.random()<.12){s.timeouts[side][half]=true;voltaLog(`⏱ ${side==='home'?s.homeName:s.awayName}이(가) 1분 작전타임을 요청합니다.`,'timeout');s.momentum[side]=voltaClamp(s.momentum[side]+5,-100,100)}}}}
+function voltaMatchTick(){
+ const s=voltaMatchState;if(!s||s.finished)return;
+ const prev=s.time;s.time=Math.min(2400,s.time+20*s.speed);
+ if(prev<1200&&s.time>=1200){voltaLog(`— 전반 종료. 누적 파울이 초기화되고 후반전이 시작됩니다. —`,'half');s.fouls={home:0,away:0};s.momentum.home*=.45;s.momentum.away*=.45}
+ const repeats=Math.max(1,s.speed);for(let i=0;i<repeats;i++)voltaAttackSequence(voltaChoosePossession());voltaMaybeTimeout();
+ if(s.time>=2400){voltaFinishMatch();return}render();
+}
+function voltaStartMatch(){
+ voltaEnsureRosterProfiles();const opp=voltaNextOpponent();if(!opp)return;
+ const tactics={mentality:document.getElementById('voltaTacticMentality')?.value||voltaSave.tactics?.mentality||'balanced',pressing:document.getElementById('voltaTacticPressing')?.value||voltaSave.tactics?.pressing||'normal',passing:document.getElementById('voltaTacticPassing')?.value||voltaSave.tactics?.passing||'balanced',focus:document.getElementById('voltaTacticFocus')?.value||voltaSave.tactics?.focus||'center'};voltaSave.tactics=tactics;voltaPersist();
+ const homePlayers=voltaAssignPositions(voltaSave.roster),enemyRaw=voltaOpponentPlayers(opp,voltaLeague().grade),awayPlayers=voltaAssignPositions(enemyRaw),enemyT=voltaEnemyTactics(voltaLeague().grade,opp.name);
+ homePlayers.forEach(p=>p.rating=6.5);awayPlayers.forEach(p=>p.rating=6.5);
+ voltaMatchState={time:0,speed:1,finished:false,homeName:voltaSave.teamName,awayName:opp.name,score:{home:0,away:0},momentum:{home:0,away:0},fouls:{home:0,away:0},timeouts:{home:[false,false],away:[false,false]},logs:[],highlight:'킥오프를 준비합니다.',stats:{home:{shots:0,onTarget:0,goals:0,saves:0,blocks:0,woodwork:0,passes:0,passesCompleted:0,possessions:0,fouls:0,yellow:0},away:{shots:0,onTarget:0,goals:0,saves:0,blocks:0,woodwork:0,passes:0,passesCompleted:0,possessions:0,fouls:0,yellow:0}},teams:{home:{players:homePlayers,tactics,metrics:voltaTeamMetrics(homePlayers,tactics,voltaSave.coach.name,voltaMoraleMult())},away:{players:awayPlayers,tactics:enemyT,metrics:voltaTeamMetrics(awayPlayers,enemyT,'문제영',1)}}};
+ voltaLog(`경기 시작! 풋살 규칙에 따라 5 대 5로 진행됩니다.`,'start');clearInterval(voltaMatchTimer);voltaMatchTimer=setInterval(voltaMatchTick,700);mode='volta-match';render();
+}
+function voltaSetMatchSpeed(v){if(!voltaMatchState)return;voltaMatchState.speed=v;render()}
+function voltaFinishMatch(){const s=voltaMatchState;if(!s||s.finished)return;s.finished=true;clearInterval(voltaMatchTimer);voltaMatchTimer=null;
+ const h=s.score.home,a=s.score.away;if(h>a){voltaSave.wins++;voltaSave.money+=10;voltaSave.teamMorale=voltaClamp((voltaSave.teamMorale||65)+4,1,100)}else if(h<a){voltaSave.losses++;voltaSave.teamMorale=voltaClamp((voltaSave.teamMorale||65)-4,1,100)}else voltaSave.teamMorale=voltaClamp((voltaSave.teamMorale||65)+1,1,100);
+ voltaSave.nextOpponentIndex=((voltaSave.nextOpponentIndex||0)+1)%Math.max(1,voltaLeague().teams.length);voltaPersist();mode='volta-match-result';render()}
+function voltaMatchPossessionPct(side){const s=voltaMatchState,total=s.stats.home.possessions+s.stats.away.possessions;return total?Math.round(s.stats[side].possessions/total*100):50}
+function voltaPassPct(side){const x=voltaMatchState.stats[side];return x.passes?Math.round(x.passesCompleted/x.passes*100):0}
+function voltaBackToClub(){clearInterval(voltaMatchTimer);voltaMatchTimer=null;voltaMatchState=null;mode='volta-club';render()}
+
 const VOLTA_STAT_LABELS=['슈팅','스피드','패스','피지컬','키퍼'];
 let voltaDraft={characterIndex:0,coachIndex:0,managerIndex:0};
 let voltaSave=null;
@@ -1073,6 +1259,7 @@ function voltaLoad(){try{
  if(!Number.isFinite(voltaSave.teamMorale))voltaSave.teamMorale=65;
  if(!voltaSave.lockerRoomMood)voltaSave.lockerRoomMood='미지근함';
  if(!Number.isFinite(voltaSave.nextOpponentIndex))voltaSave.nextOpponentIndex=0;
+ voltaEnsureRosterProfiles();
  mode='volta-club';render();return true
 }catch(e){alert('SAVE 데이터를 불러오지 못했습니다.');return false}}
 function voltaNewGame(){voltaDraft={characterIndex:0,coachIndex:0,managerIndex:0};mode='volta-character';render()}
@@ -1080,8 +1267,8 @@ function voltaCycle(kind,dir){const map={character:VOLTA_CHARACTERS,coach:VOLTA_
 function voltaPickCharacter(){voltaDraft.character=VOLTA_CHARACTERS[voltaDraft.characterIndex];mode='volta-coach';render()}
 function voltaPickCoach(){voltaDraft.coach=VOLTA_COACHES[voltaDraft.coachIndex];mode='volta-manager';render()}
 function voltaPickManager(){voltaDraft.manager=VOLTA_MANAGERS[voltaDraft.managerIndex];mode='volta-teamname';render()}
-function voltaCreateTeam(){const input=document.getElementById('voltaTeamName');const teamName=(input?.value||'').trim();if(!teamName){alert('팀명을 입력해 주세요.');return}voltaSave={version:1,teamName,character:voltaDraft.character,coach:voltaDraft.coach,manager:voltaDraft.manager,money:0,leagueIndex:0,unlockedLeague:0,stadium:'흙바닥 운동장',wins:0,losses:0,championships:[],teamMorale:65,lockerRoomMood:'미지근함',nextOpponentIndex:0,roster:[{name:voltaDraft.character.name,hero:true},...VOLTA_STARTERS.map(name=>({name,hero:false}))],createdAt:Date.now()};voltaPersist();mode='volta-club';render()}
-function voltaStatRows(){return VOLTA_STAT_LABELS.map(x=>`<div class="volta-stat"><span>${x}</span><b>미정</b></div>`).join('')}
+function voltaCreateTeam(){const input=document.getElementById('voltaTeamName');const teamName=(input?.value||'').trim();if(!teamName){alert('팀명을 입력해 주세요.');return}voltaSave={version:1,teamName,character:voltaDraft.character,coach:voltaDraft.coach,manager:voltaDraft.manager,money:0,leagueIndex:0,unlockedLeague:0,stadium:'흙바닥 운동장',wins:0,losses:0,championships:[],teamMorale:65,lockerRoomMood:'미지근함',nextOpponentIndex:0,roster:[{name:voltaDraft.character.name,hero:true},...VOLTA_STARTERS.map(name=>({name,hero:false}))],createdAt:Date.now()};voltaEnsureRosterProfiles();voltaPersist();mode='volta-club';render()}
+function voltaStatRows(){const c=VOLTA_CHARACTERS[voltaDraft.characterIndex],s=VOLTA_PLAYER_PRESETS[c?.name]||{};const map={'슈팅':'shooting','스피드':'speed','패스':'passing','피지컬':'physical','키퍼':'keeper'};return VOLTA_STAT_LABELS.map(x=>`<div class="volta-stat"><span>${x}</span><b>${s[map[x]]??'-'}</b></div>`).join('')}
 function voltaGo(target){mode=target;render()}
 function voltaLeague(){return VOLTA_LEAGUES[Math.max(0,Math.min(VOLTA_LEAGUES.length-1,voltaSave?.leagueIndex||0))]}
 function voltaNextOpponent(){const league=voltaLeague(),teams=league?.teams||[];if(!teams.length)return null;const idx=Math.max(0,Math.min(teams.length-1,voltaSave?.nextOpponentIndex||0));return teams[idx]}
@@ -1159,13 +1346,13 @@ if(mode==="volta-club"&&voltaSave){
        <button class="active" onclick="mode='volta-club';render()"><span>⌂</span>구단 홈</button>
        <button onclick="voltaOpenPlaceholder('뉴스 / 소설','구단 뉴스와 이벤트 소설이 표시될 공간입니다.')"><span>▣</span>뉴스 / 소설</button>
        <button onclick="voltaOpenPlaceholder('스쿼드','선수단 상세 관리 화면을 다음 단계에서 연결합니다.')"><span>♟</span>스쿼드</button>
-       <button onclick="voltaOpenPlaceholder('전술 / 포메이션','선발 5명과 포메이션을 설정하는 화면을 연결합니다.')"><span>⌘</span>전술 / 포메이션</button>
+       <button onclick="voltaGo('volta-match-setup')"><span>⌘</span>전술 / 포메이션</button>
        <button onclick="voltaGo('volta-training')"><span>↗</span>훈련</button>
        <button onclick="voltaGo('volta-transfer')"><span>⇄</span>이적시장</button>
        <button onclick="voltaOpenPlaceholder('스폰서','리그 진행에 따라 스폰서를 계약하는 시스템이 들어갈 공간입니다.')"><span>₩</span>스폰서</button>
        <button onclick="voltaGo('volta-facility')"><span>▦</span>시설</button>
      </nav>
-     <button class="volta-fm-start" onclick="voltaGo('volta-league')">경기 시작 ▶</button>
+     <button class="volta-fm-start" onclick="voltaGo('volta-match-setup')">경기 시작 ▶</button>
      <div class="volta-fm-sidefoot"><b>${league.grade} · ${league.name}</b><span>다음 상대 · ${next?.name||'미정'}</span></div>
    </aside>
    <section class="volta-fm-main">
@@ -1175,7 +1362,7 @@ if(mode==="volta-club"&&voltaSave){
          <div><span>소속 리그</span><b>${league.name}</b></div><div><span>전적</span><b>${voltaSave.wins}승 ${voltaSave.losses}패</b></div><div><span>감독</span><b>${voltaSave.coach.name} <em>${voltaSave.coach.grade}</em></b></div>
          <div><span>매니저</span><b>${voltaSave.manager.name} <em>${voltaSave.manager.grade}</em></b></div><div><span>운동장</span><b>${voltaSave.stadium}</b></div><div><span>선수단</span><b>${voltaSave.roster.length}명</b></div>
        </div></section>
-       <section class="volta-fm-card next"><div class="volta-fm-cardhead"><h3>다음 경기</h3><span>${league.grade} 리그</span></div><div class="volta-fm-nextmatch"><div class="badge">${next?.name?.slice(0,1)||'?'}</div><div><small>${league.name}</small><h3>${voltaSave.teamName} <i>VS</i> ${next?.name||'미정'}</h3><p>${next ? next.players.join(' · ') : '상대 선수 미정'}</p></div></div><button onclick="voltaGo('volta-league')">경기 준비 화면 →</button></section>
+       <section class="volta-fm-card next"><div class="volta-fm-cardhead"><h3>다음 경기</h3><span>${league.grade} 리그</span></div><div class="volta-fm-nextmatch"><div class="badge">${next?.name?.slice(0,1)||'?'}</div><div><small>${league.name}</small><h3>${voltaSave.teamName} <i>VS</i> ${next?.name||'미정'}</h3><p>${next ? next.players.join(' · ') : '상대 선수 미정'}</p></div></div><button onclick="voltaGo('volta-match-setup')">경기 준비 화면 →</button></section>
      </div>
      <section class="volta-fm-card atmosphere"><div class="volta-fm-cardhead"><h3>팀 분위기</h3><span>LOCKER ROOM</span></div><div class="volta-fm-atmo"><div class="morale"><div class="number"><b>${morale}</b><span>/ 100</span></div><div class="bar"><i style="width:${morale}%"></i></div><small>팀 사기 · ${voltaMoraleLabel(morale)}</small></div><div class="locker"><span>라커룸 분위기</span><b>${locker}</b><p>${locker==='불화'?'선수단 내부 갈등이 경기력에 영향을 줄 수 있습니다.':locker==='미지근함'?'큰 문제는 없지만 아직 팀이 완전히 뭉치지는 않았습니다.':'선수단 분위기가 안정적입니다.'}</p></div></div></section>
      <section class="volta-fm-card squad-preview"><div class="volta-fm-cardhead"><h3>선수단</h3><span>${voltaSave.roster.length} PLAYERS</span></div><div class="volta-fm-roster">${voltaSave.roster.map((p,i)=>`<div class="${p.hero?'hero':''}"><span>${String(i+1).padStart(2,'0')}</span><b>${p.name}</b><small>${p.hero?'주인공 선수':'초기 선수'}</small></div>`).join('')}</div></section>
@@ -1186,8 +1373,24 @@ if(mode==="volta-club"&&voltaSave){
 
 if(mode==="volta-league"&&voltaSave){
  const league=voltaLeague();
- body=`<div class="volta-subpage"><div class="volta-subhead"><div><small>${league.grade} GRADE</small><h2>${league.name}</h2><p>${league.unlock}</p></div><button onclick="mode='volta-club';render()">구단으로</button></div><div class="volta-opponents">${league.teams.map((t,i)=>`<div class="volta-opponent"><div class="volta-opponent-rank">${String(i+1).padStart(2,'0')}</div><h3>${t.name}</h3><div>${t.players.map(x=>`<span>${x}</span>`).join('')}</div><button disabled>경기 엔진 준비 중</button></div>`).join('')}</div><div class="volta-rulebox"><b>경기 보상</b><span>승리 +10원 · 리그 우승 +50원</span></div></div>`;
+ body=`<div class="volta-subpage"><div class="volta-subhead"><div><small>${league.grade} GRADE</small><h2>${league.name}</h2><p>${league.unlock}</p></div><button onclick="mode='volta-club';render()">구단으로</button></div><div class="volta-opponents">${league.teams.map((t,i)=>`<div class="volta-opponent ${i===(voltaSave.nextOpponentIndex||0)?'current':''}"><div class="volta-opponent-rank">${String(i+1).padStart(2,'0')}</div><h3>${t.name}</h3><div>${t.players.map(x=>`<span>${x}</span>`).join('')}</div><button onclick="voltaSave.nextOpponentIndex=${i};voltaPersist();mode='volta-match-setup';render()">${i===(voltaSave.nextOpponentIndex||0)?'다음 경기 준비':'이 상대와 경기 준비'}</button></div>`).join('')}</div><div class="volta-rulebox"><b>경기 보상</b><span>승리 +10원 · 리그 우승 +50원</span></div></div>`;
 }
+
+
+if(mode==="volta-match-setup"&&voltaSave){
+ voltaEnsureRosterProfiles();const league=voltaLeague(),opp=voltaNextOpponent(),t=voltaSave.tactics||{mentality:'balanced',pressing:'normal',passing:'balanced',focus:'center'};const home=voltaAssignPositions(voltaSave.roster),away=voltaAssignPositions(voltaOpponentPlayers(opp,league.grade));const hm=voltaTeamMetrics(home,t,voltaSave.coach.name,voltaMoraleMult()),et=voltaEnemyTactics(league.grade,opp?.name||''),am=voltaTeamMetrics(away,et,'문제영',1);
+ const opts=(map,val)=>Object.entries(map).map(([k,v])=>`<option value="${k}" ${k===val?'selected':''}>${v}</option>`).join('');
+ body=`<div class="volta-match-setup"><div class="volta-match-head"><div><small>${league.grade} · ${league.name}</small><h2>경기 준비</h2><p>${voltaSave.teamName} vs ${opp?.name||'미정'}</p></div><button onclick="mode='volta-club';render()">구단으로</button></div><div class="volta-match-setup-grid"><section class="volta-match-panel"><h3>선발 5명</h3>${home.map(p=>`<div class="volta-lineup-row"><span>${p.position}</span><b>${p.name}</b><small>컨디션 ${p.condition}</small><em>슛 ${p.stats.shooting} · 속 ${p.stats.speed} · 패 ${p.stats.passing} · 피 ${p.stats.physical} · GK ${p.stats.keeper}</em></div>`).join('')}</section><section class="volta-match-panel tactics"><h3>경기 전술</h3><label>공격 성향<select id="voltaTacticMentality">${opts(VOLTA_TACTIC_LABELS.mentality,t.mentality)}</select></label><label>압박<select id="voltaTacticPressing">${opts(VOLTA_TACTIC_LABELS.pressing,t.pressing)}</select></label><label>패스 스타일<select id="voltaTacticPassing">${opts(VOLTA_TACTIC_LABELS.passing,t.passing)}</select></label><label>공격 집중<select id="voltaTacticFocus">${opts(VOLTA_TACTIC_LABELS.focus,t.focus)}</select></label><div class="volta-coach-style"><span>감독 전술 성향</span><b>${VOLTA_COACH_STYLES[voltaSave.coach.name]?.name||'밸런스형'} · ${voltaSave.coach.name}</b></div></section><section class="volta-match-panel power"><h3>전력 비교</h3><div><span>공격</span><b>${Math.round(hm.attack)}</b><i>${Math.round(am.attack)}</i></div><div><span>수비</span><b>${Math.round(hm.defense)}</b><i>${Math.round(am.defense)}</i></div><div><span>전개</span><b>${Math.round(hm.build)}</b><i>${Math.round(am.build)}</i></div><div><span>GK</span><b>${Math.round(hm.keeper)}</b><i>${Math.round(am.keeper)}</i></div><small>왼쪽이 우리 팀, 오른쪽이 상대 팀입니다. 전력 차이가 결과를 확정하지는 않습니다.</small></section><section class="volta-match-panel rules"><h3>풋살 적용 규칙</h3><p>5대5 · GK 포함 · 전/후반 각 20분 · 오프사이드 없음</p><p>누적 파울 6회부터 10m 직접 프리킥 · 재개는 4초 제한 · 전/후반 각 1회 작전타임</p><p>교체는 무제한 규칙을 따르며, 현재 선수단이 5명이므로 교체 후보는 없습니다.</p></section></div><button class="volta-kickoff" onclick="voltaStartMatch()">경기 시작 ▶</button></div>`;
+}
+if(mode==="volta-match"&&voltaMatchState){
+ const s=voltaMatchState,home=s.teams.home.players,away=s.teams.away.players;
+ body=`<div class="volta-live"><div class="volta-live-top"><div><small>${voltaLeague().grade} · ${voltaLeague().name}</small><h2>${s.homeName} <b>${s.score.home} : ${s.score.away}</b> ${s.awayName}</h2></div><div class="volta-live-clock">${voltaFormatClock(s.time)}</div></div><div class="volta-speedbar"><span>시뮬레이션 속도</span>${[1,2,4].map(v=>`<button class="${s.speed===v?'on':''}" onclick="voltaSetMatchSpeed(${v})">${v}×</button>`).join('')}</div><div class="volta-live-grid"><section class="volta-commentary"><div class="volta-highlight">${s.highlight}</div><div class="volta-log">${s.logs.slice().reverse().map(x=>`<div class="${x.type}"><span>${x.time}</span><p>${x.text}</p></div>`).join('')}</div></section><aside class="volta-live-side"><div class="volta-mini-score"><div><b>${s.score.home}</b><span>${s.homeName}</span></div><i>VS</i><div><b>${s.score.away}</b><span>${s.awayName}</span></div></div><div class="volta-live-stat"><span>슈팅</span><b>${s.stats.home.shots}</b><i>${s.stats.away.shots}</i></div><div class="volta-live-stat"><span>유효슈팅</span><b>${s.stats.home.onTarget}</b><i>${s.stats.away.onTarget}</i></div><div class="volta-live-stat"><span>점유율</span><b>${voltaMatchPossessionPct('home')}%</b><i>${voltaMatchPossessionPct('away')}%</i></div><div class="volta-live-stat"><span>패스 성공</span><b>${voltaPassPct('home')}%</b><i>${voltaPassPct('away')}%</i></div><div class="volta-live-stat"><span>선방</span><b>${s.stats.home.saves}</b><i>${s.stats.away.saves}</i></div><div class="volta-live-stat"><span>누적 파울</span><b>${s.fouls.home}</b><i>${s.fouls.away}</i></div><div class="volta-rules-note">오프사이드 없음 · 6번째 누적 파울부터 10m 직접 FK</div></aside></div></div>`;
+}
+if(mode==="volta-match-result"&&voltaMatchState){
+ const s=voltaMatchState;const ratingRows=[...s.teams.home.players].sort((a,b)=>(b.rating||6.5)-(a.rating||6.5));
+ body=`<div class="volta-result"><div class="volta-result-head"><small>FULL TIME</small><h2>${s.homeName} <b>${s.score.home} : ${s.score.away}</b> ${s.awayName}</h2><p>${s.score.home>s.score.away?'승리 · +10원':s.score.home<s.score.away?'패배':'무승부'}</p></div><div class="volta-result-grid"><section class="volta-result-card"><h3>경기 기록</h3>${[['슈팅','shots'],['유효슈팅','onTarget'],['점유율','possession'],['패스 성공','pass'],['선방','saves'],['누적 파울','fouls']].map(([label,key])=>{let h,a;if(key==='possession'){h=voltaMatchPossessionPct('home')+'%';a=voltaMatchPossessionPct('away')+'%'}else if(key==='pass'){h=voltaPassPct('home')+'%';a=voltaPassPct('away')+'%'}else{h=s.stats.home[key];a=s.stats.away[key]}return `<div class="volta-result-stat"><b>${h}</b><span>${label}</span><i>${a}</i></div>`}).join('')}</section><section class="volta-result-card"><h3>선수 평점</h3>${ratingRows.map(p=>`<div class="volta-rating"><span>${p.position}</span><b>${p.name}</b><em>${voltaClamp((p.rating||6.5)+(p.matchGoals||0)*.1,5,10).toFixed(1)}</em></div>`).join('')}</section></div><button class="volta-result-back" onclick="voltaBackToClub()">구단으로 돌아가기 →</button></div>`;
+}
+
 if(mode==="volta-training"&&voltaSave){body=`<div class="volta-subpage"><div class="volta-subhead"><div><small>TRAINING</small><h2>훈련</h2><p>${voltaSave.coach.name} 감독 · ${voltaSave.coach.grade}등급</p></div><button onclick="mode='volta-club';render()">구단으로</button></div><div class="volta-placeholder"><b>훈련 시스템 준비</b><p>슈팅 · 스피드 · 패스 · 피지컬 · 키퍼를 훈련하며 감독 등급에 따라 효율이 달라집니다.</p><span>선수 세부 스탯 수치가 정해지면 실제 성장 로직을 연결합니다.</span></div></div>`;}
 if(mode==="volta-transfer"&&voltaSave){body=`<div class="volta-subpage"><div class="volta-subhead"><div><small>TRANSFER MARKET</small><h2>이적시장</h2><p>리그 우승 보상으로 개방됩니다.</p></div><button onclick="mode='volta-club';render()">구단으로</button></div><div class="volta-placeholder locked"><b>🔒 현재 잠김</b><p>곡선중 리그 우승 후 첫 특별 이적시장이 열립니다.</p><span>1·2·3학년 선수 + 선택하지 않은 주인공 캐릭터가 후보에 포함됩니다.</span></div></div>`;}
 if(mode==="volta-facility"&&voltaSave){body=`<div class="volta-subpage"><div class="volta-subhead"><div><small>FACILITY</small><h2>시설</h2><p>현재 시설을 확인합니다.</p></div><button onclick="mode='volta-club';render()">구단으로</button></div><div class="volta-facility-card"><div class="dirt-pitch">⚽</div><div><small>STARTING GROUND</small><h3>${voltaSave.stadium}</h3><p>시설 업그레이드는 추후 재화를 사용하도록 확장할 수 있습니다.</p></div></div></div>`;}
@@ -1364,8 +1567,8 @@ ${searching?`<button class="findbtn searching">게임 찾는 중...</button><but
 </div>
 ${found?`<div class="matchfound"><div class="mf-inner"><div class="mf-icon"><span>⚔</span></div><div class="eyebrow">ARAM · CHAOS</div><h2>게임을 찾았습니다!</h2><p>무작위 총력전 · 아수라장</p><button class="accept" onclick="acceptMatch()">수락</button><button class="decline" onclick="stopQueue()">거절</button></div></div>`:""}`;
 }
-const stepLabel=mode==="select"?"01 / CHARACTER":mode==="method"?"02 / CALL":mode==="volta"?"VOLTA / HOME":mode==="volta-character"?"VOLTA / PLAYER":mode==="volta-coach"?"VOLTA / COACH":mode==="volta-manager"?"VOLTA / MANAGER":mode==="volta-teamname"?"VOLTA / CLUB":String(mode).startsWith("volta-")?"VOLTA / CAREER":"03 / PARTY";
-app.innerHTML=((mode==="hub"||mode==="volta-club")?"":header(stepLabel))+`<main class="${mode==="volta-club"?'volta-fm-mainwrap':''}">${body}</main>`;
+const stepLabel=mode==="select"?"01 / CHARACTER":mode==="method"?"02 / CALL":mode==="volta"?"VOLTA / HOME":mode==="volta-character"?"VOLTA / PLAYER":mode==="volta-coach"?"VOLTA / COACH":mode==="volta-manager"?"VOLTA / MANAGER":mode==="volta-teamname"?"VOLTA / CLUB":mode==="volta-match"?"VOLTA / MATCH":mode==="volta-match-setup"?"VOLTA / TACTICS":mode==="volta-match-result"?"VOLTA / RESULT":String(mode).startsWith("volta-")?"VOLTA / CAREER":"03 / PARTY";
+app.innerHTML=((mode==="hub"||mode==="volta-club"||mode==="volta-match")?"":header(stepLabel))+`<main class="${mode==="volta-club"?'volta-fm-mainwrap':''}">${body}</main>`;
 if(mode==='battle')setTimeout(syncLiveBattleHud,0);
 // V51: 새 카톡 메시지가 렌더링될 때 항상 최신 메시지가 보이도록 자동 스크롤
 if(mode==="group" || mode==="private"){
@@ -2805,6 +3008,12 @@ render();
 <style id="v98-volta-fm-office">
 .volta-fm-mainwrap{padding:0!important;max-width:none!important}.volta-fm-shell{min-height:100vh;display:grid;grid-template-columns:250px minmax(0,1fr);background:#0b1016;color:#dbe4eb}.volta-fm-sidebar{position:sticky;top:0;height:100vh;box-sizing:border-box;padding:16px 12px 18px;background:#131a22;border-right:1px solid #26313d;display:flex;flex-direction:column}.volta-fm-brand{padding:0 8px 15px;border-bottom:1px solid #29333d}.volta-fm-brand strong{display:block;color:#f2c84b;font-size:20px}.volta-fm-brand span{display:block;margin-top:3px;color:#758491;font-size:9px;letter-spacing:1.5px}.volta-fm-club{margin:14px 0 10px;padding:13px 12px;border-radius:6px;background:#086db5;border:1px solid #0c82d7}.volta-fm-club b{display:block;color:#fff;font-size:15px}.volta-fm-club small{display:block;color:#b9ddf5;margin-top:5px;font-size:10px}.volta-fm-nav{display:grid;gap:3px}.volta-fm-nav button{display:grid;grid-template-columns:26px 1fr;align-items:center;text-align:left;width:100%;padding:10px 11px;border:0;border-radius:4px;background:transparent;color:#c6d0d8;font:700 12px/1.2 inherit;cursor:pointer}.volta-fm-nav button span{color:#91a5b3;font-size:14px;text-align:center}.volta-fm-nav button:hover{background:#1d2934}.volta-fm-nav button.active{background:#20a4ef;color:white}.volta-fm-nav button.active span{color:white}.volta-fm-start{margin-top:auto;padding:14px;border:1px solid #238546;border-radius:7px;background:linear-gradient(#177b39,#0b5f2b);color:#fff;font:900 14px/1 inherit;cursor:pointer}.volta-fm-sidefoot{margin-top:12px;padding:11px;border-radius:6px;background:#1b232c;color:#82919c}.volta-fm-sidefoot b,.volta-fm-sidefoot span{display:block;font-size:10px}.volta-fm-sidefoot span{margin-top:5px}.volta-fm-main{padding:22px 28px 60px;max-width:1120px}.volta-fm-topline{display:flex;align-items:flex-end;justify-content:space-between;margin-bottom:18px;padding-bottom:13px;border-bottom:1px solid #25303b}.volta-fm-topline small{color:#7c8d99;font-size:9px;letter-spacing:1.8px}.volta-fm-topline h2{font-size:24px;margin:3px 0 0;color:#eef4f7}.volta-fm-money{text-align:right}.volta-fm-money span{display:block;color:#81909a;font-size:9px}.volta-fm-money b{font-size:20px;color:#f0cb55}.volta-fm-grid.two{display:grid;grid-template-columns:1.08fr .92fr;gap:14px}.volta-fm-card{margin-bottom:14px;padding:15px;border:1px solid #2a3540;border-radius:7px;background:#171e26;box-shadow:0 1px 0 #070a0d}.volta-fm-cardhead{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}.volta-fm-cardhead h3{margin:0;color:#f0c447;font-size:14px}.volta-fm-cardhead span{color:#738491;font-size:9px;letter-spacing:1px}.volta-fm-statusgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:7px}.volta-fm-statusgrid>div{padding:11px;border:1px solid #222d38;border-radius:5px;background:#0f151c}.volta-fm-statusgrid span{display:block;color:#71818e;font-size:9px}.volta-fm-statusgrid b{display:block;margin-top:4px;font-size:12px;color:#d9e3e9}.volta-fm-statusgrid em{font-style:normal;color:#53d36f}.volta-fm-nextmatch{display:grid;grid-template-columns:62px 1fr;gap:13px;align-items:center;padding:7px 0 13px}.volta-fm-nextmatch .badge{width:58px;height:58px;display:grid;place-items:center;border-radius:50%;background:#23354a;border:2px solid #4387bd;color:#fff;font-size:25px;font-weight:1000}.volta-fm-nextmatch small{color:#8e9ba5}.volta-fm-nextmatch h3{margin:3px 0 6px;font-size:16px}.volta-fm-nextmatch h3 i{font-style:normal;color:#f0c44e;font-size:11px;margin:0 4px}.volta-fm-nextmatch p{margin:0;color:#73818b;font-size:9px;line-height:1.45}.volta-fm-card.next button{width:100%;padding:9px;border:1px solid #35424e;background:#202a34;color:#d6dfe5;cursor:pointer;border-radius:4px}.volta-fm-atmo{display:grid;grid-template-columns:1.05fr .95fr;gap:24px;align-items:center}.volta-fm-atmo .number b{font-size:38px;color:#f0c84d}.volta-fm-atmo .number span{color:#75848f;font-size:12px}.volta-fm-atmo .bar{height:8px;margin:7px 0;background:#0c1117;border:1px solid #29323a;border-radius:8px;overflow:hidden}.volta-fm-atmo .bar i{display:block;height:100%;background:linear-gradient(90deg,#b37425,#edc74d,#44c769)}.volta-fm-atmo small{color:#8f9da7}.volta-fm-atmo .locker{padding-left:22px;border-left:1px solid #29343e}.volta-fm-atmo .locker span{display:block;color:#798995;font-size:9px}.volta-fm-atmo .locker b{display:block;margin:5px 0;font-size:24px;color:#dce7ed}.volta-fm-atmo .locker p{margin:0;color:#81909a;font-size:10px;line-height:1.5}.volta-fm-roster{display:grid;grid-template-columns:repeat(5,1fr);gap:7px}.volta-fm-roster>div{padding:12px 9px;border:1px solid #28343f;background:#10161d}.volta-fm-roster>div.hero{border-color:#9a7a2c;background:#211d13}.volta-fm-roster span{display:block;color:#61717d;font-size:9px}.volta-fm-roster b{display:block;margin:4px 0;color:#e4ebef;font-size:12px}.volta-fm-roster small{font-size:8px;color:#7f8e98}.volta-fm-inboxline{padding:9px 4px;border-top:1px solid #222c35;color:#aab7c0;font-size:10px}.volta-fm-inboxline:first-of-type{border-top:0}@media(max-width:900px){.volta-fm-shell{grid-template-columns:1fr}.volta-fm-sidebar{position:relative;height:auto}.volta-fm-nav{grid-template-columns:1fr 1fr}.volta-fm-start{margin-top:10px}.volta-fm-main{padding:15px}.volta-fm-grid.two{grid-template-columns:1fr}.volta-fm-atmo{grid-template-columns:1fr}.volta-fm-atmo .locker{border-left:0;border-top:1px solid #29343e;padding:14px 0 0}.volta-fm-roster{grid-template-columns:1fr 1fr}}
 </style>
+
+<style id="v99-volta-match-engine">
+.volta-match-setup,.volta-live,.volta-result{max-width:1180px;margin:0 auto;padding:22px 18px 70px;color:#dce5eb}.volta-match-head,.volta-live-top{display:flex;justify-content:space-between;align-items:flex-end;border-bottom:1px solid #2b3540;padding-bottom:14px;margin-bottom:14px}.volta-match-head small,.volta-live-top small{color:#7d8c97;letter-spacing:1.5px}.volta-match-head h2,.volta-live-top h2{margin:3px 0 0;font-size:25px}.volta-match-head p{margin:4px 0 0;color:#8d9aa3}.volta-match-head button{padding:8px 13px;background:#18212a;border:1px solid #36424e;color:#d8e1e7}.volta-match-setup-grid{display:grid;grid-template-columns:1.05fr .95fr;gap:12px}.volta-match-panel{background:#171e26;border:1px solid #2b3742;border-radius:7px;padding:15px}.volta-match-panel h3{margin:0 0 12px;color:#f0c44f;font-size:14px}.volta-lineup-row{display:grid;grid-template-columns:48px 90px 90px 1fr;gap:8px;align-items:center;padding:9px 0;border-top:1px solid #26313a}.volta-lineup-row:first-of-type{border-top:0}.volta-lineup-row span{color:#36a9ef;font-weight:900}.volta-lineup-row b{font-size:12px}.volta-lineup-row small,.volta-lineup-row em{font-style:normal;color:#82919c;font-size:9px}.volta-match-panel.tactics{display:grid;grid-template-columns:1fr 1fr;gap:10px}.volta-match-panel.tactics h3,.volta-coach-style{grid-column:1/-1}.volta-match-panel.tactics label{display:grid;gap:6px;color:#83939e;font-size:10px}.volta-match-panel select{background:#0c1218;border:1px solid #33414e;color:#fff;padding:9px}.volta-coach-style{padding:10px;border-top:1px solid #29353f}.volta-coach-style span{display:block;color:#758590;font-size:9px}.volta-coach-style b{display:block;margin-top:4px}.volta-match-panel.power>div{display:grid;grid-template-columns:1fr 60px 60px;gap:8px;padding:7px;border-top:1px solid #26313a}.volta-match-panel.power>div b{color:#55cc7c}.volta-match-panel.power>div i{font-style:normal;color:#ff7780}.volta-match-panel.power small,.volta-match-panel.rules p{color:#82909a;font-size:9px;line-height:1.55}.volta-kickoff{display:block;width:min(520px,100%);margin:16px auto 0;padding:14px;border:1px solid #248444;background:linear-gradient(#177b39,#0c5e2a);color:#fff;font-weight:1000;cursor:pointer}.volta-opponent.current{border-color:#c39631!important}.volta-opponent button:not([disabled]){color:#dce8ef!important;cursor:pointer!important;background:#17314a!important;border-color:#315b7e!important}.volta-live{max-width:none;padding:18px 24px;min-height:100vh;background:#0b1016;box-sizing:border-box}.volta-live-top h2 b{color:#f0cb55;margin:0 12px;font-size:32px}.volta-live-clock{font-size:24px;font-weight:1000;color:#e7eef2}.volta-speedbar{display:flex;justify-content:flex-end;gap:6px;align-items:center;margin-bottom:10px}.volta-speedbar span{font-size:9px;color:#75848f}.volta-speedbar button{padding:6px 11px;background:#121b23;border:1px solid #31404c;color:#9eabb4;cursor:pointer}.volta-speedbar button.on{border-color:#d0a63d;color:#f1ce65}.volta-live-grid{display:grid;grid-template-columns:minmax(0,1fr) 340px;gap:12px}.volta-commentary,.volta-live-side{background:#151d25;border:1px solid #2c3944}.volta-highlight{min-height:92px;display:grid;place-items:center;padding:18px;text-align:center;font-size:20px;font-weight:900;color:#fff;border-bottom:1px solid #2e3a45;background:linear-gradient(135deg,#162838,#121920)}.volta-log{height:600px;overflow:auto;padding:10px 14px}.volta-log>div{display:grid;grid-template-columns:105px 1fr;gap:10px;padding:8px 0;border-bottom:1px solid #202a33}.volta-log span{color:#6f8290;font-size:9px}.volta-log p{margin:0;color:#b8c4cc;font-size:11px}.volta-log .goal p{color:#f0d364;font-weight:900}.volta-log .foul p,.volta-log .danger p{color:#ff9898}.volta-log .save p{color:#7fc3ff}.volta-mini-score{display:grid;grid-template-columns:1fr auto 1fr;gap:8px;align-items:center;text-align:center;padding:17px;border-bottom:1px solid #2b3641}.volta-mini-score b{display:block;font-size:35px;color:#f0c84b}.volta-mini-score span{font-size:10px;color:#98a6b0}.volta-mini-score i{font-style:normal;color:#61717d}.volta-live-stat{display:grid;grid-template-columns:1fr 60px 60px;padding:10px 14px;border-bottom:1px solid #222c35}.volta-live-stat span{color:#80909b;font-size:10px}.volta-live-stat b{color:#66d785}.volta-live-stat i{font-style:normal;color:#ff7b83}.volta-rules-note{padding:15px;color:#6f808b;font-size:9px;line-height:1.5}.volta-result-head{text-align:center;padding:35px 10px}.volta-result-head small{letter-spacing:3px;color:#75848f}.volta-result-head h2{font-size:32px;margin:8px 0}.volta-result-head h2 b{color:#f0c94e;margin:0 12px}.volta-result-head p{color:#8fa0aa}.volta-result-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}.volta-result-card{background:#171e26;border:1px solid #2b3742;padding:16px}.volta-result-card h3{color:#f0c44d;margin:0 0 12px}.volta-result-stat{display:grid;grid-template-columns:1fr 1fr 1fr;text-align:center;padding:9px;border-top:1px solid #26313a}.volta-result-stat b{color:#5bd07d}.volta-result-stat span{color:#81909a}.volta-result-stat i{font-style:normal;color:#ff7b83}.volta-rating{display:grid;grid-template-columns:55px 1fr 55px;padding:9px;border-top:1px solid #26313a}.volta-rating span{color:#45aef0;font-weight:900}.volta-rating em{font-style:normal;color:#f0c74e;font-weight:900;text-align:right}.volta-result-back{display:block;width:min(420px,100%);margin:16px auto;padding:13px;background:#157137;border:1px solid #2f934e;color:white;font-weight:900}.volta-stat b{color:#e7d168!important}
+@media(max-width:850px){.volta-match-setup-grid,.volta-live-grid,.volta-result-grid{grid-template-columns:1fr}.volta-live-side{order:-1}.volta-log{height:420px}.volta-lineup-row{grid-template-columns:45px 1fr}.volta-lineup-row small,.volta-lineup-row em{grid-column:2}.volta-match-panel.tactics{grid-template-columns:1fr}}
+</style>
+
 </body>
 </html><style>
 /* ===== V33 PICK SCREEN SCALE-UP ===== */
