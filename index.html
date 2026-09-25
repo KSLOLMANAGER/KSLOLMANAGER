@@ -1985,8 +1985,10 @@ function voltaVisualTick(now=performance.now()){
      const tx=voltaClamp(base.x+(ball.x-base.x)*roleFollow*stageBoost+pressShift,4,96);
      const lane=Math.sin(now/1300+i*1.7+(side==='home'?0:2.3))*1.2;
      const ty=voltaClamp(base.y+(ball.y-base.y)*(p.position==='GK'?.06:.26)+lane,7,93);
+     const dx=tx-pt.x,dy=ty-pt.y,mag=Math.hypot(dx,dy)||1;
+     pt.dirX=dx/mag;pt.dirY=dy/mag;pt.targetX=tx;pt.targetY=ty;
      const pEase=1-Math.exp(-(p.position==='GK'?3.4:4.9)*dt*speedEase);
-     pt.x+=(tx-pt.x)*pEase;pt.y+=(ty-pt.y)*pEase;
+     pt.x+=dx*pEase;pt.y+=dy*pEase;
    });
  }
  voltaDrawMatchCanvas(now);
@@ -2045,6 +2047,17 @@ function voltaDrawMatchCanvas(now=performance.now()){
      ctx.shadowColor='rgba(0,0,0,.55)';ctx.shadowBlur=8;ctx.shadowOffsetY=3;
      ctx.beginPath();ctx.arc(q.x,q.y,r,0,Math.PI*2);ctx.fillStyle=p.position==='GK'?gkFill:fill;ctx.fill();
      ctx.lineWidth=2;ctx.strokeStyle='#f2f6f8';ctx.stroke();ctx.restore();
+
+     // FM/K리그 매니저식 이동 방향 화살표: 바둑알이 향하는 방향을 즉시 읽을 수 있게 한다.
+     const dirX=Number(pt.dirX)||0,dirY=Number(pt.dirY)||0;
+     if(Math.hypot(dirX,dirY)>.2){
+       const tipX=q.x+dirX*(r+12),tipY=q.y+dirY*(r+12);
+       const baseX=q.x+dirX*(r+4),baseY=q.y+dirY*(r+4);
+       const px=-dirY,py=dirX;
+       ctx.save();ctx.fillStyle='rgba(238,245,248,.92)';ctx.strokeStyle='rgba(20,27,31,.65)';ctx.lineWidth=1;
+       ctx.beginPath();ctx.moveTo(tipX,tipY);ctx.lineTo(baseX+px*4.2,baseY+py*4.2);ctx.lineTo(baseX-px*4.2,baseY-py*4.2);ctx.closePath();ctx.fill();ctx.stroke();ctx.restore();
+     }
+
      ctx.fillStyle='#fff';ctx.font='700 9px Segoe UI, Malgun Gothic, sans-serif';ctx.textAlign='center';ctx.textBaseline='middle';
      ctx.fillText(p.position,q.x,q.y+.5);
      ctx.font='700 10px Segoe UI, Malgun Gothic, sans-serif';ctx.fillStyle='rgba(241,247,250,.96)';
@@ -2059,6 +2072,13 @@ function voltaDrawMatchCanvas(now=performance.now()){
  const bp=voltaCanvasPos(cv,s.board.ball.x,s.board.ball.y);
  ctx.save();ctx.shadowColor='#000';ctx.shadowBlur=7;ctx.shadowOffsetY=2;
  ctx.fillStyle='#f7f7f3';ctx.beginPath();ctx.arc(bp.x,bp.y,6,0,Math.PI*2);ctx.fill();ctx.strokeStyle='#20262a';ctx.lineWidth=2;ctx.stroke();ctx.restore();
+
+ // 공의 다음 이동 경로를 하이라이트 순간에 짧은 가이드 라인으로 표시.
+ if(voltaPresentationState()==='highlight'&&s.board.ballTarget){
+   const bt=voltaCanvasPos(cv,s.board.ballTarget.x,s.board.ballTarget.y);
+   ctx.save();ctx.setLineDash([6,6]);ctx.strokeStyle='rgba(245,245,235,.34)';ctx.lineWidth=1.5;
+   ctx.beginPath();ctx.moveTo(bp.x,bp.y);ctx.lineTo(bt.x,bt.y);ctx.stroke();ctx.restore();
+ }
 
  // event emphasis, visual only — engine result is unchanged.
  const cue=s.visualCue;
@@ -2205,9 +2225,11 @@ function voltaSidebarHtml(active=''){
  ${item('volta-transfer','이적시장','⇄')}
  <button onclick="voltaOpenPlaceholder('스폰서','리그 진행에 따라 스폰서를 계약하는 시스템입니다.')"><span>₩</span>스폰서</button>
  ${item('volta-facility','시설','▦',null,voltaUnread('facility'))}
- </nav><button class="volta-fm-start" onclick="voltaProceedOrMatch()">${voltaMainActionLabel()}</button><div class="volta-fm-sidefoot"><b>${voltaDateLabelFull(voltaSave.currentDate)}</b><span>${nextDate?`${voltaDateLabel(nextDate)} · ${next?.name||'-'}`:'시즌 일정 종료'}</span></div></aside>`;
+ </nav>${mode==='volta-match'?`<div class="volta-fm-match-live">● 경기 진행 중</div>`:`<button class="volta-fm-start" onclick="voltaProceedOrMatch()">${voltaMainActionLabel()}</button>`}<div class="volta-fm-sidefoot"><b class="date">${voltaDateLabelFull(voltaSave.currentDate)}</b><span>${nextDate?`${voltaDateLabel(nextDate)} · ${next?.name||'-'}`:'시즌 일정 종료'}</span></div></aside>`;
 }
-function voltaWrapCareer(content,active){return `<div class="volta-fm-shell career">${voltaSidebarHtml(active)}<section class="volta-career-content">${content}</section></div>`}
+function voltaWrapCareer(content,active){
+ return `<div class="volta-fm-shell career">${voltaSidebarHtml(active)}<section class="volta-career-content"><div class="volta-career-datebar"><b>${voltaDateLabelFull(voltaSave.currentDate)}</b><span>${voltaLeague().grade} · ${voltaLeague().name}</span></div>${content}</section></div>`
+}
 
 
 function voltaResetSave(){if(!confirm('볼타 SAVE를 삭제하고 처음부터 시작할까요?'))return;try{localStorage.removeItem('gokseon-volta-save-v1')}catch(e){}voltaSave=null;mode='volta';render()}
@@ -2269,7 +2291,7 @@ if(mode==="volta-teamname"){
 if(mode==="volta-club"&&voltaSave){
  voltaEnsureV102Save();const league=voltaLeague(),next=voltaNextOpponent(),morale=Math.max(1,Math.min(100,Number(voltaSave.teamMorale)||65)),locker=voltaLockerMoodLabel(),rows=voltaLeagueTableRows(),leaders=voltaSeasonTopCards(),nextDate=voltaNextMatchDate();voltaSave.lockerRoomMood=locker;
  body=`<div class="volta-fm-shell"><aside class="volta-fm-sidebar"><div class="volta-fm-brand"><strong>볼타 매니저</strong><span>VOLTA MANAGER</span></div><div class="volta-fm-club"><b>${voltaSave.teamName}</b><small>${league.grade}등급 · ${league.name}</small></div><nav class="volta-fm-nav"><button class="active" onclick="mode='volta-club';render()"><span>⌂</span>구단 홈</button><button onclick="voltaOpenPlaceholder('뉴스 / 소설','구단 뉴스와 이벤트 소설이 표시될 공간입니다.')"><span>▣</span>뉴스 / 소설</button><button onclick="voltaGo('volta-squad')"><span>♟</span>스쿼드</button><button onclick="voltaOpenCalendar()"><span>▦</span>일정</button><button onclick="voltaGo('volta-match-setup')"><span>⌘</span>전술 / 포메이션</button><button onclick="voltaGo('volta-training')"><span>↗</span>훈련</button><button onclick="voltaGo('volta-transfer')"><span>⇄</span>이적시장</button><button onclick="voltaOpenPlaceholder('스폰서','리그 진행에 따라 스폰서를 계약하는 시스템입니다.')"><span>₩</span>스폰서</button><button onclick="voltaGo('volta-facility')"><span>▦</span>시설</button></nav><button class="volta-fm-start" onclick="voltaProceedOrMatch()">${voltaMainActionLabel()}</button><div class="volta-fm-sidefoot"><b>${voltaSave.seasonYear} 시즌</b><span>${nextDate?voltaDateLabel(nextDate):'시즌 일정 종료'} · ${next?.name||'-'}</span></div></aside>
- <section class="volta-fm-main"><div class="volta-fm-topline"><div><small>VOLTA MANAGER · ${voltaDateLabelFull(voltaSave.currentDate)}</small><h2>구단 오피스</h2></div><div class="volta-fm-money"><span>보유 재화</span><b>₩ ${Number(voltaSave.money||0).toLocaleString()}</b></div></div><div class="volta-fm-grid two"><section class="volta-fm-card"><div class="volta-fm-cardhead"><h3>구단 현황</h3><span>${league.grade} GRADE</span></div><div class="volta-fm-statusgrid"><div><span>소속 리그</span><b>${league.name}</b></div><div><span>전적</span><b>${voltaSave.wins}승 ${voltaSave.losses}패</b></div><div><span>감독</span><b>${voltaHeadCoach().name}</b></div><div><span>피지컬 코치</span><b>${voltaPhysicalCoach().name} <em>${voltaPhysicalCoach().grade}</em></b></div><div><span>매니저</span><b>${voltaSave.manager.name} <em>${voltaSave.manager.grade}</em></b></div><div><span>경기장</span><b>${voltaSave.stadium}</b></div><div><span>선수단</span><b>${voltaSave.roster.length}명</b></div></div></section><section class="volta-fm-card next"><div class="volta-fm-cardhead"><h3>다음 경기</h3><span>${nextDate?voltaDateLabel(nextDate):'시즌 종료'}</span></div><div class="volta-fm-nextmatch"><div class="badge">${next?.name?.slice(0,1)||'?'}</div><div><small>${league.name}</small><h3>${voltaSave.teamName} <i>VS</i> ${next?.name||'미정'}</h3><p>${next?next.players.join(' · '):'일정 없음'}</p></div></div><button onclick="voltaGo('volta-match-setup')">경기 준비 화면 →</button></section></div>
+ <section class="volta-fm-main"><div class="volta-fm-topline"><div><small>VOLTA MANAGER</small><div class="volta-office-date">${voltaDateLabelFull(voltaSave.currentDate)}</div><h2>구단 오피스</h2></div><div class="volta-fm-money"><span>보유 재화</span><b>₩ ${Number(voltaSave.money||0).toLocaleString()}</b></div></div><div class="volta-fm-grid two"><section class="volta-fm-card"><div class="volta-fm-cardhead"><h3>구단 현황</h3><span>${league.grade} GRADE</span></div><div class="volta-fm-statusgrid"><div><span>소속 리그</span><b>${league.name}</b></div><div><span>전적</span><b>${voltaSave.wins}승 ${voltaSave.losses}패</b></div><div><span>감독</span><b>${voltaHeadCoach().name}</b></div><div><span>피지컬 코치</span><b>${voltaPhysicalCoach().name} <em>${voltaPhysicalCoach().grade}</em></b></div><div><span>매니저</span><b>${voltaSave.manager.name} <em>${voltaSave.manager.grade}</em></b></div><div><span>경기장</span><b>${voltaSave.stadium}</b></div><div><span>선수단</span><b>${voltaSave.roster.length}명</b></div></div></section><section class="volta-fm-card next"><div class="volta-fm-cardhead"><h3>다음 경기</h3><span>${nextDate?voltaDateLabel(nextDate):'시즌 종료'}</span></div><div class="volta-fm-nextmatch"><div class="badge">${next?.name?.slice(0,1)||'?'}</div><div><small>${league.name}</small><h3>${voltaSave.teamName} <i>VS</i> ${next?.name||'미정'}</h3><p>${next?next.players.join(' · '):'일정 없음'}</p></div></div><button onclick="voltaGo('volta-match-setup')">경기 준비 화면 →</button></section></div>
  <section class="volta-fm-card atmosphere"><div class="volta-fm-cardhead"><h3>팀 분위기</h3><span>LOCKER ROOM</span></div><div class="volta-fm-atmo"><div class="morale"><div class="number"><b>${morale}</b><span>/ 100</span></div><div class="bar"><i style="width:${morale}%"></i></div><small>팀 사기 · ${voltaMoraleLabel(morale)}</small></div><div class="locker"><span>라커룸 분위기</span><b>${locker}</b><p>${locker==='불화'?'선수단 내부 갈등이 경기력에 영향을 줄 수 있습니다.':locker==='미지근함'?'큰 문제는 없지만 아직 팀이 완전히 뭉치지는 않았습니다.':'선수단 분위기가 안정적입니다.'}</p></div></div></section>
  <div class="volta-fm-grid two rankings"><section class="volta-fm-card"><div class="volta-fm-cardhead"><h3>리그 순위</h3><span>TABLE</span></div>${rows.map((r,i)=>`<div class="fm-mini-table ${r.name===voltaSave.teamName?'mine':''}"><span>${i+1}</span><b>${r.name}</b><i>${r.p}경기</i><strong>${r.pts}점</strong></div>`).join('')}</section><section class="volta-fm-card"><div class="volta-fm-cardhead"><h3>개인 순위</h3><span>GOALS / ASSISTS</span></div><div class="fm-leader-columns"><div><h4>득점</h4>${leaders.goals.slice(0,4).map((x,i)=>`<p><span>${i+1}</span><b>${x.name}</b><i>${x.goals}</i></p>`).join('')}</div><div><h4>도움</h4>${leaders.assists.slice(0,4).map((x,i)=>`<p><span>${i+1}</span><b>${x.name}</b><i>${x.assists}</i></p>`).join('')}</div></div></section></div>
  <section class="volta-fm-card"><div class="volta-fm-cardhead"><h3>시즌 일정</h3><span>매주 토요일 경기</span></div><div class="fm-calendar-strip">${voltaSave.season.schedule.map((r,i)=>`<div class="${i===voltaSave.season.round?'current':''} ${i<voltaSave.season.round?'done':''}"><b>${voltaDateLabel(r.date)}</b><span>${r.fixtures.map(f=>`${f.home} vs ${f.away}`).join(' · ')}</span></div>`).join('')}</div></section>
@@ -2322,7 +2344,7 @@ if(mode==="volta-match"&&voltaMatchState){
  body=`<div class="volta-live-fm">
   <div class="volta-live-scorebar">
    <span class="team home">${s.homeName}</span><b>${s.score.home} : ${s.score.away}</b><span class="team away">${s.awayName}</span>
-   <em>${voltaFormatClock(s.time)}</em><i>${s.time<1200?'전반':'후반'}</i>
+   <em>${voltaFormatClock(s.time)}</em><i>${s.time<1200?'전반':'후반'}</i><strong class="match-date">${voltaDateLabelFull(voltaSave.currentDate)}</strong>
   </div>
   <div class="volta-fm-live-grid">
    <aside class="volta-live-panel stats">
@@ -2576,7 +2598,7 @@ ${searching?`<button class="findbtn searching">게임 찾는 중...</button><but
 ${found?`<div class="matchfound"><div class="mf-inner"><div class="mf-icon"><span>⚔</span></div><div class="eyebrow">ARAM · CHAOS</div><h2>게임을 찾았습니다!</h2><p>무작위 총력전 · 아수라장</p><button class="accept" onclick="acceptMatch()">수락</button><button class="decline" onclick="stopQueue()">거절</button></div></div>`:""}`;
 }
 
-const voltaCareerModes=['volta-news','volta-locker','volta-squad','volta-calendar','volta-match-setup','volta-training','volta-transfer','volta-facility'];
+const voltaCareerModes=['volta-news','volta-locker','volta-squad','volta-calendar','volta-match-setup','volta-match','volta-training','volta-transfer','volta-facility'];
 if(voltaSave&&voltaCareerModes.includes(mode))body=voltaWrapCareer(body,mode);
 const stepLabel=mode==="select"?"01 / CHARACTER":mode==="method"?"02 / CALL":mode==="volta"?"VOLTA / HOME":mode==="volta-character"?"VOLTA / HEAD COACH":mode==="volta-coach"?"VOLTA / PHYSICAL COACH":mode==="volta-manager"?"VOLTA / MANAGER":mode==="volta-teamname"?"VOLTA / CLUB":mode==="volta-match"?"VOLTA / MATCH":mode==="volta-match-setup"?"VOLTA / TACTICS":mode==="volta-match-result"?"VOLTA / RESULT":String(mode).startsWith("volta-")?"VOLTA / CAREER":"03 / PARTY";
 app.innerHTML=((mode==="hub"||mode==="volta-club"||mode==="volta-match"||(voltaSave&&voltaCareerModes.includes(mode)))?"":header(stepLabel))+`<main class="${mode==="volta-club"|| (voltaSave&&voltaCareerModes.includes(mode))?'volta-fm-mainwrap':''}">${body}</main>`;
@@ -4192,6 +4214,39 @@ render();
 .facility-chain span.constructing{border-color:#d69a36!important;color:#f0c15d!important;background:#332715!important}.facility-build-status{margin-top:13px;padding:12px;border:1px solid #8d6b2d;background:#2b2213}.facility-build-status b,.facility-build-status span{display:block}.facility-build-status b{color:#f2cc62;font-size:12px}.facility-build-status span{margin-top:5px;color:#a99a76;font-size:9px}
 .volta-live-head .presentation{display:flex;gap:4px}.volta-live-head .presentation button{padding:5px 8px;border:1px solid #33404a;background:#151d24;color:#84939d;font-size:9px}.volta-live-head .presentation button.on{border-color:#c49b35;color:#f1cc5a;background:#332b17}.volta-live-head .mode.hot{color:#ff655f;text-shadow:0 0 9px #ff5d52}
 @media(max-width:820px){.volta-locker-grid{grid-template-columns:1fr}.reaction-head,.locker-card.reactions>div:not(.reaction-head){grid-template-columns:110px 70px 1fr}.volta-live-head{flex-wrap:wrap}.volta-live-head .presentation{order:3;width:100%}}
+</style>
+
+
+<style id="v108-kleague-live">
+html,body{margin:0!important;padding:0!important}
+body>main.volta-fm-mainwrap{margin:0!important;padding:0!important;width:100%!important;max-width:none!important}
+.volta-fm-shell.career{grid-template-columns:214px minmax(0,1fr)!important;width:100vw!important;max-width:none!important;margin:0!important}
+.volta-fm-sidebar.persistent{position:sticky!important;top:0!important;left:0!important;height:100vh!important;border-radius:0!important;z-index:80}
+.volta-career-content{padding:0 12px 40px!important;min-width:0}
+.volta-career-datebar{height:38px;display:flex;align-items:center;gap:12px;padding:0 14px;margin:0 -12px 10px;border-bottom:1px solid #28343e;background:#10171e}
+.volta-career-datebar b{color:#f0c64e;font-size:14px}.volta-career-datebar span{color:#7f909b;font-size:9px}
+.volta-fm-sidefoot b.date{color:#f0c64e!important;font-size:12px!important;line-height:1.35}
+.volta-fm-match-live{margin-top:auto;padding:12px;border:1px solid #8b3c3c;border-radius:6px;background:#2a1618;color:#ff756e;text-align:center;font-size:10px;font-weight:1000}
+.volta-office-date{display:inline-block;margin-top:5px;padding:4px 8px;border:1px solid #705e2e;background:#282313;color:#f0c64e;font-size:12px;font-weight:900}
+.volta-live-fm{padding:0 0 24px!important}
+.volta-live-scorebar{position:relative;justify-content:flex-start!important;padding-right:180px!important}
+.volta-live-scorebar .match-date{position:absolute;right:12px;top:50%;transform:translateY(-50%);color:#f0c64e;font-size:12px;white-space:nowrap}
+.volta-fm-live-grid{grid-template-columns:minmax(190px,235px) minmax(620px,1fr) minmax(240px,305px)!important;max-width:1500px;margin:0 auto}
+.volta-live-center{min-width:0}
+#voltaMatchCanvas{aspect-ratio:40/25;min-height:520px}
+.volta-live-panel{min-height:0}
+@media(max-width:1250px){
+ .volta-fm-live-grid{grid-template-columns:210px minmax(520px,1fr)!important}
+ .volta-live-panel.right{grid-column:1/-1}
+}
+@media(max-width:900px){
+ .volta-fm-shell.career{grid-template-columns:1fr!important;width:100%!important}
+ .volta-fm-sidebar.persistent{position:relative!important;height:auto!important}
+ .volta-career-datebar{margin:0 -10px 10px}
+ .volta-live-scorebar{padding-right:10px!important;flex-wrap:wrap}
+ .volta-live-scorebar .match-date{position:static;transform:none;width:100%;text-align:center}
+ #voltaMatchCanvas{min-height:0}
+}
 </style>
 
 </body>
