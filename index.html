@@ -346,7 +346,7 @@ button{font:inherit}.app{min-height:100vh;width:100%;max-width:1240px;margin:0 a
 /* V28: always-visible speed dock + per-player augment slots */
 .b2-speed-dock{position:absolute;z-index:35;top:12px;left:50%;transform:translateX(-50%);display:flex;gap:4px;padding:5px;background:#061219e8;border:1px solid #38515d;box-shadow:0 5px 18px #0008}
 .b2-speed-dock button{border:1px solid #314b57;background:#0a1b24;color:#9fb0b7;padding:5px 8px;font-size:9px;font-weight:900;cursor:pointer}.b2-speed-dock button.active{color:#f0d784;border-color:#b8994d;background:#19251f}
-.unit-augments{display:grid;grid-template-columns:repeat(4,1fr);gap:2px;margin-top:4px}.unit-augment{height:15px;border:1px solid #314550;background:#071219;color:#657780;font-size:8px;display:grid;place-items:center;overflow:hidden;white-space:nowrap}.unit-augment.filled{color:#e8d797;border-color:#75663f}.unit-augment.silver{border-color:#89979e;color:#cbd5da}.unit-augment.gold{border-color:#a98839;color:#e9c45e}.unit-augment.prismatic{border-color:#8c5db7;color:#d2a4ff}
+.unit-augments{display:grid;grid-template-columns:repeat(5,1fr);gap:2px;margin-top:4px}.unit-augment{height:15px;border:1px solid #314550;background:#071219;color:#657780;font-size:8px;display:grid;place-items:center;overflow:hidden;white-space:nowrap}.unit-augment.filled{color:#e8d797;border-color:#75663f}.unit-augment.silver{border-color:#89979e;color:#cbd5da}.unit-augment.gold{border-color:#a98839;color:#e9c45e}.unit-augment.prismatic{border-color:#8c5db7;color:#d2a4ff}
 @media(max-width:800px){.b2-speed-dock{top:4px;gap:2px;padding:3px}.b2-speed-dock button{padding:4px 5px;font-size:7px}.unit-augments{gap:1px}.unit-augment{height:10px;font-size:0}.unit-augment.filled:after{content:'◆';font-size:6px}.b2-unit{height:52px!important}}
 
 /* ===== V29 PICK SCREEN REWORK ===== */
@@ -403,7 +403,7 @@ button{font:inherit}.app{min-height:100vh;width:100%;max-width:1240px;margin:0 a
  .b2-side.right .b2-unit{grid-template-columns:1fr 72px!important}
  .portrait{width:66px!important;height:82px!important}
  .b2-unit strong{font-size:14px!important}.b2-unit small{font-size:10px!important}.b2-gold{font-size:10px!important}
- .unit-augments{grid-template-columns:repeat(4,34px)!important;gap:5px!important;margin-top:7px!important}
+ .unit-augments{grid-template-columns:repeat(5,30px)!important;gap:5px!important;margin-top:7px!important}
  .unit-augment{width:34px!important;height:34px!important;padding:0!important;border-radius:4px!important;overflow:hidden!important;position:relative!important;background:#07121b!important}
  .unit-augment img{width:100%!important;height:100%!important;object-fit:cover!important;display:block}
  .unit-augment i{width:100%;height:100%;place-items:center;font-style:normal;font-size:12px}
@@ -1139,7 +1139,10 @@ body=`<div class="loading-screen"><div class="loading-inner"><div class="loading
 if(mode==="battle"){
 const bs=battleState || {time:0,status:"전투 준비 중",team:[],enemy:[],log:[],speed:1,structures:[],relics:[],fx:[]};
 const portrait=(u)=>`<div class="portrait"><img src="assets/champions/${championImageId(u.champ.id)}_0.jpg" onerror="this.style.display='none';this.parentElement.textContent='${u.icon}'"></div>`;
-const augSlots=(u)=>`<div class="unit-augments">${[0,1,2,3].map(i=>{const a=(u.augments||[])[i];return a?`<span class="unit-augment filled ${a.tier}" title="${a.name} · ${a.desc}"><img src="assets/augments/${a.tier}/${a.name}.jpg" alt="${a.name}" onerror="this.style.display='none';this.nextElementSibling.style.display='grid'"><i style="display:none">◆</i></span>`:`<span class="unit-augment" title="미선택"><i>+</i></span>`}).join('')}</div>`;
+const augSlots=(u)=>{
+ const shown=allOwnedAugments(u).slice(0,5);
+ return `<div class="unit-augments">${[0,1,2,3,4].map(i=>{const a=shown[i];return a?`<span class="unit-augment filled ${a.tier}" title="${a.name} · ${a.desc}"><img src="assets/augments/${a.tier}/${a.name}.jpg" alt="${a.name}" onerror="this.style.display='none';this.nextElementSibling.style.display='grid'"><i style="display:none">◆</i></span>`:`<span class="unit-augment" title="미선택"><i>+</i></span>`}).join('')}</div>`;
+};
 const row=(u,right=false)=>`<div class="b2-unit ${u.alive?"":"dead"}" data-hud-unit="${u.id}">${right?`<div class="unit-info"><strong>${u.nick}</strong><small>${u.champ.name} · Lv.${u.level}</small><div class="b2-hp"><i style="width:${Math.max(0,u.hp/u.maxHp*100)}%"></i></div><div class="b2-gold">${Math.floor(u.gold).toLocaleString()} G</div>${augSlots(u)}</div>${portrait(u)}`:`${portrait(u)}<div class="unit-info"><strong>${u.nick}</strong><small>${u.champ.name} · Lv.${u.level}</small><div class="b2-hp"><i style="width:${Math.max(0,u.hp/u.maxHp*100)}%"></i></div><div class="b2-gold">${Math.floor(u.gold).toLocaleString()} G</div>${augSlots(u)}</div>`}</div>`;
 body=`<div class="battle-v2"><div class="b2-head"><div></div><div><div class="b2-score"><span class="blue" data-team-kills>${bs.teamKills||0}</span> &nbsp; ⚔ &nbsp; <span class="red" data-enemy-kills>${bs.enemyKills||0}</span></div><div class="b2-clock">${formatBattleTime(bs.time)}</div></div><div class="b2-right">${bs.status}</div></div><div class="b2-main"><aside class="b2-side"><div class="b2-side-title">우리 팀</div>${bs.team.map(u=>row(u,false)).join("")}</aside><div class="b2-stage"><div class="b2-map"><div class="clean-bridge"></div></div>
 <div class="structure-track">${bs.structures.map(st=>`<div class="b2-structure ${st.team==='enemy'?'red':''} ${st.type} ${st.alive?'':'dead'}" data-structure="${st.id}" style="left:${st.x}%"><div class="sicon">${st.type==='nexus'?'◆':st.type==='inhib'?'✦':'▥'}</div><div class="sname">${st.name} · ${Math.max(0,Math.round(st.hp))}%</div></div>`).join("")}</div>
@@ -2263,6 +2266,7 @@ const AUGMENT_DESCRIPTIONS={
 AUGMENT_DESCRIPTIONS["판도라의 상자"]="현재 보유한 모든 증강을 각각 무작위 프리즘 증강으로 변환합니다.";
 AUGMENT_DESCRIPTIONS["전환: 골드"]="실버 증강이지만 선택하면 무작위 골드 증강 하나를 추가로 얻습니다.";
 AUGMENT_DESCRIPTIONS["전환: 프리즘"]="골드 증강이지만 선택하면 무작위 프리즘 증강 하나를 추가로 얻습니다.";
+AUGMENT_DESCRIPTIONS["전환: 혼돈"]="프리즘 증강이며, 선택하면 무작위 증강체 두 개를 추가로 얻습니다.";
 
 function augmentDescription(name){return AUGMENT_DESCRIPTIONS[name]||'고유 효과를 지닌 증강체입니다. 챔피언과 조합에 따라 효율이 달라집니다.'}
 
@@ -2349,14 +2353,15 @@ function randomUnseenAugment(tier,u,stage){
  return makePickedAugment(u,a,stage);
 }
 function addBonusAugment(u,tier,stage,depth=0){
- if(!u||depth>4)return null;
+ if(!u||depth>6)return null;
  u.bonusAugments=u.bonusAugments||[];
  const picked=randomUnseenAugment(tier,u,stage);
  if(!picked)return null;
  u.bonusAugments.push(picked);
- // 전환: 골드로 뽑은 골드가 전환: 프리즘이면 그 효과도 실제로 이어서 처리.
- if(picked.name==='전환: 프리즘')addBonusAugment(u,'prismatic',stage,depth+1);
  syncPlayerAugmentList(u);
+ if(['전환: 골드','전환: 프리즘','전환: 혼돈','판도라의 상자'].includes(picked.name)){
+   resolveSpecialAugment(u,picked,stage,depth+1);
+ }
  return picked;
 }
 function transformAllOwnedToPrismatic(u){
@@ -2387,11 +2392,19 @@ function transformAllOwnedToPrismatic(u){
  bonus.forEach(x=>u.bonusAugments[x.index]=makeReplacement(x.pick));
  syncPlayerAugmentList(u);
 }
-function resolveSpecialAugment(u,picked,stage){
- if(!u||!picked)return;
- if(picked.name==='전환: 골드')addBonusAugment(u,'gold',stage);
- else if(picked.name==='전환: 프리즘')addBonusAugment(u,'prismatic',stage);
- else if(picked.name==='판도라의 상자')transformAllOwnedToPrismatic(u);
+function resolveSpecialAugment(u,picked,stage,depth=0){
+ if(!u||!picked||depth>6)return;
+ if(picked.name==='전환: 골드'){
+   addBonusAugment(u,'gold',stage,depth+1);
+ }else if(picked.name==='전환: 프리즘'){
+   addBonusAugment(u,'prismatic',stage,depth+1);
+ }else if(picked.name==='전환: 혼돈'){
+   addBonusAugment(u,rollAugmentTier(),stage,depth+1);
+   addBonusAugment(u,rollAugmentTier(),stage,depth+1);
+ }else if(picked.name==='판도라의 상자'){
+   transformAllOwnedToPrismatic(u);
+ }
+ syncPlayerAugmentList(u);
 }
 
 function maybeJungDaunAugmentChat(u,picked){
@@ -2556,7 +2569,7 @@ render();
 @media (min-width:801px){
   .b2-side .b2-unit,.b2-side.right .b2-unit{overflow:hidden!important;}
   .b2-side .unit-info{min-width:0!important;width:100%!important;overflow:hidden!important;}
-  .b2-side .unit-augments{display:grid!important;grid-template-columns:repeat(4,minmax(0,1fr))!important;gap:3px!important;width:100%!important;max-width:100%!important;margin-top:5px!important;}
+  .b2-side .unit-augments{display:grid!important;grid-template-columns:repeat(5,minmax(0,1fr))!important;gap:3px!important;width:100%!important;max-width:100%!important;margin-top:5px!important;}
   .b2-side .unit-augment{width:auto!important;min-width:0!important;height:22px!important;box-sizing:border-box!important;}
   .b2-side .unit-augment img{width:100%!important;height:100%!important;object-fit:cover!important;}
 }
@@ -2956,4 +2969,35 @@ render();
 .result-chat-body{min-height:360px!important;max-height:68dvh!important;}
 }
 @media (max-width:390px){.end-chat{height:68dvh!important;min-height:390px!important;}}
+</style>
+
+<style id="v94-roster-and-augment">
+@media (min-width:1001px){
+  .b2-main{grid-template-columns:360px minmax(0,1fr) 360px!important}
+  .b2-side{padding:18px 15px!important;overflow:auto!important}
+  .b2-side-title{font-size:13px!important;margin:0 5px 13px!important}
+  .b2-unit,.b2-side.right .b2-unit{
+    height:128px!important;
+    grid-template-columns:82px minmax(0,1fr)!important;
+    gap:12px!important;
+    padding:12px!important;
+    margin-bottom:11px!important;
+  }
+  .b2-side.right .b2-unit{grid-template-columns:minmax(0,1fr) 82px!important}
+  .portrait{width:76px!important;height:96px!important}
+  .b2-unit strong{font-size:16px!important;line-height:1.15!important}
+  .b2-unit small{font-size:11px!important;margin-top:4px!important}
+  .b2-gold{font-size:11px!important;margin-top:5px!important}
+  .b2-hp{height:6px!important;margin-top:7px!important}
+  .b2-side .unit-augments{
+    grid-template-columns:repeat(5,minmax(0,1fr))!important;
+    gap:4px!important;
+    margin-top:7px!important;
+    width:100%!important;
+  }
+  .b2-side .unit-augment{width:auto!important;height:27px!important;min-width:0!important}
+}
+@media (max-width:1000px){
+  .unit-augments{grid-template-columns:repeat(5,minmax(0,1fr))!important}
+}
 </style>
