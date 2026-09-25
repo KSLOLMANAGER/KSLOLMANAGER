@@ -599,7 +599,7 @@ button{font:inherit}.app{min-height:100vh;width:100%;max-width:1240px;margin:0 a
 /* ===== V67 BATTLE SCOREBOARD ===== */
 .battle-scoreboard{position:absolute;left:24px;bottom:18px;width:min(390px,34%);height:224px;z-index:34;background:linear-gradient(180deg,rgba(4,18,29,.97),rgba(2,9,15,.97));border:1px solid #355c73;box-shadow:0 12px 34px #000b;box-sizing:border-box;overflow:hidden;font-family:Arial,"Noto Sans KR",sans-serif}
 .battle-scoreboard-head{height:30px;display:flex;align-items:center;justify-content:space-between;padding:0 10px;border-bottom:1px solid #28485d;color:#c8dae4;font-size:11px;font-weight:900;letter-spacing:1px}.score-close{display:none;border:0;background:transparent;color:#d7e2e7;font-size:20px;line-height:1;padding:0 4px}
-.battle-scoreboard-teams{display:grid;grid-template-columns:1fr 1fr;height:calc(100% - 30px)}.battle-scoreboard-teams section{min-width:0;padding:5px 6px}.battle-scoreboard-teams section+section{border-left:1px solid #20394b}.battle-scoreboard h4{margin:0 0 4px;font-size:8px;letter-spacing:1px;color:#7898aa}.score-mini-row{height:33px;display:grid;grid-template-columns:28px 1fr;gap:5px;align-items:center;padding:2px 3px;margin-bottom:2px;background:rgba(11,30,45,.72);border-left:2px solid #3199ff;box-sizing:border-box}.score-mini-row.enemy{border-left-color:#e94b58;background:rgba(39,17,25,.68)}.score-mini-portrait{width:26px;height:26px;border:1px solid #3f88cf;overflow:hidden;display:grid;place-items:center;font-size:10px}.score-mini-row.enemy .score-mini-portrait{border-color:#b84a55}.score-mini-portrait img{width:100%;height:100%;object-fit:cover}.score-mini-main{min-width:0}.score-mini-top{display:flex;align-items:center;gap:4px;white-space:nowrap;min-width:0;line-height:11px}.score-mini-top b{max-width:62px;overflow:hidden;text-overflow:ellipsis;font-size:7px;color:#e4ecf0}.score-mini-kda{margin-left:auto;font-size:7px;color:#d2dde3;font-weight:900}.score-mini-cs{font-size:6px;color:#91a4ae}.score-mini-items{display:flex;gap:2px;margin-top:2px}.score-item{width:13px;height:13px;display:grid;place-items:center;border:1px solid #314654;background:#07131c;color:#334954;font-style:normal;font-size:7px;line-height:1;box-sizing:border-box}.score-item.filled{border-color:#9b7c37;background:radial-gradient(circle at 35% 30%,#806f3c,#1a1b17 70%);color:#f0d579;box-shadow:inset 0 0 4px #c79a3455}.mobile-score-toggle{display:none}
+.battle-scoreboard-teams{display:grid;grid-template-columns:1fr 1fr;height:calc(100% - 30px)}.battle-scoreboard-teams section{min-width:0;padding:5px 6px}.battle-scoreboard-teams section+section{border-left:1px solid #20394b}.battle-scoreboard h4{margin:0 0 4px;font-size:8px;letter-spacing:1px;color:#7898aa}.score-mini-row{height:33px;display:grid;grid-template-columns:28px 1fr;gap:5px;align-items:center;padding:2px 3px;margin-bottom:2px;background:rgba(11,30,45,.72);border-left:2px solid #3199ff;box-sizing:border-box}.score-mini-row.enemy{border-left-color:#e94b58;background:rgba(39,17,25,.68)}.score-mini-portrait{width:26px;height:26px;border:1px solid #3f88cf;overflow:hidden;display:grid;place-items:center;font-size:10px}.score-mini-row.enemy .score-mini-portrait{border-color:#b84a55}.score-mini-portrait img{width:100%;height:100%;object-fit:cover}.score-mini-main{min-width:0}.score-mini-top{display:flex;align-items:center;gap:4px;white-space:nowrap;min-width:0;line-height:11px}.score-mini-top b{max-width:62px;overflow:hidden;text-overflow:ellipsis;font-size:7px;color:#e4ecf0}.score-mini-kda{margin-left:auto;font-size:7px;color:#d2dde3;font-weight:900}.score-mini-cs{font-size:6px;color:#91a4ae}.score-mini-items{display:flex;gap:2px;margin-top:2px}.score-item{font-style:normal;font-weight:800;font-size:9px;width:13px;height:13px;display:grid;place-items:center;border:1px solid #314654;background:#07131c;color:#334954;font-style:normal;font-size:7px;line-height:1;box-sizing:border-box}.score-item.filled{border-color:#9b7c37;background:radial-gradient(circle at 35% 30%,#806f3c,#1a1b17 70%);color:#f0d579;box-shadow:inset 0 0 4px #c79a3455}.mobile-score-toggle{display:none}
 @media (min-width:801px){.battle-scoreboard{display:block!important}}
 @media (max-width:800px){
  .battle-scoreboard{display:none;position:absolute;left:64px;right:64px;bottom:74px;width:auto;height:min(54dvh,390px);z-index:90;border-color:#4b7590;box-shadow:0 14px 42px #000e}.battle-scoreboard.open{display:block}.battle-scoreboard-head{height:34px;font-size:10px}.score-close{display:block}.battle-scoreboard-teams{height:calc(100% - 34px);grid-template-columns:1fr;overflow-y:auto;-webkit-overflow-scrolling:touch}.battle-scoreboard-teams section{padding:6px 7px}.battle-scoreboard-teams section+section{border-left:0;border-top:1px solid #20394b}.score-mini-row{height:35px;grid-template-columns:30px 1fr}.score-mini-portrait{width:28px;height:28px}.score-mini-top b{max-width:110px;font-size:8px}.score-mini-kda{font-size:8px}.score-mini-cs{font-size:7px}.score-item{width:14px;height:14px;font-size:7px}
@@ -709,6 +709,7 @@ const SIGNATURE_CHAT={siljeom:"돈 드리겠습니다~",molcho:"보여줄게",dw
 let signatureRequests=[],signatureRequest=null,signatureChatDone=new Set(),signatureChatLog=[],molchoDealerChatDone=false,pickSpecialChatDone=new Set();
 let mode="select", callMode=null, me=null, selected=[], party=[], chatMembers=[], declinedMembers=[], replies=0, privateIndex=0, privateAnswered=false, privateTargets=[], searching=false, queueSeconds=0, queueTimer=null, found=false, champOptions=[], teamPicks=[], chosenChamp=null, finalPool=[], enemyTeam=[], loadingSeconds=10, loadingTimer=null, loadingTransitionTimer=null, battleState=null, battleTimer=null, matchResult=null;
 let battleRafPending=false, battleWatchdogTimer=null, battleUiSyncTimer=null;
+let developerTestConfig=null;
 
 function syncLiveBattleHud(){
   const bs=battleState;
@@ -792,19 +793,155 @@ function hasBatchim(text){
 }
 function josa(text,withBatchim,withoutBatchim){return hasBatchim(text)?withBatchim:withoutBatchim}
 
+
+const START_ITEMS={
+ marksman:{id:'guardian_blade',name:'수호자의 검',cost:950,sell:665,kind:'start',symbol:'검'},
+ assassin:{id:'guardian_blade',name:'수호자의 검',cost:950,sell:665,kind:'start',symbol:'검'},
+ fighter:{id:'guardian_hammer',name:'수호자의 망치',cost:950,sell:665,kind:'start',symbol:'망'},
+ tank:{id:'guardian_horn',name:'수호자의 뿔피리',cost:950,sell:665,kind:'start',symbol:'뿔'},
+ mage:{id:'guardian_orb',name:'수호자의 보주',cost:950,sell:665,kind:'start',symbol:'보'},
+ support:{id:'guardian_orb',name:'수호자의 보주',cost:950,sell:665,kind:'start',symbol:'보'}
+};
+const LEGENDARY_ITEMS={
+ '크라켄 학살자':{name:'크라켄 학살자',cost:3000,symbol:'크'},
+ '도미닉 경의 인사':{name:'도미닉 경의 인사',cost:3300,symbol:'도'},
+ '유령 무희':{name:'유령 무희',cost:2650,symbol:'유'},
+ '피바라기':{name:'피바라기',cost:3400,symbol:'피'},
+ '불멸의 철갑궁':{name:'불멸의 철갑궁',cost:3000,symbol:'철'},
+ '루난의 허리케인':{name:'루난의 허리케인',cost:2650,symbol:'루'},
+
+ '요우무의 유령검':{name:'요우무의 유령검',cost:2800,symbol:'요'},
+ '불경한 히드라':{name:'불경한 히드라',cost:2850,symbol:'불'},
+ '밤의 끝자락':{name:'밤의 끝자락',cost:3000,symbol:'밤'},
+ '징수의 총':{name:'징수의 총',cost:3000,symbol:'징'},
+ '원칙의 원형낫':{name:'원칙의 원형낫',cost:2750,symbol:'원'},
+ '오만':{name:'오만',cost:2950,symbol:'오'},
+
+ '삼위일체':{name:'삼위일체',cost:3333,symbol:'삼'},
+ '갈라진 하늘':{name:'갈라진 하늘',cost:3100,symbol:'갈'},
+ '스테락의 도전':{name:'스테락의 도전',cost:3200,symbol:'스'},
+ '죽음의 무도':{name:'죽음의 무도',cost:3300,symbol:'죽'},
+ '칠흑의 양날 도끼':{name:'칠흑의 양날 도끼',cost:3000,symbol:'칠'},
+ '거대한 히드라':{name:'거대한 히드라',cost:3300,symbol:'거'},
+
+ '강철심장':{name:'강철심장',cost:3000,symbol:'강'},
+ '태양불꽃 방패':{name:'태양불꽃 방패',cost:2800,symbol:'태'},
+ '정령의 형상':{name:'정령의 형상',cost:2700,symbol:'정'},
+ '가시 갑옷':{name:'가시 갑옷',cost:2450,symbol:'가'},
+ '워모그의 갑옷':{name:'워모그의 갑옷',cost:3100,symbol:'워'},
+ '해신 작쇼':{name:'해신 작쇼',cost:3200,symbol:'작'},
+
+ '루덴의 메아리':{name:'루덴의 메아리',cost:2750,symbol:'루'},
+ '그림자불꽃':{name:'그림자불꽃',cost:3200,symbol:'그'},
+ '리안드리의 고통':{name:'리안드리의 고통',cost:3000,symbol:'리'},
+ '공허의 지팡이':{name:'공허의 지팡이',cost:3000,symbol:'공'},
+ '존야의 모래시계':{name:'존야의 모래시계',cost:3250,symbol:'존'},
+ '우주의 추진력':{name:'우주의 추진력',cost:3000,symbol:'우'},
+
+ '월석 재생기':{name:'월석 재생기',cost:2200,symbol:'월'},
+ '불타는 향로':{name:'불타는 향로',cost:2200,symbol:'향'},
+ '구원':{name:'구원',cost:2300,symbol:'구'},
+ '헬리아의 메아리':{name:'헬리아의 메아리',cost:2200,symbol:'헬'},
+ '슈렐리아의 군가':{name:'슈렐리아의 군가',cost:2200,symbol:'슈'},
+ '새벽심장':{name:'새벽심장',cost:2500,symbol:'새'}
+};
+const ROLE_ITEM_BUILDS={
+ marksman:['크라켄 학살자','도미닉 경의 인사','유령 무희','피바라기','불멸의 철갑궁','루난의 허리케인'],
+ assassin:['요우무의 유령검','불경한 히드라','밤의 끝자락','징수의 총','원칙의 원형낫','오만'],
+ fighter:['삼위일체','갈라진 하늘','스테락의 도전','죽음의 무도','칠흑의 양날 도끼','거대한 히드라'],
+ tank:['강철심장','태양불꽃 방패','정령의 형상','가시 갑옷','워모그의 갑옷','해신 작쇼'],
+ mage:['루덴의 메아리','그림자불꽃','리안드리의 고통','공허의 지팡이','존야의 모래시계','우주의 추진력'],
+ support:['월석 재생기','불타는 향로','구원','헬리아의 메아리','슈렐리아의 군가','새벽심장']
+};
+// 챔피언별 템트리가 필요해지면 이 맵에 id별 6개 빌드만 덮어쓰면 된다.
+const CHAMPION_ITEM_BUILDS={};
+
+function itemArchetype(champ){
+ const roles=champ?.roles||[];
+ const profile=champDamageProfile(champ);
+ if(roles.includes('Marksman'))return 'marksman';
+ if(roles.includes('Assassin')&&profile==='ad')return 'assassin';
+ // AP 암살자는 보주 + 마법사 전설템
+ if(roles.includes('Assassin')&&profile==='ap')return 'mage';
+ // 순수 서포터는 서폿, 마법사 겸 서폿은 마법사 우선
+ if(roles.includes('Mage'))return 'mage';
+ if(roles.includes('Support')&&!roles.includes('Tank'))return 'support';
+ if(roles.includes('Tank')&&!roles.includes('Fighter'))return 'tank';
+ if(roles.includes('Fighter'))return 'fighter';
+ if(roles.includes('Tank'))return 'tank';
+ if(roles.includes('Support'))return 'support';
+ return 'fighter';
+}
+function recommendedItemBuild(champ){
+ const own=CHAMPION_ITEM_BUILDS[champ?.id];
+ return (own&&own.length?own:ROLE_ITEM_BUILDS[itemArchetype(champ)]||ROLE_ITEM_BUILDS.fighter).slice(0,6);
+}
+function initUnitItems(u){
+ if(!u||u.kind!=='champ')return;
+ const archetype=itemArchetype(u.champ);
+ const start={...START_ITEMS[archetype]};
+ u.itemArchetype=archetype;
+ u.inventory=[start];
+ u.itemBuild=recommendedItemBuild(u.champ);
+ u.itemBuildIndex=0;
+ // 시작 골드 1400G에서 시작 아이템 950G 자동 구매
+ u.gold=Math.max(0,(u.gold||0)-start.cost);
+}
+function autoBuyItems(u){
+ if(!u||u.kind!=='champ'||!Array.isArray(u.inventory))return;
+ const build=u.itemBuild||[];
+ if(u.itemBuildIndex>=build.length)return;
+ const name=build[u.itemBuildIndex];
+ const item=LEGENDARY_ITEMS[name];
+ if(!item){u.itemBuildIndex++;return;}
+
+ if(u.inventory.length<6){
+   if(u.gold>=item.cost){
+     u.gold-=item.cost;
+     u.inventory.push({...item,kind:'legendary'});
+     u.itemBuildIndex++;
+   }
+   return;
+ }
+
+ // 수호자 시작템 + 전설 5개 상태에서 마지막 6번째 전설템을 살 수 있으면 시작템 자동 판매.
+ const startIndex=u.inventory.findIndex(x=>x?.kind==='start');
+ if(startIndex>=0){
+   const start=u.inventory[startIndex];
+   if(u.gold+(start.sell||0)>=item.cost){
+     u.gold+=(start.sell||0);
+     u.inventory.splice(startIndex,1);
+     u.gold-=item.cost;
+     u.inventory.push({...item,kind:'legendary'});
+     u.itemBuildIndex++;
+   }
+ }
+}
+function itemPerformanceMultiplier(u){
+ if(!u||u.kind!=='champ'||!Array.isArray(u.inventory))return 1;
+ const legendary=u.inventory.filter(x=>x?.kind==='legendary').length;
+ const hasStart=u.inventory.some(x=>x?.kind==='start');
+ // 시간 자체가 아니라 실제 구매 완료된 아이템 수에 따라 전투력이 성장한다.
+ const perLegendary=(u.itemArchetype==='tank'||u.itemArchetype==='support')?.045:.055;
+ return (hasStart?1.03:1)*(1+legendary*perLegendary);
+}
+
+function battleItemImagePath(item){
+ return item?.name?`assets/items/${item.name}.png`:'';
+}
 function battleItemSymbol(u,i){
- const pool=['✦','◆','◈','⬟','◇','✧'];
- const role=(u?.champ?.roles||[])[0]||'Fighter';
- const off={Tank:1,Mage:2,Assassin:0,Marksman:3,Support:4,Fighter:0}[role]||0;
- return pool[(i+off)%pool.length];
+ const item=u?.inventory?.[i];
+ return item?.symbol||'';
 }
 function battleItemCount(u){
- const g=Math.max(0,u?.gold||0);
- return Math.max(1,Math.min(6,1+Math.floor(Math.max(0,g-1400)/2200)));
+ return Math.max(0,Math.min(6,u?.inventory?.length||0));
 }
 function scoreItemsHtml(u, enemy=false){
  const cnt=battleItemCount(u);
- return `<div class="score-items ${enemy?'enemy-items':''}">${[0,1,2,3,4,5].map(i=>`<i class="score-item ${i<cnt?'filled':''}" data-item="${i}">${i<cnt?battleItemSymbol(u,i):''}</i>`).join('')}</div>`;
+ return `<div class="score-items ${enemy?'enemy-items':''}">${[0,1,2,3,4,5].map(i=>{
+   const item=u?.inventory?.[i];
+   return `<i class="score-item ${i<cnt?'filled':''}" data-item="${i}" title="${item?`${item.name} · ${Number(item.cost||0).toLocaleString()}G`:''}">${item?`<img src="${battleItemImagePath(item)}" alt="${item.name}" onerror="this.style.display='none';this.nextElementSibling.style.display='grid'"><span class="score-item-fallback" style="display:none">${battleItemSymbol(u,i)}</span>`:''}</i>`;
+ }).join('')}</div>`;
 }
 function scorePortraitHtml(u, enemy=false){
  return `<div class="score-champ ${enemy?'enemy':''}" data-score-unit="${u.id}"><img src="assets/champions/${championImageId(u.champ.id)}_0.jpg" onerror="this.style.display='none';this.parentElement.textContent='${u.icon}'"></div>`;
@@ -862,8 +999,14 @@ function syncBattleScoreboard(){
      const u=units[j];if(!u)return;
      const cnt=battleItemCount(u);
      wrap.querySelectorAll('.score-item').forEach((el,n)=>{
+       const item=u?.inventory?.[n];
        el.classList.toggle('filled',n<cnt);
-       el.textContent=n<cnt?battleItemSymbol(u,n):'';
+       el.title=item?`${item.name} · ${Number(item.cost||0).toLocaleString()}G`:'';
+       if(item){
+         el.innerHTML=`<img src="${battleItemImagePath(item)}" alt="${item.name}" onerror="this.style.display='none';this.nextElementSibling.style.display='grid'"><span class="score-item-fallback" style="display:none">${battleItemSymbol(u,n)}</span>`;
+       }else{
+         el.innerHTML='';
+       }
      });
    });
  });
@@ -871,10 +1014,75 @@ function syncBattleScoreboard(){
 
 function render(){
 let body="";
+
+if(mode==="dev"){
+ const champOpts=champions.map(c=>`<option value="${c.id}">${c.name}</option>`).join('');
+ const charOpts=chars.map(c=>`<option value="${c.id}">${c.nickname} · ${c.name}</option>`).join('');
+ const allyDefaults=['siljeom','3patourwan','molcho','joguk','nguyen'];
+ const champDefaults=['pyke','hwei','swain','singed','kayle'];
+ const enemyChampDefaults=['garen','lux','jinx','malphite','zed'];
+ const enemyNickDefaults=['TEST-1','TEST-2','TEST-3','TEST-4','TEST-5'];
+ body=`<div class="dev-screen">
+   <div class="dev-head"><div><div class="eyebrow">DEVELOPER TEST MODE</div><h2>전투 테스트 설정</h2><p>랜덤 과정을 건너뛰고 원하는 조합으로 바로 전투를 재현합니다.</p></div><button class="dev-exit" onclick="mode='select';render()">나가기</button></div>
+
+   <div class="dev-grid">
+     <section class="dev-panel"><h3>우리 팀</h3>
+       ${[0,1,2,3,4].map(i=>`<div class="dev-row"><b>${i===0?'나':'팀원 '+i}</b>
+         <select id="devAllyChar${i}">${charOpts}</select>
+         <select id="devAllyChamp${i}">${champOpts}</select>
+       </div>`).join('')}
+     </section>
+
+     <section class="dev-panel"><h3>적 팀</h3>
+       ${[0,1,2,3,4].map(i=>`<div class="dev-row enemy"><b>적 ${i+1}</b>
+         <input id="devEnemyNick${i}" value="${enemyNickDefaults[i]}" maxlength="20">
+         <select id="devEnemyChamp${i}">${champOpts}</select>
+       </div>`).join('')}
+     </section>
+
+     <section class="dev-panel dev-options"><h3>경기 설정</h3>
+       <label>시작 게임 시간
+         <select id="devStartTime">
+           <option value="0">00:00</option>
+           <option value="240">04:00</option>
+           <option value="295">04:55</option>
+           <option value="595">09:55</option>
+           <option value="900">15:00</option>
+           <option value="1200">20:00</option>
+         </select>
+       </label>
+       <label>강제 팝업 이벤트
+         <select id="devForcedEvent">
+           <option value="">없음</option>
+           <option value="jaebin-taunt">이재빈 전체채팅</option>
+           <option value="jaebin-heal">이재빈 힐팩</option>
+           <option value="molcho-phone">김병욱 전화</option>
+           <option value="molcho-drunk">김병욱 술</option>
+           <option value="galio-sleep">김정운 졸음</option>
+           <option value="siljeom-penalty">박성진 수원 삼성</option>
+           <option value="munchul">황재윤 ↔ 김병욱 문철</option>
+         </select>
+       </label>
+       <label>게임 속도
+         <select id="devSpeed"><option value="1">1×</option><option value="4">4×</option><option value="8">8×</option><option value="16">16×</option><option value="32">32×</option></select>
+       </label>
+       <div class="dev-note">시작 증강 선택은 실제 게임처럼 유지됩니다. 증강 선택 후 강제 이벤트가 약 1초 내 발생합니다.</div>
+     </section>
+   </div>
+   <button class="primary dev-start" onclick="startDeveloperBattle()">테스트 경기 바로 시작 →</button>
+ </div>`;
+
+ requestAnimationFrame(()=>{
+   allyDefaults.forEach((v,i)=>{const el=document.getElementById('devAllyChar'+i);if(el)el.value=v});
+   champDefaults.forEach((v,i)=>{const el=document.getElementById('devAllyChamp'+i);if(el)el.value=v});
+   enemyChampDefaults.forEach((v,i)=>{const el=document.getElementById('devEnemyChamp'+i);if(el&&champions.some(c=>c.id===v))el.value=v});
+ });
+}
+
 if(mode==="select"){
  body=`<div class="section"><span>01</span><div><h2>캐릭터를 선택하세요</h2><p>선택한 캐릭터가 이번 게임의 당신입니다.</p></div></div>
  <div class="grid">${chars.map((c,i)=>`<button class="card ${me?.id===c.id?"sel":""}" onclick="choose('${c.id}')"><span class="num">0${i+1}</span><span class="nick">${c.nickname}</span><span class="real">${c.name}</span><span class="signature-label">시그니처 챔피언 - ${signatureChampionName(c.id)}</span><span class="check">${me?.id===c.id?"✓":""}</span></button>`).join("")}</div>
- ${button(me?me.nickname+"으로 계속하기 →":"캐릭터를 먼저 선택하세요",!me,"goMethod()")}`;
+ ${button(me?me.nickname+"으로 계속하기 →":"캐릭터를 먼저 선택하세요",!me,"goMethod()")}<button class="dev-secret" onclick="mode=\'dev\';render()" title="Developer Test">DEV</button>`;
 }
 if(mode==="method"){
 body=`<div class="section"><span>02</span><div><h2>어떻게 호출할까요?</h2><p><b>${me.nickname}</b> · ${me.name}으로 플레이합니다.</p></div></div>
@@ -1414,7 +1622,7 @@ function roleDamageMultiplier(u){
  return roles.reduce((sum,r)=>sum+(weights[r]??1),0)/roles.length;
 }
 function enemyBaseDifficultyMultiplier(u){return u?.team==='enemy'?1.10:1}
-function combatPerformanceMultiplier(u){return augmentPerformanceMultiplier(u)*(u?.compositionMultiplier||1)*molchoEventMultiplier(u)*jaebinEventMultiplier(u)*personalPopupMultiplier(u)*enemyBaseDifficultyMultiplier(u)}
+function combatPerformanceMultiplier(u){return augmentPerformanceMultiplier(u)*(u?.compositionMultiplier||1)*molchoEventMultiplier(u)*jaebinEventMultiplier(u)*personalPopupMultiplier(u)*itemPerformanceMultiplier(u)*enemyBaseDifficultyMultiplier(u)}
 
 function createChampionUnit(team,index,champ,nick,realName=null){
  const roleStats=team==='team'?(playerRoleStats[realName]||Object.fromEntries(["Fighter","Tank","Mage","Assassin","Marksman","Support"].map(r=>[r,60]))):enemyRoleStats();
@@ -1427,7 +1635,9 @@ function createChampionUnit(team,index,champ,nick,realName=null){
  const speed=(2.1+Math.random()*.25)*(1+power*.06);
  const formation=championFormation(champ);
  const combatRange=formation==='back'?6.8:4.9;
- return {id:`${team}-c${index}`,kind:'champ',team,champ,nick,realName,icon:champ.icon,x:team==='team'?8:92,y:36+index*7,maxHp,hp:maxHp,level:3,gold:1400,xp:0,atk,range:combatRange,speed,roleStats,roleSkill,formation,attackCd:0,alive:true,respawn:0,laneBias:(index-2)*5.2,phase:Math.random()*6.28,kills:0,deaths:0,assists:0,cs:0,damageDealt:0,damageTaken:0,augments:[]};
+ const u={id:`${team}-c${index}`,kind:'champ',team,champ,nick,realName,icon:champ.icon,x:team==='team'?8:92,y:36+index*7,maxHp,hp:maxHp,level:3,gold:1400,xp:0,atk,range:combatRange,speed,roleStats,roleSkill,formation,attackCd:0,alive:true,respawn:0,laneBias:(index-2)*5.2,phase:Math.random()*6.28,kills:0,deaths:0,assists:0,cs:0,damageDealt:0,damageTaken:0,augments:[],bonusAugments:[],seenAugments:new Set()};
+ initUnitItems(u);
+ return u;
 }
 function createMinion(team,type='melee'){const cannon=type==='cannon';return {id:`m-${team}-${Math.random()}`,kind:'minion',minionType:type,team,nick:'미니언',xpValue:cannon?100:type==='ranged'?32:65,x:team==='team'?7:93,y:46+Math.random()*8,maxHp:cannon?54:type==='melee'?30:23,hp:cannon?54:type==='melee'?30:23,atk:cannon?3.7:type==='melee'?2.0:1.7,range:cannon?4:type==='ranged'?4.2:2.4,speed:1.45,attackCd:0,alive:true,laneBias:(Math.random()-.5)*6,phase:Math.random()*6.28}}
 function startBattle(){
@@ -1456,7 +1666,8 @@ augmentOpen:true,augmentStage:'start',augmentChoices:[],augments:[],augmentDone:
  // 이전처럼 RAF를 먼저 시작한 뒤 0.7초 후 paused=true를 거는 순서를 없애서 00:00 정지 상태를 방지한다.
  battleState.molchoRandomEventAt=battleState.molchoRandomEventType==='drunk'?(50+Math.random()*25):(300+Math.random()*600);
  battleState.augmentTier=getAugmentTierForStage('start');
- battleState.augmentChoices=makeAugmentChoices(battleState.augmentTier);
+ battleState.augmentChoices=makeAugmentChoices(battleState.augmentTier,battleState.team?.[0]);
+ applyDeveloperBattleConfig(battleState);
  if(party.some(c=>c.id==='siljeom')) battleState.chat.push(`<span class="all-tag">[전체]</span> <span class="ally-chat">실점:</span> 안녕하세요~ 매너게임이요 ^^`);
  mode='battle';
  render();
@@ -1593,7 +1804,7 @@ function updateStructures(dt){const bs=battleState;for(const st of bs.structures
  }}
 function updateUnits(dt){const bs=battleState;syncNpcAugments();if(bs.paused)return;const all=bs.units;for(const u of all){
  if(!u.alive){if(u.kind==='champ'&&u.respawn>0){u.respawn-=dt;if(u.respawn<=0){u.alive=true;u.hp=u.maxHp*.72;u.x=u.team==='team'?8:92;u.y=50+u.laneBias;u.gold=Math.max(u.gold,1400);u.phase=Math.random()*6.28}}continue}
- u.gold+=6*dt;if(u.kind==='champ')u.xp+=5*teamXpCatchup(u.team)*dt;u.level=u.kind==='champ'?levelFromXp(u.xp):u.level;u.attackCd=Math.max(0,(u.attackCd||0)-dt);
+ u.gold+=6*dt;if(u.kind==='champ'){autoBuyItems(u);u.xp+=5*teamXpCatchup(u.team)*dt;}u.level=u.kind==='champ'?levelFromXp(u.xp):u.level;u.attackCd=Math.max(0,(u.attackCd||0)-dt);
  if(u===bs.team[0]&&!bs.augmentOpen&&!bs.jaebinEventOpen&&!bs.jaebinHealOpen&&!bs.jaebinBadAugmentOpen&&!bs.molchoPhoneOpen&&!bs.molchoDrunkOpen&&!bs.molchoAugmentScamOpen){for(const lv of [7,11,15]){if(u.level>=lv&&!bs.augmentDone[lv]){openAugment(lv);return}}}
  const enemyChamps=bs.units.filter(e=>e.alive&&e.kind==='champ'&&e.team!==u.team);
  const enemyMinions=bs.units.filter(e=>e.alive&&e.kind==='minion'&&e.team!==u.team);
@@ -1817,6 +2028,7 @@ function battleFrame(ts){
    if(bs.paused){bs.lastTs=ts;scheduleBattleFrame();return;}
    if(bs.endPending){bs.lastTs=ts;syncBattleDom();if(checkEnd())return;scheduleBattleFrame();return;}
    let raw=Math.min(.05,(ts-bs.lastTs)/1000);bs.lastTs=ts;let dt=Math.min(.8,raw*bs.speed);bs.time+=dt;
+   if(!bs.devForcedEventDone&&!bs.augmentOpen){if(triggerDeveloperForcedEvent()){scheduleBattleFrame();return;}}
    if(!bs.akaliChatDone&&party.some(c=>c.id==='nguyen')&&bs.enemy.some(u=>u.champ?.id==='akali')&&bs.time>=bs.akaliChatAt){bs.chat.push(`<span class="all-tag">[전체]</span> <span class="ally-chat">Nguyen Ngoc Tu:</span> 아칼리 사기 챔피언 하면 재미있음?`);bs.akaliChatDone=true;}
    if(bs.galioMessiMatch&&bs.galioMessiChatStage===0&&bs.time>=1){bs.chat.push(`<span class="all-tag">[전체]</span> <span class="ally-chat">갈리오:</span> 무슨 고트가 메시임?`);bs.galioMessiChatStage=1;}
    if(bs.galioMessiMatch&&bs.galioMessiChatStage===1&&bs.time>=4){bs.chat.push(`<span class="all-tag">[전체]</span> <span class="ally-chat">갈리오:</span> 우리 날두횽이 고트지;`);bs.galioMessiChatStage=2;}
@@ -1886,6 +2098,80 @@ function syncBattleDom(){const bs=battleState;try{syncBattleScoreboard()}catch(e
  }
  syncBattleScoreboard();
  const fxWrap=document.querySelector('.b2-stage');if(fxWrap){document.querySelectorAll('[data-fx]').forEach(el=>el.remove());for(const f of bs.fx){const d=document.createElement('div');d.className='b2-fx '+(f.team==='enemy'?'red':'blue');d.dataset.fx=f.id;const p=screenPos(f.x,f.y);d.style.left=p.left+'%';d.style.top=p.top+'%';d.textContent=f.text;fxWrap.appendChild(d)}}}
+
+function startDeveloperBattle(){
+ const allyIds=[0,1,2,3,4].map(i=>document.getElementById('devAllyChar'+i)?.value).filter(Boolean);
+ if(new Set(allyIds).size!==5){alert('우리 팀 캐릭터 5명은 서로 다르게 선택해 주세요.');return;}
+ const allyChamps=[0,1,2,3,4].map(i=>champions.find(c=>c.id===document.getElementById('devAllyChamp'+i)?.value));
+ const enemyChamps=[0,1,2,3,4].map(i=>champions.find(c=>c.id===document.getElementById('devEnemyChamp'+i)?.value));
+ if(allyChamps.some(x=>!x)||enemyChamps.some(x=>!x)){alert('챔피언 선택을 확인해 주세요.');return;}
+
+ party=allyIds.map(id=>chars.find(c=>c.id===id));
+ me=party[0];
+ teamPicks=allyChamps;
+ chosenChamp=teamPicks[0];
+ enemyTeam=enemyChamps.map((champ,i)=>({
+   champ,
+   nick:(document.getElementById('devEnemyNick'+i)?.value||`TEST-${i+1}`).trim()||`TEST-${i+1}`
+ }));
+ developerTestConfig={
+   enabled:true,
+   startTime:Number(document.getElementById('devStartTime')?.value||0),
+   forcedEvent:document.getElementById('devForcedEvent')?.value||'',
+   speed:Number(document.getElementById('devSpeed')?.value||1)
+ };
+ signatureRequests=[];signatureRequest=null;signatureChatDone=new Set();signatureChatLog=[];pickSpecialChatDone=new Set();molchoDealerChatDone=false;
+ stopBattleUiSync();
+ startBattle();
+}
+
+function applyDeveloperBattleConfig(bs){
+ if(!developerTestConfig?.enabled||!bs)return;
+ const t=Math.max(0,Number(developerTestConfig.startTime)||0);
+ bs.time=t;
+ bs.nextWaveAt=Math.max(45,45+Math.floor(Math.max(0,t-45)/30+1)*30);
+ bs.speed=developerTestConfig.speed||1;
+ bs.devForcedEvent=developerTestConfig.forcedEvent||'';
+ bs.devForcedEventDone=!bs.devForcedEvent;
+
+ // 랜덤 이벤트가 먼저 끼어드는 것을 방지하고, 선택한 강제 이벤트만 즉시 검증 가능하게 한다.
+ if(bs.devForcedEvent){
+   bs.jaebinRandomEventEnabled=false;
+   bs.molchoRandomEventEnabled=false;
+   bs.galioSleepEnabled=false;
+   bs.siljeomPenaltyEnabled=false;
+   bs.munchulEnabled=false;
+ }
+}
+
+function triggerDeveloperForcedEvent(){
+ const bs=battleState;if(!bs||!developerTestConfig?.enabled||bs.devForcedEventDone||bs.augmentOpen||anyCharacterPopupOpen(bs))return false;
+ const ev=bs.devForcedEvent;
+ let opened=false;
+
+ if(ev==='jaebin-taunt'){
+   bs.jaebinRandomEventType='taunt';bs.jaebinRandomEventDone=false;bs.jaebinEventOpen=true;opened=true;
+ }else if(ev==='jaebin-heal'){
+   bs.jaebinRandomEventType='healpack';bs.jaebinRandomEventDone=false;bs.jaebinHealOpen=true;opened=true;
+ }else if(ev==='molcho-phone'){
+   bs.molchoRandomEventType='phone';bs.molchoRandomEventDone=false;bs.molchoPhoneOpen=true;opened=true;
+ }else if(ev==='molcho-drunk'){
+   bs.molchoRandomEventType='drunk';bs.molchoRandomEventDone=false;bs.molchoDrunkOpen=true;opened=true;
+ }else if(ev==='galio-sleep'){
+   bs.galioSleepEnabled=true;bs.galioSleepDone=false;bs.galioSleepOpen=true;opened=true;
+ }else if(ev==='siljeom-penalty'){
+   bs.siljeomPenaltyEnabled=true;bs.siljeomPenaltyDone=false;bs.siljeomPenaltyResult=null;bs.siljeomPenaltyOpen=true;opened=true;
+ }else if(ev==='munchul'){
+   bs.munchulEnabled=true;bs.munchulDone=false;bs.munchulResult=null;bs.munchulScenario=(me?.id==='molcho'?'molcho':'dage');bs.munchulOpen=true;opened=true;
+ }
+
+ bs.devForcedEventDone=true;
+ if(opened){
+   bs.paused=true;bs.status='이벤트 일시정지';render();return true;
+ }
+ return false;
+}
+
 function choose(id){me=chars.find(c=>c.id===id);render()}
 function goMethod(){mode="method";render()}
 const declineReasons={
@@ -1941,7 +2227,7 @@ function augmentRankInfo(champId,augmentName){
 function augmentGradeWeight(grade){return grade==='S'?10:grade==='A'?5.5:grade==='B'?2.5:grade==='C'?1:1.35}
 function augmentGradePerformance(grade){return grade==='S'?1.5:grade==='A'?1.2:grade==='B'?.8:grade==='C'?.5:1}
 function augmentPerformanceMultiplier(u){
- const picked=(u?.augments||[]).filter(Boolean);
+ const picked=allOwnedAugments(u);
  if(!picked.length)return 1;
  const vals=picked.map(a=>augmentGradePerformance(a.opggGrade)).filter(v=>Number.isFinite(v));
  return vals.length?vals.reduce((a,b)=>a+b,0)/vals.length:1;
@@ -1973,42 +2259,191 @@ const augmentNames={
 const AUGMENT_DESCRIPTIONS={
  "전환: 프리즘":"무작위 프리즘 증강 하나를 추가로 얻습니다.","되풀이":"스킬 가속이 크게 증가합니다.","보석 건틀릿":"스킬 피해에도 치명타가 적용될 수 있고 치명타 확률이 증가합니다.","축소 엔진":"처치 관여로 몸집이 작아지며 스킬 가속과 이동 속도를 쌓습니다. 사망하면 중첩 일부를 잃습니다.","마도사의 주스 상자":"모든 피해 흡혈을 얻어 가한 피해 일부를 회복합니다.","마법 미사일":"스킬 피해를 입히면 추가 투사체를 발사해 거리에 비례한 최대 체력 기반 고정 피해를 줍니다.","치명적 미사일":"치명타 적중 시 추가 미사일이 발사되며 치명타 확률도 증가합니다.","극악무도":"스킬로 적 챔피언에게 피해를 줄 때마다 주문력을 영구적으로 쌓습니다.","상급 조준경 부착":"기본 공격 사거리가 크게 증가합니다.","조준경 부착":"기본 공격 사거리가 증가합니다.","최상급 조준경 부착":"기본 공격 사거리가 매우 크게 증가합니다.","유레카":"주문력에 비례해 추가 스킬 가속을 얻습니다.","탱크 엔진":"처치 관여로 최대 체력과 크기가 증가하는 중첩을 쌓습니다. 사망 시 일부를 잃습니다.","영혼 흡수":"치명타 피해 일부만큼 체력을 회복하고 치명타 확률을 얻습니다.","무한의 대검 업그레이드":"골드를 얻고 무한의 대검을 강화해 기본 공격의 치명타 피해 변동 폭을 키웁니다.","쌍둥이 불꽃":"스킬 피해 시 추가 투사체를 발사하며 치명타 확률을 얻습니다.","바늘에 실 끼우기":"방어구 관통력과 마법 관통력을 함께 얻습니다.","환영 무기":"스킬이 적중 시 효과를 적용하도록 만들어 공격 효과 연계를 강화합니다.","육중한 힘":"공격력이 크게 증가합니다.","드롭킥":"체력이 낮은 적을 공격하면 처형과 넉백이 발동하고 자신은 회복합니다.","이빨 요정":"폭발적인 피해를 줄 때 이빨이 떨어지며, 주워서 물리·마법 관통력을 영구적으로 올립니다.","노련한 저격수":"먼 거리에서 기본 스킬을 적중시키면 해당 스킬의 재사용 대기시간을 크게 돌려받습니다.","도주 계획":"체력이 위험 수준으로 떨어지면 큰 보호막과 이동 속도, 축소 효과를 얻습니다.","타오르는 이자":"챔피언에게 준 화상·지속 피해가 추가 골드를 만들어냅니다.","굶주린 속박":"이동 방해 효과를 적중시키면 추가 피해를 주고 체력을 회복합니다.","민병대":"비전투 상태에서 이동 속도가 크게 증가하며 피해를 받으면 잠시 비활성화됩니다.","치명적 리듬":"치명타 기본 공격으로 공격 속도 중첩을 쌓고 치명타 확률을 얻습니다.","순수주의자 - 마법사":"공격 속도를 스킬 가속으로 전환하고 재사용 대기시간 감소 능력을 강화합니다.","무한 반복":"큰 스킬 가속을 얻고 처치 관여할수록 추가 스킬 가속을 쌓습니다.","처형 시간":"궁극기 사용 후 적에게 표식을 남겨 이후 가한 피해를 저장했다가 폭발시킵니다.","선혈포식":"모든 피해 흡혈을 크게 얻습니다.","양손잡이":"기본 공격 시 추가 투사체로 적중 효과를 일부 적용하고 공격 속도를 얻습니다.","천상의 신체":"최대 체력이 크게 증가하지만 가하는 피해량이 일부 감소합니다.","거인":"몸집과 최대 체력이 크게 늘고 적응형 능력치도 증가합니다.","강타자":"기본 공격에 자신의 최대 체력 비례 추가 물리 피해가 붙습니다.","취약":"아이템과 지속 피해에도 치명타가 적용될 수 있으며 치명타 확률이 증가합니다.","거인 학살자":"몸집이 작아지고 이동 속도를 얻으며 자신보다 큰 적에게 추가 피해를 줍니다.","능수능란":"공격 속도가 크게 증가합니다.","적응형 능력치":"추가 공격력을 주문력으로 전환하고 주문력을 추가로 증가시킵니다.","마법 명사수":"기본 공격에 주문력 비례 추가 물리 피해가 붙습니다.","전환: 혼돈":"무작위 증강 두 개를 추가로 얻습니다.","하체 운동의 날":"이동 속도와 둔화 저항을 크게 얻습니다.","데굴데굴 눈덩이!":"눈덩이를 강화해 더 자주 사용하고, 관통·둔화·에어본·추가 피해 효과를 얻습니다.","지옥의 전도체":"스킬 사용 시 화상을 중첩하고, 화상이 기본 스킬 재사용 대기시간을 줄여줍니다.","미친 과학자":"부활할 때마다 거대화 또는 축소 계열의 무작위 강화 효과를 얻습니다.","신비한 주먹":"적중 시 스킬 재사용 대기시간을 줄입니다.","최종 형태":"궁극기 사용 후 잠시 보호막, 피해 흡혈, 이동 속도를 크게 얻습니다.","신난다!":"처치 관여 후 잠시 이동 속도와 공격 속도가 증가합니다.","장인의 솜씨":"아이템과 증강이 가하는 피해량이 증가합니다.","치명적인 공격":"치명타 확률이 크게 증가합니다.","압력솥":"주변 적에게 최대 체력 비례 화상을 누적시키며 퀘스트 진행에 따라 효과가 강해집니다.","전술적 대비":"주문력에 비례한 큰 보호막을 주기적으로 얻습니다.","정신 변환":"보유 마나에 비례해 최대 체력이 증가합니다.","빠르고 안전하게":"돌진이나 점멸 후 보호막을 얻습니다.","무법자의 투지":"돌진·점멸·순간이동 후 방어력과 마법 저항력을 중첩해서 얻습니다.","승리를 위한 회전":"회전형 스킬의 스킬 가속과 피해량이 증가합니다.","확률적 방어":"치명타 확률에 비례해 받는 피해를 크게 줄이는 방어가 발동할 수 있습니다.","검을 뽑아라":"근접 판정으로 바뀌며 잃은 사거리에 비례해 공격력·체력·공격 속도·흡혈·이동 속도를 얻습니다.","우당탕탕":"적을 이동 불가 상태로 만들 때 적응형 능력치를 쌓고 사망 시 일부를 잃습니다.","전장의 교향곡":"치명적 속도와 정복자 핵심 룬 효과를 함께 얻습니다.","죽음의 무도 업그레이드":"받는 피해 일부를 지연시키고 처치 관여 시 회복하는 효과를 강화합니다.","돌진":"돌진·도약·점멸·순간이동 계열 스킬의 스킬 가속이 매우 크게 증가합니다.","날쌘걸음":"사용 시 커서 방향으로 빠르게 돌진합니다.","요정 마법":"궁극기로 피해를 준 적을 잠시 변이시킵니다.","바다의 영혼":"적에게 피해를 준 뒤 체력과 마나 재생이 크게 증가합니다.","거인의 결의":"피해를 주거나 받을 때 중첩을 쌓아 공격·방어·강인함과 크기를 함께 키웁니다.","소환술사":"소환물의 크기, 체력, 피해량이 증가합니다.","소나타":"주기적으로 회복·보호막 오라와 이동 속도 오라를 번갈아 자동 사용합니다.","전능의 영혼":"무작위 드래곤 영혼 세 개를 얻습니다.","초월 의식":"처치 관여로 생긴 정수를 공격하면 이동 속도가 오르고 기본 스킬이 초기화됩니다.","넘을 수 없는 벽":"여진과 빙결 강화 핵심 룬 효과를 얻습니다.","신성한 눈덩이":"눈덩이를 강화하고 눈덩이 돌진 중 잠시 무적 상태가 됩니다.","자연의 회복":"수풀에 들어가면 체력을 크게 회복합니다.","결투의 대가":"기본 공격으로 주문력을, 스킬 피해로 공격력을 쌓습니다.","도망갈 수 없어":"궁극기 사용 시 주변 적을 도발하고 피해 감소를 얻으며 궁극기 가속도 증가합니다.","치명적 치유":"회복과 보호막이 치명타처럼 증폭될 수 있고 치명타 확률을 얻습니다.","우리의 치유":"주변에서 발생하는 회복 일부를 자신도 회복하며 적의 회복은 더 크게 반영됩니다.","치명적 가속":"치명타 확률에 비례한 스킬 가속을 얻습니다.","음속 폭발":"아군에게 회복·보호막·버프를 주면 그 아군 주변 적에게 피해와 둔화를 줍니다.","열의":"적 챔피언을 공격해 중첩을 쌓고 최대 중첩 상태에서 사망하면 강화된 상태로 부활합니다.","유리 대포":"최대 체력을 희생하는 대신 가하는 피해에 추가 고정 피해가 붙습니다.","골드 강탈":"챔피언에게 피해를 주면 추가 마법 피해와 골드, 이동 속도를 얻습니다.","대지의 영혼":"비전투 상태가 되면 잠시 보호막을 얻습니다.","공포":"특정 스킬 사용 시 주변 적에게 공포를 겁니다.","창공의 서약":"회복·보호막 효과가 증가하고 아군에게 순간이동해 보호막을 주는 주문을 얻습니다.","강력한 방패":"보호막을 얻으면 잠시 적응형 능력치가 증가합니다.","차원 이동":"영역 안의 대상을 잠시 다른 차원으로 보내는 소환사 주문을 얻습니다.","Hide on bush":"수풀에 들어간 뒤 잠시 가하는 피해량이 증가합니다."
 };
+
+AUGMENT_DESCRIPTIONS["판도라의 상자"]="현재 보유한 모든 증강을 각각 무작위 프리즘 증강으로 변환합니다.";
+AUGMENT_DESCRIPTIONS["전환: 골드"]="실버 증강이지만 선택하면 무작위 골드 증강 하나를 추가로 얻습니다.";
+AUGMENT_DESCRIPTIONS["전환: 프리즘"]="골드 증강이지만 선택하면 무작위 프리즘 증강 하나를 추가로 얻습니다.";
+
 function augmentDescription(name){return AUGMENT_DESCRIPTIONS[name]||'고유 효과를 지닌 증강체입니다. 챔피언과 조합에 따라 효율이 달라집니다.'}
 
-function augmentEffectFor(tier,name){
+
+function augmentEffectMeta(tier,name){
  const mult=tier==='silver'?1.035:tier==='gold'?1.065:1.10;
  const hp=tier==='silver'?1.045:tier==='gold'?1.08:1.13;
  const speed=tier==='silver'?1.018:tier==='gold'?1.032:1.05;
  let h=0;for(const ch of name)h=(h*31+ch.charCodeAt(0))>>>0;
- const kind=h%4;
- return {name,desc:augmentDescription(name),icon:tier==='silver'?'◇':tier==='gold'?'✦':'◆',apply:u=>{if(kind===0)u.atk*=mult;else if(kind===1){u.maxHp*=hp;u.hp*=hp}else if(kind===2)u.speed*=speed;else{u.atk*=1+(mult-1)*.6;u.maxHp*=1+(hp-1)*.6;u.hp*=1+(hp-1)*.6}}};
+ return {mult,hp,speed,kind:h%4};
+}
+function applyAugmentStatEffect(u,tier,name){
+ const {mult,hp,speed,kind}=augmentEffectMeta(tier,name);
+ if(kind===0)u.atk*=mult;
+ else if(kind===1){u.maxHp*=hp;u.hp*=hp}
+ else if(kind===2)u.speed*=speed;
+ else{u.atk*=1+(mult-1)*.6;u.maxHp*=1+(hp-1)*.6;u.hp*=1+(hp-1)*.6}
+}
+function undoAugmentStatEffect(u,pick){
+ if(!u||!pick)return;
+ const tier=pick.tier||'silver',name=pick.name||'';
+ const {mult,hp,speed,kind}=augmentEffectMeta(tier,name);
+ if(kind===0)u.atk/=mult;
+ else if(kind===1){u.maxHp/=hp;u.hp/=hp}
+ else if(kind===2)u.speed/=speed;
+ else{
+   const am=1+(mult-1)*.6,hm=1+(hp-1)*.6;
+   u.atk/=am;u.maxHp/=hm;u.hp/=hm;
+ }
+ u.hp=Math.min(u.hp,u.maxHp);
+}
+function augmentEffectFor(tier,name){
+ return {name,desc:augmentDescription(name),icon:tier==='silver'?'◇':tier==='gold'?'✦':'◆',apply:u=>applyAugmentStatEffect(u,tier,name)};
 }
 const augmentTemplates={silver:augmentNames.silver.map(n=>augmentEffectFor('silver',n)),gold:augmentNames.gold.map(n=>augmentEffectFor('gold',n)),prismatic:augmentNames.prismatic.map(n=>augmentEffectFor('prismatic',n))};
 function rollAugmentTier(){const r=Math.random()*100;return r<30?'silver':r<80?'gold':'prismatic'}
-function makeAugmentChoices(tier=rollAugmentTier()){
- const pool=[...augmentTemplates[tier]];const picks=[];
- while(picks.length<3&&pool.length){const j=Math.floor(Math.random()*pool.length);picks.push({...pool.splice(j,1)[0],tier,rerolled:false,key:tier+'-'+Math.random()})}
+
+function ensureAugmentSeen(u){
+ if(!u)return new Set();
+ if(!(u.seenAugments instanceof Set))u.seenAugments=new Set(Array.isArray(u.seenAugments)?u.seenAugments:[]);
+ return u.seenAugments;
+}
+function markAugmentSeen(u,name){
+ if(u&&name)ensureAugmentSeen(u).add(name);
+}
+function availableAugmentPool(tier,u,extraExclude=[]){
+ const seen=ensureAugmentSeen(u);
+ const extra=new Set(extraExclude||[]);
+ return (augmentTemplates[tier]||[]).filter(a=>!seen.has(a.name)&&!extra.has(a.name));
+}
+function makeAugmentChoices(tier=rollAugmentTier(),u=null){
+ const pool=[...availableAugmentPool(tier,u)],picks=[];
+ while(picks.length<3&&pool.length){
+   const j=Math.floor(Math.random()*pool.length);
+   const a={...pool.splice(j,1)[0],tier,rerolled:false,key:tier+'-'+Math.random()};
+   picks.push(a);
+   markAugmentSeen(u,a.name); // 화면에 한 번이라도 뜨는 즉시 이후 풀에서 제외
+ }
  return picks;
 }
+function makePickedAugment(u,a,stage){
+ const ri=augmentRankInfo(u?.champ?.id,a.name);
+ return {name:a.name,tier:a.tier,desc:a.desc,stage,opggGrade:ri.grade,opggRank:ri.rank};
+}
+function allOwnedAugments(u){
+ return [...(u?.augments||[]).filter(Boolean),...(u?.bonusAugments||[]).filter(Boolean)];
+}
+function syncPlayerAugmentList(u){
+ const bs=battleState;
+ if(bs&&u===bs.team?.[0])bs.augments=allOwnedAugments(u);
+}
+function randomUnseenAugment(tier,u,stage){
+ let pool=availableAugmentPool(tier,u);
+ // 정상 플레이에서는 풀 소진이 사실상 불가능하지만, 소진 시 같은 등급 전체에서 중복 소유만 피한다.
+ if(!pool.length){
+   const owned=new Set(allOwnedAugments(u).map(a=>a.name));
+   pool=(augmentTemplates[tier]||[]).filter(a=>!owned.has(a.name));
+ }
+ if(!pool.length)return null;
+ const base=pool[Math.floor(Math.random()*pool.length)];
+ const a={...base,tier,rerolled:false,key:tier+'-'+Math.random()};
+ markAugmentSeen(u,a.name);
+ a.apply(u);
+ return makePickedAugment(u,a,stage);
+}
+function addBonusAugment(u,tier,stage,depth=0){
+ if(!u||depth>4)return null;
+ u.bonusAugments=u.bonusAugments||[];
+ const picked=randomUnseenAugment(tier,u,stage);
+ if(!picked)return null;
+ u.bonusAugments.push(picked);
+ // 전환: 골드로 뽑은 골드가 전환: 프리즘이면 그 효과도 실제로 이어서 처리.
+ if(picked.name==='전환: 프리즘')addBonusAugment(u,'prismatic',stage,depth+1);
+ syncPlayerAugmentList(u);
+ return picked;
+}
+function transformAllOwnedToPrismatic(u){
+ if(!u)return;
+ u.augments=u.augments||[];
+ u.bonusAugments=u.bonusAugments||[];
+
+ const standard=u.augments.map((p,i)=>p?{pick:p,index:i}:null).filter(Boolean);
+ const bonus=u.bonusAugments.map((p,i)=>p?{pick:p,index:i}:null).filter(Boolean);
+ const old=[...standard,...bonus];
+
+ // 기존 증강의 실제 스탯 효과를 먼저 제거한다.
+ old.forEach(x=>undoAugmentStatEffect(u,x.pick));
+
+ const usedNow=new Set();
+ const makeReplacement=(oldPick)=>{
+   let pool=availableAugmentPool('prismatic',u,[...usedNow]);
+   if(!pool.length)pool=(augmentTemplates.prismatic||[]).filter(a=>!usedNow.has(a.name));
+   if(!pool.length)return oldPick;
+   const base=pool[Math.floor(Math.random()*pool.length)];
+   usedNow.add(base.name);markAugmentSeen(u,base.name);
+   const a={...base,tier:'prismatic',rerolled:false,key:'prismatic-'+Math.random()};
+   a.apply(u);
+   return makePickedAugment(u,a,oldPick.stage);
+ };
+
+ standard.forEach(x=>u.augments[x.index]=makeReplacement(x.pick));
+ bonus.forEach(x=>u.bonusAugments[x.index]=makeReplacement(x.pick));
+ syncPlayerAugmentList(u);
+}
+function resolveSpecialAugment(u,picked,stage){
+ if(!u||!picked)return;
+ if(picked.name==='전환: 골드')addBonusAugment(u,'gold',stage);
+ else if(picked.name==='전환: 프리즘')addBonusAugment(u,'prismatic',stage);
+ else if(picked.name==='판도라의 상자')transformAllOwnedToPrismatic(u);
+}
+
 function maybeJungDaunAugmentChat(u,picked){
  const bs=battleState;if(!bs||!picked||u.team!=='team'||!party.some(c=>c.id==='3patourwan'))return;
  const lines={'육중한 힘':'육중한 힘~~','우리의 치유':'우리의 치유~~ 우리의 사랑~~','부식':'부시기 횽이야~','차가운 냉기':'차냉이 횽이야~~','영혼 폭탄':'영포기 횽이야~~'};
  const msg=lines[picked.name];if(msg)bs.chat.push(`<span class="all-tag">[전체]</span> <span class="ally-chat">쓰리빠뚜르완:</span> ${msg}`);
 }
 function getAugmentTierForStage(stage){const bs=battleState;if(!bs)return rollAugmentTier();bs.augmentTierByStage=bs.augmentTierByStage||{};const key=String(stage);if(!bs.augmentTierByStage[key])bs.augmentTierByStage[key]=rollAugmentTier();return bs.augmentTierByStage[key]}
-function autoPickAugmentFor(u,stage){if(!u||u.kind!=='champ')return;u.augments=u.augments||[];const idx=stage==='start'?0:stage===7?1:stage===11?2:3;if(u.augments[idx])return;const tier=getAugmentTierForStage(stage),choices=makeAugmentChoices(tier),a=weightedPickAugmentForChampion(u,choices)||choices[Math.floor(Math.random()*choices.length)];a.apply(u);const ri=augmentRankInfo(u.champ?.id,a.name);u.augments[idx]={name:a.name,tier:a.tier,desc:a.desc,stage,opggGrade:ri.grade,opggRank:ri.rank};maybeJungDaunAugmentChat(u,u.augments[idx]);if(!checkMolchoAugmentScam(u))checkJaebinBadAugments(u);}
+function autoPickAugmentFor(u,stage){
+ if(!u||u.kind!=='champ')return;
+ u.augments=u.augments||[];u.bonusAugments=u.bonusAugments||[];
+ const idx=stage==='start'?0:stage===7?1:stage===11?2:3;
+ if(u.augments[idx])return;
+ const tier=getAugmentTierForStage(stage),choices=makeAugmentChoices(tier,u);
+ if(!choices.length)return;
+ const a=weightedPickAugmentForChampion(u,choices)||choices[Math.floor(Math.random()*choices.length)];
+ a.apply(u);
+ const picked=makePickedAugment(u,a,stage);
+ u.augments[idx]=picked;
+ maybeJungDaunAugmentChat(u,picked);
+ resolveSpecialAugment(u,picked,stage);
+ if(!checkMolchoAugmentScam(u))checkJaebinBadAugments(u);
+}
 function syncNpcAugments(){const bs=battleState;if(!bs)return;for(const u of [...bs.team,...bs.enemy]){if(u===bs.team[0])continue;if(!(u.augments||[]).length)autoPickAugmentFor(u,'start');if(bs.paused)return;for(const lv of [7,11,15]){if(u.level>=lv)autoPickAugmentFor(u,lv);if(bs.paused)return}}}
-function openAugment(stage){const bs=battleState;if(!bs||bs.augmentOpen||bs.molchoPhoneOpen||bs.molchoDrunkOpen||bs.molchoAugmentScamOpen||bs.jaebinEventOpen||bs.jaebinHealOpen||bs.jaebinBadAugmentOpen)return;bs.augmentStage=stage;bs.augmentTier=getAugmentTierForStage(stage);bs.augmentChoices=makeAugmentChoices(bs.augmentTier);bs.augmentOpen=true;bs.paused=true;bs.status='증강체 선택 중';render()}
-function rerollAugment(i,e){if(e)e.stopPropagation();const bs=battleState;if(!bs||!bs.augmentOpen||bs.augmentChoices[i].rerolled)return;const old=bs.augmentChoices[i],shown=new Set(bs.augmentChoices.map(a=>a.name)),pool=augmentTemplates[bs.augmentTier].filter(a=>!shown.has(a.name));const a=pool[Math.floor(Math.random()*pool.length)]||augmentTemplates[bs.augmentTier][0];bs.augmentChoices[i]={...a,tier:bs.augmentTier,rerolled:true,key:bs.augmentTier+'-'+Math.random()};render()}
+function openAugment(stage){const bs=battleState;if(!bs||bs.augmentOpen||bs.molchoPhoneOpen||bs.molchoDrunkOpen||bs.molchoAugmentScamOpen||bs.jaebinEventOpen||bs.jaebinHealOpen||bs.jaebinBadAugmentOpen)return;bs.augmentStage=stage;bs.augmentTier=getAugmentTierForStage(stage);bs.augmentChoices=makeAugmentChoices(bs.augmentTier,bs.team?.[0]);bs.augmentOpen=true;bs.paused=true;bs.status='증강체 선택 중';render()}
+function rerollAugment(i,e){
+ if(e)e.stopPropagation();
+ const bs=battleState;if(!bs||!bs.augmentOpen||!bs.augmentChoices[i]||bs.augmentChoices[i].rerolled)return;
+ const me=bs.team?.[0];
+ const pool=availableAugmentPool(bs.augmentTier,me);
+ if(!pool.length)return;
+ const a=pool[Math.floor(Math.random()*pool.length)];
+ markAugmentSeen(me,a.name);
+ bs.augmentChoices[i]={...a,tier:bs.augmentTier,rerolled:true,key:bs.augmentTier+'-'+Math.random()};
+ render();
+}
 function chooseAugment(i){
  const bs=battleState;if(!bs||!bs.augmentOpen)return;
  const a=bs.augmentChoices[i],me=bs.team[0],stage=bs.augmentStage;
+ if(!a)return;
+ me.augments=me.augments||[];me.bonusAugments=me.bonusAugments||[];
  a.apply(me);
- const ri=augmentRankInfo(me.champ?.id,a.name);
- const picked={name:a.name,tier:a.tier,desc:a.desc,stage:stage,opggGrade:ri.grade,opggRank:ri.rank};
- bs.augments.push(picked);me.augments=me.augments||[];
+ const picked=makePickedAugment(me,a,stage);
  const ai=stage==='start'?0:stage===7?1:stage===11?2:3;
- me.augments[ai]=picked;maybeJungDaunAugmentChat(me,picked);
+ me.augments[ai]=picked;
+ syncPlayerAugmentList(me);
+ maybeJungDaunAugmentChat(me,picked);
+
+ // 전환/판도라 효과를 실제 보유 증강에 적용.
+ resolveSpecialAugment(me,picked,stage);
+ syncPlayerAugmentList(me);
+
  bs.augmentDone[stage]=true;bs.augmentOpen=false;bs.status='경기 진행 중';
  const scamTriggered=checkMolchoAugmentScam(me);
  const jaebinBadTriggered=scamTriggered?false:checkJaebinBadAugments(me);
@@ -2048,9 +2483,9 @@ function dropSwap(e,targetType,targetIndex){e.preventDefault();e.stopPropagation
   dragSource=null;render();
 }
 function openResults(){mode='results';render()}
-function playAgain(){stopBattleUiSync();battleState=null;matchResult=null;teamPicks=[];chosenChamp=null;finalPool=[];enemyTeam=[];signatureRequests=[];signatureRequest=null;signatureChatDone=new Set();signatureChatLog=[];molchoDealerChatDone=false;pickSpecialChatDone=new Set();goQueue()}
-function reselectTeam(){stopBattleUiSync();battleState=null;matchResult=null;selected=[];party=[];mode='method';render()}
-function reset(){clearInterval(queueTimer);clearInterval(loadingTimer);clearTimeout(loadingTransitionTimer);clearInterval(battleTimer);clearInterval(battleWatchdogTimer);stopBattleUiSync();battleRafPending=false;cancelAnimationFrame(window.__battleRAF);dragSource=null;mode="select";me=null;selected=[];party=[];chatMembers=[];replies=0;privateIndex=0;privateAnswered=false;searching=false;queueSeconds=0;found=false;champOptions=[];teamPicks=[];chosenChamp=null;finalPool=[];molchoDealerChatDone=false;pickSpecialChatDone=new Set();render()}
+function playAgain(){developerTestConfig=null;stopBattleUiSync();battleState=null;matchResult=null;teamPicks=[];chosenChamp=null;finalPool=[];enemyTeam=[];signatureRequests=[];signatureRequest=null;signatureChatDone=new Set();signatureChatLog=[];molchoDealerChatDone=false;pickSpecialChatDone=new Set();goQueue()}
+function reselectTeam(){developerTestConfig=null;stopBattleUiSync();battleState=null;matchResult=null;selected=[];party=[];mode='method';render()}
+function reset(){developerTestConfig=null;clearInterval(queueTimer);clearInterval(loadingTimer);clearTimeout(loadingTransitionTimer);clearInterval(battleTimer);clearInterval(battleWatchdogTimer);stopBattleUiSync();battleRafPending=false;cancelAnimationFrame(window.__battleRAF);dragSource=null;mode="select";me=null;selected=[];party=[];chatMembers=[];replies=0;privateIndex=0;privateAnswered=false;searching=false;queueSeconds=0;found=false;champOptions=[];teamPicks=[];chosenChamp=null;finalPool=[];molchoDealerChatDone=false;pickSpecialChatDone=new Set();render()}
 render();
 </script>
 
@@ -2126,6 +2561,39 @@ render();
   .b2-side .unit-augment img{width:100%!important;height:100%!important;object-fit:cover!important;}
 }
 </style>
+
+<style>
+.score-item{overflow:hidden!important;display:grid!important;place-items:center!important;padding:0!important}
+.score-item img{width:100%!important;height:100%!important;object-fit:cover!important;display:block}
+.score-item-fallback{width:100%;height:100%;place-items:center;font-size:9px;font-weight:900}
+</style>
+
+
+<style>
+.dev-secret{position:fixed;left:10px;bottom:10px;z-index:80;border:1px solid #ffffff18;background:#050b12;color:#8ea2b6;
+  font:700 9px/1 Arial;padding:5px 7px;border-radius:5px;opacity:.18;cursor:pointer;transition:.15s}
+.dev-secret:hover{opacity:.85;border-color:#ffffff38}
+.dev-screen{max-width:1180px;margin:0 auto;padding:20px 16px 80px}
+.dev-head{display:flex;justify-content:space-between;align-items:flex-start;gap:20px;margin-bottom:16px}
+.dev-head h2{margin:4px 0 6px;font-size:28px}.dev-head p{margin:0;color:#8193a5}
+.dev-exit{border:1px solid #27394c;background:#0b1520;color:#aebdca;padding:9px 14px;border-radius:8px;cursor:pointer}
+.dev-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.dev-panel{background:#09131e;border:1px solid #203246;border-radius:12px;padding:14px}
+.dev-panel h3{margin:0 0 12px;font-size:13px;color:#dbe8f4}
+.dev-row{display:grid;grid-template-columns:72px 1fr 1fr;gap:8px;align-items:center;margin:7px 0}
+.dev-row b{font-size:11px;color:#8fa4b8}.dev-row select,.dev-row input,.dev-options select{
+ width:100%;min-width:0;background:#050d15;color:#d8e4ef;border:1px solid #23384b;border-radius:7px;padding:8px;font-size:11px}
+.dev-options{grid-column:1/-1;display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+.dev-options h3{grid-column:1/-1}.dev-options label{font-size:11px;color:#91a4b7;display:grid;gap:6px}
+.dev-note{grid-column:1/-1;color:#667d92;font-size:10px;border-top:1px solid #172738;padding-top:10px}
+.dev-start{max-width:460px!important;margin:16px auto 0!important;display:block!important}
+@media(max-width:800px){
+ .dev-grid{grid-template-columns:1fr}.dev-options{grid-column:auto;grid-template-columns:1fr}.dev-options h3,.dev-note{grid-column:auto}
+ .dev-row{grid-template-columns:62px 1fr}.dev-row select:last-child,.dev-row.enemy select{grid-column:2}
+ .dev-head h2{font-size:22px}
+}
+</style>
+
 </body>
 </html><style>
 /* ===== V33 PICK SCREEN SCALE-UP ===== */
