@@ -707,7 +707,7 @@ function enemyRoleStats(){const o={};["Fighter","Tank","Mage","Assassin","Marksm
 const SIGNATURE_CHAMPS={siljeom:"pyke",molcho:"swain",dwaemesa:"samira",joguk:"singed",nguyen:"kayle","3patourwan":"hwei",mundolmaeng:"teemo",galio:"galio",dage:"irelia"};
 const SIGNATURE_CHAT={siljeom:"돈 드리겠습니다~",molcho:"보여줄게",dwaemesa:"월월 감사합니다 월월",joguk:"왔다 내 사랑",nguyen:"케권이 횽이야","3patourwan":"흐에!!",mundolmaeng:"티모횽이야",galio:"야 든든하게 막아줄게",dage:"야 게임 끝났어"};
 let signatureRequests=[],signatureRequest=null,signatureChatDone=new Set(),signatureChatLog=[],molchoDealerChatDone=false,pickSpecialChatDone=new Set();
-let mode="select", callMode=null, me=null, selected=[], party=[], chatMembers=[], declinedMembers=[], replies=0, privateIndex=0, privateAnswered=false, privateTargets=[], searching=false, queueSeconds=0, queueTimer=null, found=false, champOptions=[], teamPicks=[], chosenChamp=null, finalPool=[], enemyTeam=[], loadingSeconds=10, loadingTimer=null, loadingTransitionTimer=null, battleState=null, battleTimer=null, matchResult=null;
+let mode="hub", callMode=null, me=null, selected=[], party=[], chatMembers=[], declinedMembers=[], replies=0, privateIndex=0, privateAnswered=false, privateTargets=[], searching=false, queueSeconds=0, queueTimer=null, found=false, champOptions=[], teamPicks=[], chosenChamp=null, finalPool=[], enemyTeam=[], loadingSeconds=10, loadingTimer=null, loadingTransitionTimer=null, battleState=null, battleTimer=null, matchResult=null;
 let battleRafPending=false, battleWatchdogTimer=null, battleUiSyncTimer=null;
 let developerTestConfig=null;
 
@@ -779,7 +779,10 @@ function armBattleWatchdog(){
 
 const app=document.getElementById("app");
 const shuffle=a=>[...a].sort(()=>Math.random()-.5);
-function header(step){return `<header class="top"><div><div class="eyebrow">AUGMENT ARENA</div><h1>곡선 증바람 매니저</h1></div><div class="step">${step}</div></header>`}
+function header(step){
+ const volta=String(mode||'').startsWith('volta');
+ return `<header class="top"><div><div class="eyebrow">${volta?"VOLTA MANAGER":"AUGMENT ARENA"}</div><h1>${volta?"곡선 볼타 매니저":"곡선 증바람 매니저"}</h1></div><div class="step">${step}</div></header>`;
+}
 function button(text,disabled=false,onclick=""){return `<button class="primary" ${disabled?"disabled":""} onclick="${onclick}">${text}</button>`}
 const CHAMPION_IMAGE_IDS={reksai:"RekSai",leesin:"LeeSin",masteryi:"MasterYi",drmundo:"DrMundo",missfortune:"MissFortune",xinzhao:"XinZhao",aurelionsol:"AurelionSol",wukong:"MonkeyKing",jarvaniv:"JarvanIV",kogmaw:"KogMaw",ksante:"KSante",tahmkench:"TahmKench",twistedfate:"TwistedFate",fiddlesticks:"FiddleSticks"};
 function championImageId(id){return id ? (CHAMPION_IMAGE_IDS[id]||id.charAt(0).toUpperCase()+id.slice(1)) : id;}
@@ -1012,8 +1015,136 @@ function syncBattleScoreboard(){
  });
 }
 
+
+const VOLTA_CHARACTERS=[
+ {id:'park-seongjin',name:'박성진'},{id:'lee-donggi',name:'이동기'},{id:'kim-byeonguk',name:'김병욱'},
+ {id:'hwang-jaeyoon',name:'황재윤'},{id:'lee-jaebin',name:'이재빈'},{id:'lim-dohyeon',name:'임도현'},
+ {id:'jung-daun',name:'정다운'},{id:'cho-siwon',name:'조시원'},{id:'kim-jeongun',name:'김정운'}
+];
+const VOLTA_COACHES=[
+ {id:'shin-jinwon',name:'신진원',grade:'D'},{id:'moon-jeyoung',name:'문제영',grade:'D'},{id:'cha-jeongsu',name:'차정수',grade:'D'},
+ {id:'lee-chuno',name:'이추노',grade:'D'},{id:'seong-gijun',name:'성기준',grade:'D'}
+];
+const VOLTA_MANAGERS=[
+ {id:'cha-soyoung',name:'차소영',grade:'D'},{id:'ddochi',name:'또치',grade:'D'},
+ {id:'kim-hyeonju',name:'김현주',grade:'D'},{id:'shin-miyoung',name:'신미영',grade:'D'}
+];
+const VOLTA_STARTERS=['이동근','강산하','박광수','김영웅'];
+const VOLTA_LEAGUES=[
+ {grade:'G',name:'곡선중 리그',unlock:'기본 리그',teams:[
+  {name:'1학년',players:['김준엽','송하일','신민기','김사무엘','허진']},
+  {name:'2학년',players:['정민우','이정수','백승철','한상원','윤호성']},
+  {name:'3학년',players:['김현석','조성신','김진우','안기훈','이중승']}]},
+ {grade:'F',name:'수원시 중학교 리그',unlock:'곡선중 리그 우승',teams:[
+  {name:'권선중',players:['정민','김준우','박수일','민형석','황주안']},
+  {name:'화홍중',players:['김민영','김수찬','박민수','이민성','서도환']},
+  {name:'남수원중',players:['김성현','서기찬','이찬형','오동민','우찬형']}]},
+ {grade:'E',name:'수원시 고등학교 리그',unlock:'수원시 중학교 리그 우승',teams:[
+  {name:'수원고',players:['음건무','박성준','황지윤','김명균','유호철']},
+  {name:'권선고',players:['임도환','김정은','김권선','박권선','정권선']},
+  {name:'화홍고',players:['이재방','김화홍','이화홍','박화홍','정화홍']}]},
+ {grade:'D',name:'경기도 아마추어 리그',unlock:'수원시 고등학교 리그 우승',teams:[
+  {name:'발로차 FC',players:['김아재','박아재','이아재','정아재','최아재']},
+  {name:'짱돌 FC',players:['김할배','박할배','이할배','정할배','최할배']},
+  {name:'선행초 조축회',players:['김선','김행','김초','박선','박행']}]},
+ {grade:'C',name:'경기도 프로 리그',unlock:'경기도 아마추어 리그 우승',teams:[
+  {name:'수원 시청 FC',players:['프리조','이현용','바비','이재원','양한빈']},
+  {name:'용인 FC',players:['석현준','김보섭','최영준','강신명','노보']},
+  {name:'성남 FC',players:['빌레로','유주안','박상혁','김주원','이광연']}]},
+ {grade:'B',name:'K 풋살 리그',unlock:'경기도 프로 리그 우승',teams:[
+  {name:'수원 삼성',players:['두비츠카스','브루노실바','정호연','고종현','김준홍']},
+  {name:'울산 HD',players:['말컹','이동경','이규성','김영권','조현우']},
+  {name:'FC 서울',players:['클리말라','문선민','정승원','야잔','구성윤']}]},
+ {grade:'A',name:'K 해외 리그',unlock:'K 풋살 리그 우승',teams:[
+  {name:'서드',players:['조규성','전진우','백승호','김지수','정성룡']},
+  {name:'세컨드',players:['오현규','이재성','정우영','이한범','송범근']},
+  {name:'베스트',players:['손흥민','이강인','황인범','김민재','김승규']}]},
+ {grade:'S',name:'GOAT 리그',unlock:'K 해외 리그 우승',teams:[
+  {name:'GOAT',players:['호날두','메시','지단','말디니','야신']}]}
+];
+const VOLTA_STAT_LABELS=['슈팅','스피드','패스','피지컬','키퍼'];
+let voltaDraft={characterIndex:0,coachIndex:0,managerIndex:0};
+let voltaSave=null;
+function voltaSaveExists(){try{return !!localStorage.getItem('gokseon-volta-save-v1')}catch(e){return false}}
+function voltaPersist(){if(!voltaSave)return;try{localStorage.setItem('gokseon-volta-save-v1',JSON.stringify(voltaSave))}catch(e){console.warn('[volta-save]',e)}}
+function voltaLoad(){try{const raw=localStorage.getItem('gokseon-volta-save-v1');if(!raw)return false;voltaSave=JSON.parse(raw);mode='volta-club';render();return true}catch(e){alert('SAVE 데이터를 불러오지 못했습니다.');return false}}
+function voltaNewGame(){voltaDraft={characterIndex:0,coachIndex:0,managerIndex:0};mode='volta-character';render()}
+function voltaCycle(kind,dir){const map={character:VOLTA_CHARACTERS,coach:VOLTA_COACHES,manager:VOLTA_MANAGERS};const key=kind+'Index',arr=map[kind];voltaDraft[key]=(voltaDraft[key]+dir+arr.length)%arr.length;render()}
+function voltaPickCharacter(){voltaDraft.character=VOLTA_CHARACTERS[voltaDraft.characterIndex];mode='volta-coach';render()}
+function voltaPickCoach(){voltaDraft.coach=VOLTA_COACHES[voltaDraft.coachIndex];mode='volta-manager';render()}
+function voltaPickManager(){voltaDraft.manager=VOLTA_MANAGERS[voltaDraft.managerIndex];mode='volta-teamname';render()}
+function voltaCreateTeam(){const input=document.getElementById('voltaTeamName');const teamName=(input?.value||'').trim();if(!teamName){alert('팀명을 입력해 주세요.');return}voltaSave={version:1,teamName,character:voltaDraft.character,coach:voltaDraft.coach,manager:voltaDraft.manager,money:0,leagueIndex:0,unlockedLeague:0,stadium:'흙바닥 운동장',wins:0,losses:0,championships:[],roster:[{name:voltaDraft.character.name,hero:true},...VOLTA_STARTERS.map(name=>({name,hero:false}))],createdAt:Date.now()};voltaPersist();mode='volta-club';render()}
+function voltaStatRows(){return VOLTA_STAT_LABELS.map(x=>`<div class="volta-stat"><span>${x}</span><b>미정</b></div>`).join('')}
+function voltaGo(target){mode=target;render()}
+function voltaLeague(){return VOLTA_LEAGUES[Math.max(0,Math.min(VOLTA_LEAGUES.length-1,voltaSave?.leagueIndex||0))]}
+function voltaResetSave(){if(!confirm('볼타 SAVE를 삭제하고 처음부터 시작할까요?'))return;try{localStorage.removeItem('gokseon-volta-save-v1')}catch(e){}voltaSave=null;mode='volta';render()}
+
 function render(){
 let body="";
+
+
+if(mode==="hub"){
+ body=`<div class="game-hub">
+   <div class="hub-hero">
+     <div class="hub-kicker">GOKSEON MANAGER COLLECTION</div>
+     <h2>플레이할 게임을 선택하세요</h2>
+     <p>각 모드는 서로 독립된 게임 시스템으로 운영됩니다.</p>
+   </div>
+   <div class="hub-games">
+     <button class="hub-game aram" onclick="mode='select';render()">
+       <div class="hub-no">01</div>
+       <div class="hub-icon">⚔</div>
+       <div class="hub-copy"><small>ARAM · MAYHEM</small><h3>증바람 매니저</h3><p>기존 증바람 매니저를 플레이합니다.</p></div>
+       <span class="hub-enter">플레이하기 →</span>
+     </button>
+     <button class="hub-game volta" onclick="mode='volta';render()">
+       <div class="hub-no">02</div>
+       <div class="hub-icon">⚽</div>
+       <div class="hub-copy"><small>VOLTA · FOOTBALL</small><h3>볼타 매니저</h3><p>새로운 볼타 매니저 모드입니다.</p></div>
+       <span class="hub-enter">플레이하기 →</span>
+     </button>
+   </div>
+ </div>`;
+}
+
+
+if(mode==="volta"){
+ const hasSave=voltaSaveExists();
+ body=`<div class="volta-home"><div class="volta-stadium"><div class="volta-lights"></div><div class="volta-title"><div class="volta-ball">⚽</div><small>GOKSEON VOLTA MANAGER</small><h2>볼타 매니저</h2><p>G등급에서 시작해 GOAT 리그까지 올라가세요.</p></div><div class="volta-menu"><button onclick="voltaNewGame()"><b>게임 시작하기</b><span>새 커리어 시작</span></button><button ${hasSave?'':'disabled class="locked"'} onclick="voltaLoad()"><b>게임 불러오기 (SAVE)</b><span>${hasSave?'저장된 팀 불러오기':'저장된 게임 없음'}</span></button></div><div class="volta-pitch"><i>⚽</i><i>⚽</i><i>⚽</i><i>⚽</i><i>⚽</i></div></div><button class="back volta-back" onclick="mode='hub';render()">← 게임 선택으로 돌아가기</button></div>`;
+}
+
+if(mode==="volta-character"){
+ const c=VOLTA_CHARACTERS[voltaDraft.characterIndex];
+ body=`<div class="volta-setup"><div class="volta-progress">01 <span>/ 04</span> · 캐릭터 선택</div><div class="volta-carousel"><button class="volta-arrow" onclick="voltaCycle('character',-1)">‹</button><div class="volta-profile"><div class="volta-avatar">${c.name.slice(-1)}</div><small>PLAYER CHARACTER</small><h2>${c.name}</h2><p>이 캐릭터는 당신의 주인공 선수입니다.</p><div class="volta-stats">${voltaStatRows()}</div><div class="volta-info-note">세부 스탯 수치는 추후 설정됩니다. 선택한 캐릭터는 이후 이적시장에 등장하지 않습니다.</div><button class="volta-select" onclick="voltaPickCharacter()">${c.name} 선택하기 →</button></div><button class="volta-arrow" onclick="voltaCycle('character',1)">›</button></div><button class="back" onclick="mode='volta';render()">← 이전</button></div>`;
+}
+
+if(mode==="volta-coach"){
+ const c=VOLTA_COACHES[voltaDraft.coachIndex];
+ body=`<div class="volta-setup"><div class="volta-progress">02 <span>/ 04</span> · 감독 선택</div><div class="volta-carousel"><button class="volta-arrow" onclick="voltaCycle('coach',-1)">‹</button><div class="volta-profile staff"><div class="volta-grade">${c.grade}</div><small>HEAD COACH</small><h2>${c.name}</h2><p>감독 등급이 높을수록 선수 훈련 효율이 증가합니다.</p><div class="volta-staff-effect"><b>훈련 효율</b><span>D등급 · 낮음</span></div><button class="volta-select" onclick="voltaPickCoach()">${c.name} 감독 선택 →</button></div><button class="volta-arrow" onclick="voltaCycle('coach',1)">›</button></div><button class="back" onclick="mode='volta-character';render()">← 캐릭터 선택</button></div>`;
+}
+
+if(mode==="volta-manager"){
+ const c=VOLTA_MANAGERS[voltaDraft.managerIndex];
+ body=`<div class="volta-setup"><div class="volta-progress">03 <span>/ 04</span> · 매니저 선택</div><div class="volta-carousel"><button class="volta-arrow" onclick="voltaCycle('manager',-1)">‹</button><div class="volta-profile staff"><div class="volta-grade">${c.grade}</div><small>TEAM MANAGER</small><h2>${c.name}</h2><p>매니저 등급은 선수단 사기와 컨디션 관리에 영향을 줍니다.</p><div class="volta-staff-effect"><b>사기 관리</b><span>D등급</span></div><button class="volta-select" onclick="voltaPickManager()">${c.name} 매니저 선택 →</button></div><button class="volta-arrow" onclick="voltaCycle('manager',1)">›</button></div><button class="back" onclick="mode='volta-coach';render()">← 감독 선택</button></div>`;
+}
+
+if(mode==="volta-teamname"){
+ body=`<div class="volta-setup"><div class="volta-progress">04 <span>/ 04</span> · 팀 생성</div><div class="volta-team-create"><small>CREATE YOUR CLUB</small><h2>팀명을 정하세요</h2><input id="voltaTeamName" maxlength="18" placeholder="팀명 입력" autocomplete="off"><div class="volta-summary"><div><span>주인공</span><b>${voltaDraft.character?.name||'-'}</b></div><div><span>감독</span><b>${voltaDraft.coach?.name||'-'} · ${voltaDraft.coach?.grade||'-'}</b></div><div><span>매니저</span><b>${voltaDraft.manager?.name||'-'} · ${voltaDraft.manager?.grade||'-'}</b></div><div><span>시작 운동장</span><b>흙바닥 운동장</b></div><div><span>시작 리그</span><b>G · 곡선중 리그</b></div></div><button class="volta-select" onclick="voltaCreateTeam()">팀 창단하기 →</button></div><button class="back" onclick="mode='volta-manager';render()">← 매니저 선택</button></div>`;
+ requestAnimationFrame(()=>document.getElementById('voltaTeamName')?.focus());
+}
+
+if(mode==="volta-club"&&voltaSave){
+ const league=voltaLeague();
+ body=`<div class="volta-club"><div class="volta-club-head"><div><small>${league.grade} GRADE · ${league.name}</small><h2>${voltaSave.teamName}</h2><p>${voltaSave.stadium} · ${voltaSave.character.name} 주장</p></div><div class="volta-wallet"><span>보유 재화</span><b>₩ ${voltaSave.money}</b></div></div><div class="volta-dashboard"><section class="volta-squad"><div class="volta-section-head"><h3>선수단</h3><span>5명</span></div>${voltaSave.roster.map((p,i)=>`<div class="volta-player-row ${p.hero?'hero':''}"><div class="volta-shirt">${i+1}</div><div><b>${p.name}</b><small>${p.hero?'주인공 캐릭터':'초기 선수'}</small></div><div class="volta-mini-stats">슛 - · 스피드 - · 패스 - · 피지컬 - · 키퍼 -</div></div>`).join('')}</section><section class="volta-club-menu"><button onclick="voltaGo('volta-league')"><span>🏆</span><div><b>리그</b><small>${league.grade} · ${league.name}</small></div></button><button onclick="voltaGo('volta-training')"><span>📈</span><div><b>훈련</b><small>감독 ${voltaSave.coach.grade} · ${voltaSave.coach.name}</small></div></button><button onclick="voltaGo('volta-transfer')"><span>🔁</span><div><b>이적시장</b><small>리그 우승 후 해금</small></div></button><button onclick="voltaGo('volta-facility')"><span>🏟</span><div><b>시설</b><small>${voltaSave.stadium}</small></div></button><button onclick="voltaPersist();alert('SAVE 완료')"><span>💾</span><div><b>SAVE</b><small>현재 진행 저장</small></div></button><button onclick="voltaResetSave()"><span>↺</span><div><b>새로 시작</b><small>현재 SAVE 삭제</small></div></button></section></div><div class="volta-staff-bar"><div><span>감독</span><b>${voltaSave.coach.name}</b><em>${voltaSave.coach.grade}</em></div><div><span>매니저</span><b>${voltaSave.manager.name}</b><em>${voltaSave.manager.grade}</em></div><div><span>전적</span><b>${voltaSave.wins}승 ${voltaSave.losses}패</b><em>${voltaSave.championships.length}회 우승</em></div></div><button class="back" onclick="mode='volta';render()">← 볼타 타이틀</button></div>`;
+}
+
+if(mode==="volta-league"&&voltaSave){
+ const league=voltaLeague();
+ body=`<div class="volta-subpage"><div class="volta-subhead"><div><small>${league.grade} GRADE</small><h2>${league.name}</h2><p>${league.unlock}</p></div><button onclick="mode='volta-club';render()">구단으로</button></div><div class="volta-opponents">${league.teams.map((t,i)=>`<div class="volta-opponent"><div class="volta-opponent-rank">${String(i+1).padStart(2,'0')}</div><h3>${t.name}</h3><div>${t.players.map(x=>`<span>${x}</span>`).join('')}</div><button disabled>경기 엔진 준비 중</button></div>`).join('')}</div><div class="volta-rulebox"><b>경기 보상</b><span>승리 +10원 · 리그 우승 +50원</span></div></div>`;
+}
+if(mode==="volta-training"&&voltaSave){body=`<div class="volta-subpage"><div class="volta-subhead"><div><small>TRAINING</small><h2>훈련</h2><p>${voltaSave.coach.name} 감독 · ${voltaSave.coach.grade}등급</p></div><button onclick="mode='volta-club';render()">구단으로</button></div><div class="volta-placeholder"><b>훈련 시스템 준비</b><p>슈팅 · 스피드 · 패스 · 피지컬 · 키퍼를 훈련하며 감독 등급에 따라 효율이 달라집니다.</p><span>선수 세부 스탯 수치가 정해지면 실제 성장 로직을 연결합니다.</span></div></div>`;}
+if(mode==="volta-transfer"&&voltaSave){body=`<div class="volta-subpage"><div class="volta-subhead"><div><small>TRANSFER MARKET</small><h2>이적시장</h2><p>리그 우승 보상으로 개방됩니다.</p></div><button onclick="mode='volta-club';render()">구단으로</button></div><div class="volta-placeholder locked"><b>🔒 현재 잠김</b><p>곡선중 리그 우승 후 첫 특별 이적시장이 열립니다.</p><span>1·2·3학년 선수 + 선택하지 않은 주인공 캐릭터가 후보에 포함됩니다.</span></div></div>`;}
+if(mode==="volta-facility"&&voltaSave){body=`<div class="volta-subpage"><div class="volta-subhead"><div><small>FACILITY</small><h2>시설</h2><p>현재 시설을 확인합니다.</p></div><button onclick="mode='volta-club';render()">구단으로</button></div><div class="volta-facility-card"><div class="dirt-pitch">⚽</div><div><small>STARTING GROUND</small><h3>${voltaSave.stadium}</h3><p>시설 업그레이드는 추후 재화를 사용하도록 확장할 수 있습니다.</p></div></div></div>`;}
 
 if(mode==="dev"){
  const champOpts=champions.map(c=>`<option value="${c.id}">${c.name}</option>`).join('');
@@ -1082,7 +1213,7 @@ if(mode==="dev"){
 if(mode==="select"){
  body=`<div class="section"><span>01</span><div><h2>캐릭터를 선택하세요</h2><p>선택한 캐릭터가 이번 게임의 당신입니다.</p></div></div>
  <div class="grid">${chars.map((c,i)=>`<button class="card ${me?.id===c.id?"sel":""}" onclick="choose('${c.id}')"><span class="num">0${i+1}</span><span class="nick">${c.nickname}</span><span class="real">${c.name}</span><span class="signature-label">시그니처 챔피언 - ${signatureChampionName(c.id)}</span><span class="check">${me?.id===c.id?"✓":""}</span></button>`).join("")}</div>
- ${button(me?me.nickname+"으로 계속하기 →":"캐릭터를 먼저 선택하세요",!me,"goMethod()")}<button class="dev-secret" onclick="mode=\'dev\';render()" title="Developer Test">DEV</button>`;
+ ${button(me?me.nickname+"으로 계속하기 →":"캐릭터를 먼저 선택하세요",!me,"goMethod()")}<button class="back hub-back" onclick="mode=\'hub\';render()">← 게임 선택</button><button class="dev-secret" onclick="mode=\'dev\';render()" title="Developer Test">DEV</button>`;
 }
 if(mode==="method"){
 body=`<div class="section"><span>02</span><div><h2>어떻게 호출할까요?</h2><p><b>${me.nickname}</b> · ${me.name}으로 플레이합니다.</p></div></div>
@@ -1187,7 +1318,8 @@ ${searching?`<button class="findbtn searching">게임 찾는 중...</button><but
 </div>
 ${found?`<div class="matchfound"><div class="mf-inner"><div class="mf-icon"><span>⚔</span></div><div class="eyebrow">ARAM · CHAOS</div><h2>게임을 찾았습니다!</h2><p>무작위 총력전 · 아수라장</p><button class="accept" onclick="acceptMatch()">수락</button><button class="decline" onclick="stopQueue()">거절</button></div></div>`:""}`;
 }
-app.innerHTML=header(mode==="select"?"01 / CHARACTER":mode==="method"?"02 / CALL":"03 / PARTY")+`<main>${body}</main>`;
+const stepLabel=mode==="select"?"01 / CHARACTER":mode==="method"?"02 / CALL":mode==="volta"?"VOLTA / HOME":mode==="volta-character"?"VOLTA / PLAYER":mode==="volta-coach"?"VOLTA / COACH":mode==="volta-manager"?"VOLTA / MANAGER":mode==="volta-teamname"?"VOLTA / CLUB":String(mode).startsWith("volta-")?"VOLTA / CAREER":"03 / PARTY";
+app.innerHTML=(mode==="hub"?"":header(stepLabel))+`<main>${body}</main>`;
 if(mode==='battle')setTimeout(syncLiveBattleHud,0);
 // V51: 새 카톡 메시지가 렌더링될 때 항상 최신 메시지가 보이도록 자동 스크롤
 if(mode==="group" || mode==="private"){
@@ -1651,9 +1783,9 @@ function startBattle(){
  const enemyComp=compositionMultiplier(enemyTeam.map(e=>e.champ),teamPicks);
  team.forEach(u=>u.compositionMultiplier=teamComp);enemy.forEach(u=>u.compositionMultiplier=enemyComp);
  const structures=[
- {id:'tn1',team:'team',type:'nexus',name:'넥서스',x:5,y:50,hp:100,alive:true},{id:'tt1',team:'team',type:'tower',name:'쌍둥이 포탑',x:9,y:50,hp:82,alive:true},{id:'tt2',team:'team',type:'tower',name:'쌍둥이 포탑',x:12,y:50,hp:82,alive:true},{id:'ti',team:'team',type:'inhib',name:'억제기',x:17,y:50,hp:86,alive:true},{id:'t2',team:'team',type:'tower',name:'2차 포탑',x:28,y:50,hp:92,alive:true},{id:'t1',team:'team',type:'tower',name:'1차 포탑',x:40,y:50,hp:96,alive:true},
- {id:'e1',team:'enemy',type:'tower',name:'1차 포탑',x:60,y:50,hp:96,alive:true},{id:'e2',team:'enemy',type:'tower',name:'2차 포탑',x:72,y:50,hp:92,alive:true},{id:'ei',team:'enemy',type:'inhib',name:'억제기',x:83,y:50,hp:86,alive:true},{id:'et1',team:'enemy',type:'tower',name:'쌍둥이 포탑',x:88,y:50,hp:82,alive:true},{id:'et2',team:'enemy',type:'tower',name:'쌍둥이 포탑',x:91,y:50,hp:82,alive:true},{id:'en1',team:'enemy',type:'nexus',name:'넥서스',x:95,y:50,hp:100,alive:true}];
- battleState={time:0,lastTs:performance.now(),lastUiSync:0,status:'시작 증강체 선택 중',speed:1,team,enemy,units:[...team,...enemy],structures,relics:[],fx:[],fxSeq:0,log:[],logVersion:0,chat:[],teamKills:0,enemyKills:0,nextWaveAt:45,pushMomentumUntil:{team:0,enemy:0},waveCount:0,superTeam:false,superEnemy:false,paused:true,engineStarted:false,jaebinRandomEventEnabled:(Math.random()<.80),jaebinRandomEventType:(me?.id!=='nguyen'&&Math.random()<.5?'healpack':'taunt'),jaebinRandomEventAt:180+Math.random()*300,jaebinRandomEventDone:false,jaebinEventOpen:false,jaebinHealOpen:false,jaebinEventResult:null,jaebinChatAttempted:false,jaebinBadAugmentOpen:false,jaebinBadAugmentDone:false,jaebinBadAugmentActive:false,playerHealpackBoostActive:false,jaebinHealpackDebuffActive:false,
+ {id:'tn1',team:'team',type:'nexus',name:'넥서스',x:5,y:50,hp:100,alive:true},{id:'tt1',team:'team',type:'tower',name:'쌍둥이 포탑',x:9,y:50,hp:100,alive:true},{id:'tt2',team:'team',type:'tower',name:'쌍둥이 포탑',x:12,y:50,hp:100,alive:true},{id:'ti',team:'team',type:'inhib',name:'억제기',x:17,y:50,hp:100,alive:true},{id:'t2',team:'team',type:'tower',name:'2차 포탑',x:28,y:50,hp:100,alive:true},{id:'t1',team:'team',type:'tower',name:'1차 포탑',x:40,y:50,hp:100,alive:true},
+ {id:'e1',team:'enemy',type:'tower',name:'1차 포탑',x:60,y:50,hp:100,alive:true},{id:'e2',team:'enemy',type:'tower',name:'2차 포탑',x:72,y:50,hp:100,alive:true},{id:'ei',team:'enemy',type:'inhib',name:'억제기',x:83,y:50,hp:100,alive:true},{id:'et1',team:'enemy',type:'tower',name:'쌍둥이 포탑',x:88,y:50,hp:100,alive:true},{id:'et2',team:'enemy',type:'tower',name:'쌍둥이 포탑',x:91,y:50,hp:100,alive:true},{id:'en1',team:'enemy',type:'nexus',name:'넥서스',x:95,y:50,hp:100,alive:true}];
+ battleState={time:0,lastTs:performance.now(),lastUiSync:0,status:'시작 증강체 선택 중',speed:1,team,enemy,units:[...team,...enemy],structures,relics:[],fx:[],fxSeq:0,log:[],logVersion:0,chat:[],teamKills:0,enemyKills:0,nextWaveAt:60,pushMomentumUntil:{team:0,enemy:0},waveCount:0,superTeam:false,superEnemy:false,paused:true,engineStarted:false,jaebinRandomEventEnabled:(Math.random()<.80),jaebinRandomEventType:(me?.id!=='nguyen'&&Math.random()<.5?'healpack':'taunt'),jaebinRandomEventAt:180+Math.random()*300,jaebinRandomEventDone:false,jaebinEventOpen:false,jaebinHealOpen:false,jaebinEventResult:null,jaebinChatAttempted:false,jaebinBadAugmentOpen:false,jaebinBadAugmentDone:false,jaebinBadAugmentActive:false,playerHealpackBoostActive:false,jaebinHealpackDebuffActive:false,
 molchoRandomEventEnabled:(Math.random()<.80),molchoRandomEventType:(Math.random()<.5?'phone':'drunk'),
 molchoRandomEventAt:0,molchoRandomEventDone:false,molchoPhoneOpen:false,molchoPhoneUntil:0,molchoDrunkOpen:false,molchoDrunkActive:false,
 molchoAugmentScamOpen:false,molchoAugmentScamDone:false,molchoAugmentScamActive:false,
@@ -1755,10 +1887,27 @@ function damageStructure(st,dmg,attacker){
  const bs=battleState;if(!st||!st.alive||!attacker||!isStructureTargetable(st,attacker.team))return;
  if(attacker.kind==='champ'&&Math.abs(attacker.x-st.x)>1.85)return;
  if(attacker.kind==='minion'&&Math.abs(attacker.x-st.x)>2.45)return;
+
+ // 첫 미니언 웨이브가 나오기 전(01:00)에는 어떤 포탑도 피해를 받지 않는다.
+ if(st.type==='tower'&&bs.time<60)return;
+
  const tempo=1.34;
  const nexusMod=st.type==='nexus'?.72:1;
  const perf=attacker.kind==='champ'?combatPerformanceMultiplier(attacker):1;
- st.hp-=dmg*tempo*nexusMod*perf;
+
+ // 1차 포탑(t1/e1)은 05:00 이전 강한 초반 방어력을 갖는다.
+ // 챔피언이 미니언 없이 백도어하려는 경우에는 아예 피해가 들어가지 않는다.
+ const isOuterTower=(st.id==='t1'||st.id==='e1');
+ let earlyTowerMod=1;
+ if(isOuterTower&&bs.time<300){
+   if(attacker.kind==='champ'){
+     const alliedMinionNearby=bs.units.some(u=>u.alive&&u.kind==='minion'&&u.team===attacker.team&&Math.abs(u.x-st.x)<8);
+     if(!alliedMinionNearby)return;
+   }
+   earlyTowerMod=.20;
+ }
+
+ st.hp-=dmg*tempo*nexusMod*perf*earlyTowerMod;
  if(st.hp<=0){
   st.hp=0;st.alive=false;
   addBattleLog(`[${formatBattleTime(bs.time)}] ${st.team==='enemy'?'적':'우리'} ${st.name} 파괴`);
@@ -2132,7 +2281,7 @@ function applyDeveloperBattleConfig(bs){
  if(!developerTestConfig?.enabled||!bs)return;
  const t=Math.max(0,Number(developerTestConfig.startTime)||0);
  bs.time=t;
- bs.nextWaveAt=Math.max(45,45+Math.floor(Math.max(0,t-45)/30+1)*30);
+ bs.nextWaveAt=Math.max(60,60+Math.floor(Math.max(0,t-60)/30+1)*30);
  bs.speed=developerTestConfig.speed||1;
  bs.devForcedEvent=developerTestConfig.forcedEvent||'';
  bs.devForcedEventDone=!bs.devForcedEvent;
@@ -2498,7 +2647,7 @@ function dropSwap(e,targetType,targetIndex){e.preventDefault();e.stopPropagation
 function openResults(){mode='results';render()}
 function playAgain(){developerTestConfig=null;stopBattleUiSync();battleState=null;matchResult=null;teamPicks=[];chosenChamp=null;finalPool=[];enemyTeam=[];signatureRequests=[];signatureRequest=null;signatureChatDone=new Set();signatureChatLog=[];molchoDealerChatDone=false;pickSpecialChatDone=new Set();goQueue()}
 function reselectTeam(){developerTestConfig=null;stopBattleUiSync();battleState=null;matchResult=null;selected=[];party=[];mode='method';render()}
-function reset(){developerTestConfig=null;clearInterval(queueTimer);clearInterval(loadingTimer);clearTimeout(loadingTransitionTimer);clearInterval(battleTimer);clearInterval(battleWatchdogTimer);stopBattleUiSync();battleRafPending=false;cancelAnimationFrame(window.__battleRAF);dragSource=null;mode="select";me=null;selected=[];party=[];chatMembers=[];replies=0;privateIndex=0;privateAnswered=false;searching=false;queueSeconds=0;found=false;champOptions=[];teamPicks=[];chosenChamp=null;finalPool=[];molchoDealerChatDone=false;pickSpecialChatDone=new Set();render()}
+function reset(){developerTestConfig=null;clearInterval(queueTimer);clearInterval(loadingTimer);clearTimeout(loadingTransitionTimer);clearInterval(battleTimer);clearInterval(battleWatchdogTimer);stopBattleUiSync();battleRafPending=false;cancelAnimationFrame(window.__battleRAF);dragSource=null;mode="hub";me=null;selected=[];party=[];chatMembers=[];replies=0;privateIndex=0;privateAnswered=false;searching=false;queueSeconds=0;found=false;champOptions=[];teamPicks=[];chosenChamp=null;finalPool=[];molchoDealerChatDone=false;pickSpecialChatDone=new Set();render()}
 render();
 </script>
 
@@ -3000,4 +3149,52 @@ render();
 @media (max-width:1000px){
   .unit-augments{grid-template-columns:repeat(5,minmax(0,1fr))!important}
 }
+</style>
+
+
+<style id="v96-game-hub">
+.game-hub{min-height:calc(100vh - 40px);display:grid;place-items:center;padding:34px 18px 70px;box-sizing:border-box}
+.hub-hero{text-align:center;margin-bottom:26px}.hub-kicker{font-size:10px;letter-spacing:3px;color:#7896a8;font-weight:900}
+.hub-hero h2{font-size:34px;margin:8px 0;color:#ecf3f7}.hub-hero p{margin:0;color:#7f929e}
+.hub-games{width:min(980px,94vw);display:grid;grid-template-columns:1fr 1fr;gap:18px}
+.hub-game{position:relative;min-height:280px;padding:28px;text-align:left;border:1px solid #29475c;background:linear-gradient(145deg,#091823,#061018);color:#eaf1f4;cursor:pointer;overflow:hidden;box-shadow:0 18px 50px #0007}
+.hub-game:before{content:"";position:absolute;inset:0;background:linear-gradient(135deg,transparent 35%,rgba(75,153,199,.11));pointer-events:none}
+.hub-game.volta{border-color:#496b4e;background:linear-gradient(145deg,#0d2119,#07140f)}
+.hub-game.volta:before{background:linear-gradient(135deg,transparent 35%,rgba(95,190,111,.12))}
+.hub-game:hover{transform:translateY(-3px);border-color:#6aa1c4}.hub-game.volta:hover{border-color:#7ebd82}
+.hub-no{position:absolute;right:18px;top:14px;font-size:42px;font-weight:1000;color:#ffffff0d}
+.hub-icon{font-size:48px;margin-bottom:26px}.hub-copy small{font-size:9px;letter-spacing:2px;color:#6f8ea1;font-weight:900}
+.hub-copy h3{font-size:28px;margin:5px 0 8px}.hub-copy p{margin:0;color:#8ea1ac;font-size:12px}
+.hub-enter{position:absolute;left:28px;bottom:24px;font-size:12px;font-weight:900;color:#d8c26e}
+.hub-back{display:block!important;margin:10px auto 0!important}
+
+.volta-home{max-width:980px;margin:0 auto;padding:20px 16px 70px}
+.volta-stadium{position:relative;min-height:650px;border:1px solid #36594a;overflow:hidden;background:
+ radial-gradient(ellipse at 50% 20%,rgba(122,202,255,.2),transparent 35%),
+ linear-gradient(180deg,#102638 0,#153f48 45%,#174c38 61%,#0a2418 100%);box-shadow:0 24px 60px #0009}
+.volta-stadium:after{content:"";position:absolute;left:-10%;right:-10%;bottom:-16%;height:48%;border-radius:50% 50% 0 0;background:
+ linear-gradient(90deg,transparent 49.5%,rgba(255,255,255,.5) 50%,transparent 50.5%),
+ linear-gradient(rgba(255,255,255,.16) 1px,transparent 1px),
+ linear-gradient(90deg,rgba(255,255,255,.16) 1px,transparent 1px),
+ #168c48;background-size:auto,60px 60px,60px 60px,auto;border-top:3px solid #d8efe0;transform:perspective(500px) rotateX(58deg);transform-origin:bottom}
+.volta-lights{height:120px;background:radial-gradient(circle,#fff 0 2px,transparent 3px) 0 0/28px 22px;opacity:.28}
+.volta-title{position:relative;z-index:2;text-align:center;margin-top:30px}.volta-ball{font-size:48px}.volta-title small{font-size:9px;letter-spacing:3px;color:#c2e6cf}
+.volta-title h2{font-size:46px;margin:5px 0;color:#f3f0d7;text-shadow:0 4px 18px #000}.volta-title p{color:#b2c9c3}
+.volta-menu{position:relative;z-index:4;width:min(430px,82%);margin:36px auto;display:grid;gap:10px}
+.volta-menu button{display:flex;justify-content:space-between;align-items:center;padding:16px 18px;border:1px solid #b7c475;background:#173c32e8;color:#fff;cursor:pointer;text-align:left}
+.volta-menu button b{font-size:16px}.volta-menu button span{font-size:10px;color:#b7cfbf}.volta-menu .locked{opacity:.45;cursor:default}
+.volta-pitch{position:absolute;z-index:3;bottom:46px;left:50%;transform:translateX(-50%);display:flex;gap:62px}
+.volta-pitch i{font-style:normal;font-size:28px;filter:drop-shadow(0 3px 3px #000)}
+.volta-pitch i:nth-child(2),.volta-pitch i:nth-child(4){transform:translateY(22px)}.volta-pitch i:nth-child(3){transform:translateY(35px)}
+.volta-back{margin:14px 0 0!important}
+@media(max-width:800px){
+ .game-hub{display:block;padding-top:42px}.hub-hero h2{font-size:26px}.hub-games{grid-template-columns:1fr;width:100%}.hub-game{min-height:220px}
+ .volta-stadium{min-height:580px}.volta-title h2{font-size:36px}.volta-pitch{gap:28px}.volta-pitch i{font-size:22px}
+}
+</style>
+
+
+<style id="v97-volta-career">
+.volta-setup,.volta-club,.volta-subpage{max-width:1120px;margin:0 auto;padding:24px 18px 70px}.volta-progress{font-size:12px;letter-spacing:2px;color:#c9dfca;font-weight:900;margin-bottom:18px}.volta-progress span{color:#668071}.volta-carousel{display:grid;grid-template-columns:64px minmax(0,620px) 64px;justify-content:center;align-items:center;gap:18px;min-height:620px;background:radial-gradient(circle at 50% 38%,#173c34 0,#081712 48%,#040a08 100%);border:1px solid #294a3b}.volta-arrow{width:58px;height:90px;border:1px solid #49695b;background:#0c1c17;color:#dceadf;font-size:52px;cursor:pointer}.volta-profile{text-align:center;padding:32px}.volta-avatar{width:150px;height:150px;margin:0 auto 20px;border-radius:50%;display:grid;place-items:center;font-size:72px;font-weight:1000;background:linear-gradient(145deg,#1d6b50,#0b2920);border:3px solid #d1c66c;box-shadow:0 0 35px #6bb68a33}.volta-profile small,.volta-team-create>small{letter-spacing:3px;color:#91b59f;font-size:9px;font-weight:900}.volta-profile h2,.volta-team-create h2{font-size:42px;margin:8px 0 6px}.volta-profile p{color:#91a79d}.volta-stats{display:grid;grid-template-columns:repeat(5,1fr);gap:6px;margin:28px 0 12px}.volta-stat{padding:11px 5px;border:1px solid #2b4b3c;background:#08120f}.volta-stat span{display:block;font-size:9px;color:#82978c}.volta-stat b{display:block;font-size:17px;margin-top:5px;color:#d9e5dc}.volta-info-note{font-size:10px;color:#70857a;line-height:1.6;margin:14px auto 22px;max-width:520px}.volta-select{border:1px solid #d1bb5e;background:linear-gradient(180deg,#315c3f,#193223);color:#fff;padding:14px 24px;font-weight:1000;cursor:pointer;min-width:280px}.volta-profile.staff{max-width:520px;margin:auto}.volta-grade{width:120px;height:120px;border-radius:16px;margin:0 auto 20px;display:grid;place-items:center;font-size:64px;font-weight:1000;background:#11281d;border:2px solid #d3bd5e;color:#f2d678}.volta-staff-effect{display:flex;justify-content:space-between;margin:28px 0;padding:16px;border-top:1px solid #2e4b3d;border-bottom:1px solid #2e4b3d}.volta-staff-effect span{color:#a6bcae}.volta-team-create{max-width:680px;margin:60px auto;text-align:center;padding:44px;background:linear-gradient(180deg,#0b1d16,#06100c);border:1px solid #31513f}.volta-team-create input{width:100%;box-sizing:border-box;margin:25px 0;padding:18px;background:#030907;border:1px solid #496d58;color:#fff;text-align:center;font-size:24px;font-weight:900}.volta-summary{display:grid;grid-template-columns:1fr 1fr;gap:8px;text-align:left;margin-bottom:24px}.volta-summary div{padding:12px;border:1px solid #243b30}.volta-summary span{display:block;font-size:9px;color:#789084}.volta-summary b{font-size:13px}.volta-club-head{display:flex;justify-content:space-between;align-items:center;padding:22px;border:1px solid #315343;background:linear-gradient(90deg,#10261c,#08130e)}.volta-club-head small{color:#9cb3a3;letter-spacing:2px}.volta-club-head h2{font-size:34px;margin:4px 0}.volta-club-head p{margin:0;color:#7e9588}.volta-wallet{text-align:right}.volta-wallet span{display:block;font-size:9px;color:#84988e}.volta-wallet b{font-size:28px;color:#e4cf75}.volta-dashboard{display:grid;grid-template-columns:1.2fr .8fr;gap:14px;margin-top:14px}.volta-squad,.volta-club-menu{border:1px solid #273f34;background:#07110d;padding:14px}.volta-section-head{display:flex;justify-content:space-between;margin-bottom:10px}.volta-section-head h3{margin:0}.volta-player-row{display:grid;grid-template-columns:44px 140px 1fr;align-items:center;gap:10px;padding:10px;border-top:1px solid #1c3027}.volta-player-row.hero{background:#12251a}.volta-shirt{width:38px;height:38px;display:grid;place-items:center;background:#1b4934;border:1px solid #6e9a7d;font-weight:1000}.volta-player-row b{display:block}.volta-player-row small{display:block;color:#6f867a;font-size:9px}.volta-mini-stats{font-size:9px;color:#87998f;text-align:right}.volta-club-menu{display:grid;gap:8px}.volta-club-menu button{display:grid;grid-template-columns:42px 1fr;text-align:left;align-items:center;padding:12px;background:#0b1c15;border:1px solid #294638;color:#fff;cursor:pointer}.volta-club-menu button>span{font-size:22px}.volta-club-menu b{display:block}.volta-club-menu small{color:#7f9689}.volta-staff-bar{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:14px 0}.volta-staff-bar>div{display:grid;grid-template-columns:auto 1fr auto;gap:8px;padding:11px;border:1px solid #263e33;background:#09140f}.volta-staff-bar span{color:#72877c;font-size:9px}.volta-staff-bar em{font-style:normal;color:#dfc768;font-weight:900}.volta-subhead{display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid #2a4939;padding:12px 0 18px;margin-bottom:16px}.volta-subhead small{color:#8fa997;letter-spacing:2px}.volta-subhead h2{font-size:32px;margin:4px 0}.volta-subhead p{margin:0;color:#7d9186}.volta-subhead button{padding:9px 14px;background:#10241b;border:1px solid #345443;color:#d7e4dc;cursor:pointer}.volta-opponents{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}.volta-opponent{position:relative;padding:18px;border:1px solid #2b493a;background:#08130e}.volta-opponent-rank{position:absolute;right:12px;top:8px;font-size:34px;font-weight:1000;color:#ffffff0d}.volta-opponent h3{font-size:20px;margin:0 0 14px}.volta-opponent div:not(.volta-opponent-rank){display:flex;flex-wrap:wrap;gap:5px}.volta-opponent span{padding:5px 7px;background:#122219;font-size:9px}.volta-opponent button{margin-top:16px;width:100%;padding:8px;background:#0d1b15;border:1px solid #263d32;color:#657a6f}.volta-rulebox,.volta-placeholder,.volta-facility-card{margin-top:14px;padding:24px;border:1px solid #2c4c3b;background:#091610}.volta-rulebox{display:flex;justify-content:space-between}.volta-placeholder{text-align:center;padding:80px 24px}.volta-placeholder b{font-size:24px}.volta-placeholder p{color:#a2b4aa}.volta-placeholder span{font-size:10px;color:#74877c}.volta-placeholder.locked{opacity:.8}.volta-facility-card{display:grid;grid-template-columns:220px 1fr;gap:24px;align-items:center}.dirt-pitch{height:150px;display:grid;place-items:center;font-size:50px;background:repeating-linear-gradient(15deg,#6c5134,#6c5134 10px,#775b3a 10px,#775b3a 20px);border:2px solid #aa8a61}.volta-facility-card h3{font-size:28px;margin:5px 0}.volta-facility-card small{color:#9aaf9f;letter-spacing:2px}
+@media(max-width:800px){.volta-carousel{grid-template-columns:42px 1fr 42px;gap:5px;min-height:560px}.volta-arrow{width:40px;height:70px;font-size:38px}.volta-avatar{width:112px;height:112px;font-size:54px}.volta-profile{padding:20px 6px}.volta-profile h2,.volta-team-create h2{font-size:32px}.volta-stats{grid-template-columns:repeat(5,1fr);gap:3px}.volta-stat{padding:9px 1px}.volta-team-create{padding:25px 16px;margin:20px auto}.volta-summary{grid-template-columns:1fr}.volta-dashboard{grid-template-columns:1fr}.volta-player-row{grid-template-columns:40px 1fr}.volta-mini-stats{grid-column:2;text-align:left}.volta-staff-bar{grid-template-columns:1fr}.volta-opponents{grid-template-columns:1fr}.volta-facility-card{grid-template-columns:1fr}.dirt-pitch{height:120px}.volta-club-head{align-items:flex-start}.volta-club-head h2{font-size:27px}.volta-wallet b{font-size:20px}}
 </style>
