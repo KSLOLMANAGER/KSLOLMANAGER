@@ -7211,3 +7211,123 @@ render=function(){const r=voltaV117RenderBase();try{voltaV117EnhanceUI()}catch(e
  try{if(voltaSave){voltaSave.version=Math.max(Number(voltaSave.version)||0,122);if(voltaSave.foundingNews&&!voltaSave.foundingNews.date)voltaSave.foundingNews.date='2026-03-01';if(voltaSave.squadConfirmed==null)voltaSave.squadConfirmed=false;voltaPersist();render()}}catch(e){console.error('[V122 INIT]',e)}
 })();
 </script>
+
+
+<style id="v123-layout-tactics-polish">
+/* ===== V123 · compact squad/training, readable labels, halftime modal ===== */
+.volta-squad-page{max-width:1140px!important;width:100%!important;margin:0!important}
+.volta-squad-page .volta-subhead{max-width:1140px!important;width:100%!important;margin:0 0 14px!important;position:relative!important;padding-right:132px!important;box-sizing:border-box!important}
+.volta-squad-page .volta-subhead>button{position:absolute!important;right:0!important;top:2px!important;margin:0!important;min-width:116px!important;padding:10px 14px!important}
+.volta-squad-layout{grid-template-columns:minmax(480px,500px) minmax(610px,626px)!important;gap:14px!important;max-width:1140px!important;width:100%!important;margin:0!important}
+.volta-squad-pitch{min-height:590px!important;height:590px!important}
+.volta-squad-list.detailed{min-width:0!important;width:100%!important;overflow:hidden!important}
+.v119-squad-head,.v119-squad-row{grid-template-columns:55px 60px 110px 52px repeat(5,40px) 80px!important;gap:5px!important;padding-left:9px!important;padding-right:9px!important;box-sizing:border-box!important}
+.v119-squad-head{font-size:13px!important;line-height:1.2!important;color:#a8bac6!important}
+.v119-squad-row{min-height:58px!important;padding-top:9px!important;padding-bottom:9px!important}
+.v119-squad-row .player b{font-size:16px!important}.v119-squad-row .player small{font-size:10px!important}
+.v119-squad-row .status{font-size:12px!important}.v119-squad-row .pos{font-size:14px!important}
+.v119-squad-row .stat small{display:none!important}.v119-squad-row .stat b{font-size:15px!important;margin:0!important}
+.v119-squad-row .no{display:flex!important;justify-content:center!important;align-items:center!important}
+.v123-shirt-input{width:42px!important;height:30px!important;box-sizing:border-box!important;border:1px solid #405466!important;border-radius:4px!important;background:#09141e!important;color:#9fd1f2!important;font:800 13px/1 inherit!important;text-align:center!important;padding:3px!important}
+.v123-shirt-input:focus{outline:2px solid #3c83b2!important;border-color:#70b8e6!important}
+.v119-squad-row .pos.GK,.squad-slot.v123-pos-GK .slot-role{color:#d2ad46!important}.v119-squad-row .pos.DF,.squad-slot.v123-pos-DF .slot-role{color:#67b5df!important}.v119-squad-row .pos.MF,.squad-slot.v123-pos-MF .slot-role{color:#63c88d!important}.v119-squad-row .pos.FW,.squad-slot.v123-pos-FW .slot-role{color:#e06f76!important}
+.squad-slot.v123-pos-GK.filled{border-color:#8c7431!important;background:#2e2a16!important}.squad-slot.v123-pos-DF.filled{border-color:#397fa5!important;background:#102d3c!important}.squad-slot.v123-pos-MF.filled{border-color:#3b8760!important;background:#123326!important}.squad-slot.v123-pos-FW.filled{border-color:#93424b!important;background:#35191e!important}
+.v119-squad-help{font-size:12px!important;line-height:1.55!important}
+.v122-squad-actions{grid-column:1/-1!important;width:100%!important;max-width:1140px!important;display:flex!important;justify-content:flex-end!important;align-items:center!important;gap:8px!important;margin:0!important;padding-top:2px!important}
+.v122-squad-actions>span{display:none!important}
+.v123-save-state,.v122-squad-actions button{height:40px!important;padding:0 16px!important;border-radius:4px!important;font-size:13px!important;font-weight:800!important}
+.v123-save-state{border:1px solid #6b4a4c!important;background:#281a1c!important;color:#e38b90!important;cursor:default!important}.v123-save-state.saved{border-color:#366347!important;background:#17271e!important;color:#7ed29a!important}
+.v122-squad-actions button:not(.v123-save-state){border:1px solid #3c7398!important;background:#12344e!important;color:#eff8fd!important}
+
+/* locker: remove redundant monthly-meeting footnote */
+.locker-card.meeting>small{display:none!important}
+
+/* training: same compact left-aligned content language as squad/calendar */
+.v123-training-page{max-width:1060px!important;width:100%!important;margin:0!important}
+.v123-training-page .volta-subhead{max-width:1060px!important}
+.v123-training-page .volta-training-grid{max-width:1060px!important;grid-template-columns:repeat(3,minmax(0,1fr))!important;gap:10px!important}
+.v123-training-page .volta-training-grid section{min-width:0!important}.v123-training-page .volta-training-bottom{max-width:1060px!important}
+.v123-training-page .volta-training-note{font-size:12px!important}.v123-training-page .volta-training-grid button span{font-size:13px!important}.v123-training-page .volta-training-grid button b{font-size:11px!important}
+
+/* halftime is a true viewport modal: no clipped tactical board and no internal page scroll */
+.volta-halftime-overlay{position:fixed!important;inset:0!important;padding:12px!important;display:grid!important;place-items:center!important;overflow:hidden!important;background:rgba(3,8,13,.96)!important;box-sizing:border-box!important}
+.volta-halftime-card.v114-halftime{width:min(1280px,calc(100vw - 24px))!important;height:min(860px,calc(100vh - 24px))!important;max-width:none!important;max-height:none!important;overflow:hidden!important;padding:16px 18px!important;display:flex!important;flex-direction:column!important;box-sizing:border-box!important}
+.v122-ht-head{flex:0 0 auto!important}.v122-ht-head h2{font-size:23px!important}.v122-ht-score{font-size:17px!important}.v122-ht-stats{flex:0 0 auto!important;margin:8px 0!important}
+.v122-ht-body{flex:1 1 auto!important;height:auto!important;min-height:0!important;grid-template-columns:minmax(570px,1.45fr) minmax(340px,.55fr)!important;gap:12px!important;overflow:hidden!important}
+.v122-ht-pitch{height:100%!important;min-height:0!important;max-height:none!important;overflow:hidden!important}
+.v122-ht-slot{width:86px!important;min-height:50px!important;padding:4px!important}.v122-ht-slot b{font-size:12px!important}.v122-ht-slot span{font-size:9px!important}
+.v122-ht-side{height:100%!important;min-height:0!important;overflow:hidden!important;gap:7px!important}.v122-ht-side label{font-size:11px!important}.v122-ht-side select{font-size:12px!important;padding:6px 7px!important}.v122-ht-side h3{font-size:14px!important;margin:2px 0!important}
+.v114-tac-sub{display:grid!important;grid-template-columns:1fr 1fr auto!important;gap:6px!important}.v114-tac-sub select{min-width:0!important;width:100%!important}.v114-tac-sub button{padding:7px 10px!important}
+.v121-ht-subnote{display:none!important}.v122-ht-actions{margin-top:auto!important;gap:8px!important}.v122-ht-actions button{padding:10px 12px!important;font-size:13px!important}.v122-ht-actions .save{border-color:#536675!important;background:#14212a!important;color:#dbe5ea!important}.v122-ht-actions .start{background:#164f77!important;border-color:#4383aa!important;font-size:14px!important}
+@media(max-height:760px){.volta-halftime-card.v114-halftime{height:calc(100vh - 16px)!important;padding:10px 14px!important}.v122-ht-head h2{font-size:20px!important}.v122-ht-stats>div{padding:6px 8px!important}.v122-ht-slot{width:78px!important;min-height:44px!important}}
+@media(max-width:1000px){.volta-squad-layout{grid-template-columns:1fr!important;max-width:760px!important}.volta-squad-list.detailed{width:100%!important}.v123-training-page .volta-training-grid{grid-template-columns:1fr 1fr!important}.v122-ht-body{grid-template-columns:minmax(480px,1.3fr) minmax(300px,.7fr)!important}}
+</style>
+<script id="v123-squad-halftime-spacing">
+(function(){
+ 'use strict';
+ const esc123=x=>typeof voltaV117Esc==='function'?voltaV117Esc(x):String(x??'');
+ function toast123(msg){try{if(typeof voltaV117Toast==='function')return voltaV117Toast(msg)}catch(e){};try{alert(msg)}catch(e){}}
+
+ /* User-editable squad numbers. Keep 1-99 unique inside the club. */
+ window.voltaV123SetShirtNumber=function(name,raw){
+   if(!voltaSave)return false;const n=Math.trunc(Number(raw));
+   if(!Number.isFinite(n)||n<1||n>99){toast123('등번호는 1~99 사이로 지정해 주세요.');render();return false}
+   const owner=(voltaSave.roster||[]).find(p=>p.name!==name&&Number(p.shirtNumber)===n);
+   if(owner){toast123(`#${n}은(는) ${owner.name} 선수가 사용 중입니다.`);render();return false}
+   const p=(voltaSave.roster||[]).find(p=>p.name===name);if(!p)return false;p.shirtNumber=n;voltaPersist();return true;
+ };
+
+ function patchSquad123(){
+   if(mode!=='volta-squad'||!voltaSave)return;
+   const page=document.querySelector('.volta-squad-page');if(!page)return;
+   const rows=[...page.querySelectorAll('.v119-squad-row')];
+   rows.forEach((row,i)=>{
+     const p=(voltaSave.roster||[])[i];if(!p)return;
+     const no=row.querySelector('.no');if(no&&!no.querySelector('input'))no.innerHTML=`<input class="v123-shirt-input" type="number" min="1" max="99" value="${Number(p.shirtNumber)||i+1}" title="등번호 변경" onclick="event.stopPropagation()" onmousedown="event.stopPropagation()" onchange="voltaV123SetShirtNumber('${esc123(p.name)}',this.value)">`;
+     row.querySelectorAll('.stat small').forEach(x=>x.remove());
+     const pos=row.querySelector('.pos');if(pos){pos.classList.remove('GK','DF','MF','FW');const t=(pos.textContent||'').trim();if(['GK','DF','MF','FW'].includes(t))pos.classList.add(t)}
+   });
+   page.querySelectorAll('.squad-slot').forEach(slot=>{slot.classList.remove('v123-pos-GK','v123-pos-DF','v123-pos-MF','v123-pos-FW');const role=(slot.querySelector('.slot-role')?.textContent||'').trim();if(role)slot.classList.add('v123-pos-'+role)});
+   const layout=page.querySelector('.volta-squad-layout'),actions=page.querySelector('.v122-squad-actions');
+   if(layout&&actions&&actions.parentElement!==layout)layout.appendChild(actions);
+   if(actions){const currentSig=Object.entries(voltaSave.squadSlots||{}).filter(([,n])=>n).sort((a,b)=>a[0].localeCompare(b[0])).map(([id,n])=>id+':'+n).join('|'),ok=!!(voltaSave.squadConfirmed&&voltaSave.squadSignature===currentSig);actions.innerHTML=`<button class="v123-save-state ${ok?'saved':''}" disabled>${ok?'저장 완료':'변경사항 미저장'}</button><button onclick="voltaV122SaveSquad()">스쿼드 저장</button>`}
+ }
+ function patchTraining123(){if(mode!=='volta-training')return;const grid=document.querySelector('.volta-training-grid');grid?.closest('.volta-subpage')?.classList.add('v123-training-page')}
+
+ /* Wider tactical lanes + channel discipline. M2/M3 and F2/F3 no longer swap through each other every rotation. */
+ try{if(typeof VOLTA_V115==='object'&&VOLTA_V115)VOLTA_V115.TEAM_SEPARATION_M=2.8}catch(e){}
+ if(typeof voltaV113RoleInfo==='function'){
+   const roleInfo123=voltaV113RoleInfo;
+   voltaV113RoleInfo=function(side,p){
+     const id=p?.tacticalSlot||p?.slotId;
+     if(id&&/^[FMD][1-4]$/.test(id)){
+       const line=id[0]==='F'?'FW':id[0]==='M'?'MF':'DF',n=Number(id.slice(1)),lane=({1:-1,2:-.66,3:.66,4:1})[n]??0,role=line==='FW'?'PIVO':line==='MF'?'ALA':'FIXO';return {role,lane};
+     }
+     if(id==='G1')return {role:'GK',lane:0};return roleInfo123(side,p);
+   };
+ }
+ if(typeof voltaV113IntentTarget==='function'){
+   const target123=voltaV113IntentTarget;
+   voltaV113IntentTarget=function(side,p,ai,base){
+     const out=target123.apply(this,arguments);if(!out||!p)return out;
+     const id=p.tacticalSlot||p.slotId,state=ai?.state||'';
+     if(id&&/^[FMD][1-4]$/.test(id)&&!['PRESS','MARK','TRACK','KICKER','KICK_SUPPORT','FAR_POST'].includes(state)){
+       const n=Number(id.slice(1)),bands={1:[7,31],2:[23,47],3:[53,77],4:[69,93]},b=bands[n];if(b)out.y=voltaClamp(out.y,b[0],b[1]);
+       /* Central rotations stay in their own half-channel instead of crossing like a carousel. */
+       if(state==='ROTATE'){out.y=n<=2?Math.min(out.y,42):Math.max(out.y,58)}
+     }
+     return out;
+   };
+ }
+
+ /* Remove the redundant re-entry note wherever an old tactical-sub template still produces it. */
+ if(typeof voltaV114SubHtml==='function'){
+   const subHtml123=voltaV114SubHtml;voltaV114SubHtml=function(){return String(subHtml123.apply(this,arguments)).replace(/<div class="v121-ht-subnote">[\s\S]*?<\/div>/g,'')};
+ }
+
+ function enhance123(){patchSquad123();patchTraining123()}
+ const render123=render;render=function(){const r=render123.apply(this,arguments);try{enhance123()}catch(e){console.error('[V123 UI]',e)}return r};
+ try{if(voltaSave){voltaSave.version=Math.max(Number(voltaSave.version)||0,123);(voltaSave.roster||[]).forEach((p,i)=>{if(!Number.isFinite(Number(p.shirtNumber)))p.shirtNumber=i+1});voltaPersist();render()}}catch(e){console.error('[V123 INIT]',e)}
+})();
+</script>
+
