@@ -2322,7 +2322,14 @@ function voltaStartVisualTimer(){
  voltaVisualLast=0;
  const loop=(t)=>{
    if(!voltaMatchState||voltaMatchState.finished){voltaMatchVisualTimer=null;return}
-   voltaVisualTick(t);voltaMatchVisualTimer=requestAnimationFrame(loop);
+   try{voltaVisualTick(t)}catch(error){
+     // One bad frame must not permanently cancel the only pitch animation loop.
+     const now=performance.now();
+     if(now-(voltaMatchState._visualErrorLoggedAt||-Infinity)>2500){
+       voltaMatchState._visualErrorLoggedAt=now;
+       console.error('[VOLTA] 경기 화면 갱신 실패',error);
+     }
+   }finally{voltaMatchVisualTimer=requestAnimationFrame(loop)}
  };
  voltaMatchVisualTimer=requestAnimationFrame(loop);
 }
@@ -9606,7 +9613,14 @@ linear-gradient(to right, transparent calc(50% - .5px), rgba(255,255,255,.45) ca
   if(!kicker){s.setPiece=null;possession(side);return true}
   if(sp.type==='KICK_IN'){
    const pt=P(side,kicker),contact={x:sp.spot.x,y:sp.spot.y<50?6:94};
-   if(!pt)return true;
+   if(!pt){
+    // A substitution can invalidate the original kicker's pitch position.
+    // Let the nearest available teammate approach instead of waiting forever.
+    const replacement=voltaV113NearestPlayer(side,contact,p=>p.position!=='GK');
+    if(replacement){sp.kickerName=replacement.name;sp.stage='APPROACH';
+     intent(side,replacement,'KICKER',contact,'replacement kick-in taker');return true}
+    s.setPiece=null;possession(side);return true;
+   }
    const dist=M(pt,contact);
    if(sp.stage==='APPROACH'){
     if(dist>.65)return true;
@@ -9672,11 +9686,47 @@ linear-gradient(to right, transparent calc(50% - .5px), rgba(255,255,255,.45) ca
    data.shapeSamples++;
   }
  }
+ // The match clock uses a timer, while the pitch uses animation frames. If
+ // frames stop arriving, the timer repaints the current physics board and
+ // starts a fresh frame loop without changing any match decisions.
+ function recoverVisual(e){
+  if(mode!=='volta-match'||document.hidden===true||
+    !document.getElementById('voltaMatchCanvas'))return;
+  const wall=wallClock();
+  if(wall-(e.lastPaintAt??wall)<600||wall-(e.visualRecoveryAt??-Infinity)<350)return;
+  e.visualRecoveryAt=wall;
+  const t=e.telemetry;t.visualRecoveries=(t.visualRecoveries||0)+1;
+  if(wall-(e.visualStallLoggedAt??-Infinity)>10000){
+   e.visualStallLoggedAt=wall;
+   const detail={matchTime:voltaMatchState.time,
+    frameGapMs:Math.round(wall-(e.lastFrameAt??wall)),
+    paintGapMs:Math.round(wall-(e.lastPaintAt??wall))};
+   t.visualStalls=t.visualStalls||[];t.visualStalls.push(detail);
+   if(t.visualStalls.length>12)t.visualStalls.shift();
+   console.warn('[VOLTA] 경기 화면 갱신 지연',detail);
+  }
+  if(wall-(e.lastFrameAt??wall)>1000&&
+   wall-(e.visualLoopRestartAt??-Infinity)>1500){
+   voltaStopVisualTimer();voltaStartVisualTimer();
+   e.visualLoopRestartAt=wall;
+   t.visualLoopRestarts=(t.visualLoopRestarts||0)+1;
+  }
+  try{visual(T(),true)}
+  catch(error){
+   t.visualErrors=t.visualErrors||[];
+   t.visualErrors.push({time:voltaMatchState.time,message:String(error?.stack||error).slice(0,500)});
+   if(t.visualErrors.length>12)t.visualErrors.shift();
+   if(wall-(e.visualErrorLoggedAt??-Infinity)>2500){
+    e.visualErrorLoggedAt=wall;console.error('[VOLTA] 경기 화면 복구 실패',error);
+   }
+  }
+ }
  // MatchEngine preserves the existing fixture clock, fatigue, substitution and
  // timeout host. All live football decisions resolve through this module.
  function tick(){const s=voltaMatchState;if(!s||s.finished)return;
   const e=engine(),wall=wallClock(),speed=Math.max(1,Number(s.speed)||1);
   if(e.wallLast==null){e.wallLast=wall;e.clock=wall}
+  if(e.lastPaintAt==null){e.lastPaintAt=wall;e.lastFrameAt=wall}
   const elapsed=C(wall-e.wallLast,0,250);e.wallLast=wall;
   if(s.tacticalTimeout?.active||s.halftime?.active){
    e.pendingMs=0;return base.tick.call(this);
@@ -9712,12 +9762,14 @@ linear-gradient(to right, transparent calc(50% - .5px), rgba(255,255,255,.45) ca
    }
   }finally{e.insideTick=false;s.speed=originalSpeed;voltaSyncLiveDom=originalSync;voltaDrawMatchCanvas=originalDraw}
   if(steps)originalSync();
+  recoverVisual(e);
  }
- function visual(t=T()){const s=voltaMatchState,e=s?.matchEngine;if(!s?.board?.playerPos)return;
+ function visual(t=T(),recovery=false){const s=voltaMatchState,e=s?.matchEngine;if(!s?.board?.playerPos)return;
   const logical=e&&!e.insideTick?matchNow():t,elapsed=e?C(logical-e.clock,0,100):0,
    positions=[],ball=copy(s.board.ball),a=s.playAction,
    frameAt=wallClock(),frameDt=e?C(frameAt-(e.renderedAt??frameAt),0,200):0,
    rendered=e?(e.renderedPositions||={}):{},current={};
+  if(e&&!e.insideTick&&!recovery)e.lastFrameAt=frameAt;
   if(a&&['PASS','SHOT','LOOSE','TOUCH_OUT'].includes(a.kind)&&a.start&&a.end){
    const u=C((logical-a.startedAt)/Math.max(1,a.endAt-a.startedAt),0,1),smooth=u*u*(3-2*u);
    s.board.ball.x=a.start.x+(a.end.x-a.start.x)*smooth;
@@ -9749,6 +9801,7 @@ linear-gradient(to right, transparent calc(50% - .5px), rgba(255,255,255,.45) ca
   }
   try{
    const drawn=voltaDrawMatchCanvas(logical),sp=s.setPiece;
+   if(e&&!e.insideTick)e.lastPaintAt=frameAt;
    if(sp?.type==='KICK_IN'&&['SET_FOOT','KICK_CONTACT'].includes(sp.stage)){
     const k=voltaGetPlayer(sp.side,sp.kickerName),q=k&&P(sp.side,k),cv=document.getElementById('voltaMatchCanvas');
     if(q&&cv?.getContext){const ctx=cv.getContext('2d'),pos=voltaCanvasPos(cv,q.x,q.y),ballPos=voltaCanvasPos(cv,sp.spot.x,sp.spot.y);
