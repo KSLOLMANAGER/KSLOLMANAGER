@@ -10103,7 +10103,6 @@ linear-gradient(to right, transparent calc(50% - .5px), rgba(255,255,255,.45) ca
  function patchUi(){patchLocker();patchBroadcast();restoreHud();goalOverlay();showChampionStory()}
  const renderBase140=render;render=function(){const r=renderBase140.apply(this,arguments);requestAnimationFrame(patchUi);return r};
  if(typeof voltaSyncLiveDom==='function'){const syncBase140=voltaSyncLiveDom;voltaSyncLiveDom=function(){const r=syncBase140.apply(this,arguments);patchBroadcast();restoreHud();goalOverlay();return r}}
- setInterval(()=>{if(mode==='volta-match'&&voltaMatchState){patchBroadcast();restoreHud();goalOverlay()}},350);
  requestAnimationFrame(()=>{patchUi();if(voltaSave){ensureSpecialUserPlayers();ensureSingleRival(false);voltaPersist()}});
 })();
 </script>
@@ -10245,7 +10244,6 @@ linear-gradient(to right, transparent calc(50% - .5px), rgba(255,255,255,.45) ca
  function patchAll(){try{patchCommentary();patchSidefoot();patchFitness();patchSchedule();patchPostTalk()}catch(e){console.error('[V142 UI]',e)}}
  const render142=render;render=function(){const r=render142.apply(this,arguments);requestAnimationFrame(patchAll);return r};
  if(typeof voltaSyncLiveDom==='function'){const sync142=voltaSyncLiveDom;voltaSyncLiveDom=function(){const r=sync142.apply(this,arguments);patchCommentary();patchFitness();return r}};
- setInterval(()=>{if(mode==='volta-match'){patchCommentary();patchFitness()}},350);
 
  try{if(voltaSave){balanceUserRoster(false);voltaEnsureLeagueSeasonV102();voltaSave.version=Math.max(V,Number(voltaSave.version)||0);voltaPersist();requestAnimationFrame(patchAll)}}catch(e){console.error('[V142 INIT]',e)}
 })();
@@ -10527,7 +10525,255 @@ linear-gradient(to right, transparent calc(50% - .5px), rgba(255,255,255,.45) ca
  function patch145(){try{patchDecemberTraining();patchLiveUi()}catch(e){console.error('[V145 UI]',e)}}
  const render145=render;render=function(){const r=render145.apply(this,arguments);requestAnimationFrame(patch145);return r};
  if(typeof voltaSyncLiveDom==='function'){const sync145=voltaSyncLiveDom;voltaSyncLiveDom=function(){const r=sync145.apply(this,arguments);patchLiveUi();return r}}
- setInterval(()=>{if(mode==='volta-match')patchLiveUi()},450);
  try{if(voltaSave){migrateYoungbin();voltaSave.version=Math.max(V,Number(voltaSave.version)||0);voltaPersist();requestAnimationFrame(patch145)}}catch(e){console.error('[V145 INIT]',e)}
+})();
+</script>
+
+<!-- ===== V146 STABILITY / TRAINING / DIFFICULTY / POSITION PROFILE ===== -->
+<style id="v146-stability-style">
+/* Training: clearer position column; remove the bottom explanatory paragraph. */
+.v126-training-note{display:none!important}
+.v126-personal-head,.v126-personal-row{grid-template-columns:minmax(110px,1fr) 58px 82px 150px 140px 110px!important}
+.v146-train-pos{font-size:10px!important;font-weight:500!important;text-align:center!important}
+.v146-train-pos.GK{color:#f3cf58!important}.v146-train-pos.DF{color:#73c9ff!important}.v146-train-pos.MF{color:#70d99a!important}.v146-train-pos.FW{color:#ff7d87!important}
+@media(max-width:1080px){.v126-personal-row{grid-template-columns:minmax(100px,1fr) 54px 70px 1fr 1fr!important}.v126-personal-row button{grid-column:1/-1!important}.v126-personal-head{display:none!important}}
+@media(max-width:620px){.v126-personal-row{grid-template-columns:1fr 54px 62px!important}.v126-personal-row>b{grid-column:auto!important}.v126-personal-row select{grid-column:1/-1!important}.v126-personal-row button{grid-column:1/-1!important}}
+
+/* Match substitution: position lives inside the player-name field; no separate position box. */
+.v135-sub-row{grid-template-columns:52px minmax(0,1fr) 76px!important;column-gap:8px!important}
+.v135-sub-row .v135-sub-pos{display:none!important}
+.v135-sub-row select{grid-column:2!important;font-weight:400!important}
+.v135-sub-row select.v146-pos-GK{color:#f3cf58!important}.v135-sub-row select.v146-pos-DF{color:#73c9ff!important}.v135-sub-row select.v146-pos-MF{color:#70d99a!important}.v135-sub-row select.v146-pos-FW{color:#ff7d87!important}
+.v135-sub-row .v135-sub-fit{grid-column:3!important;display:flex!important;align-items:center!important;justify-content:center!important;text-align:center!important;margin:0!important;justify-self:stretch!important}
+.v135-sub-row option{font-weight:400!important}
+.v135-sub-row option[data-pos="GK"]{color:#f3cf58}.v135-sub-row option[data-pos="DF"]{color:#73c9ff}.v135-sub-row option[data-pos="MF"]{color:#70d99a}.v135-sub-row option[data-pos="FW"]{color:#ff7d87}
+@media(max-width:760px){.v135-sub-row{grid-template-columns:48px minmax(0,1fr) 66px!important}}
+@media(max-width:520px){.v135-sub-row{grid-template-columns:44px minmax(0,1fr) 60px!important;column-gap:5px!important}}
+
+/* Formation / position labels: color only, no heavy bold. */
+.v129-pool-player .p,.squad-slot .slot-role,.v114-tac-player span,.v132-break-player .pos{font-weight:400!important}
+.v129-pool-player.pos-GK .p,.squad-slot[data-slot^="G"] .slot-role{color:#f3cf58!important}
+.v129-pool-player.pos-DF .p,.squad-slot[data-slot^="D"] .slot-role{color:#73c9ff!important}
+.v129-pool-player.pos-MF .p,.squad-slot[data-slot^="M"] .slot-role{color:#70d99a!important}
+.v129-pool-player.pos-FW .p,.squad-slot[data-slot^="F"] .slot-role{color:#ff7d87!important}
+
+/* Live statistics labels need to be readable at desktop scale. */
+.v135-side .v132-live-stat-row{grid-template-columns:36px minmax(72px,1fr) 78px 36px!important;padding:6px 0!important}
+.v135-side .v132-live-stat-row>span{font-size:12px!important;font-weight:500!important;line-height:1.3!important;color:#b7c7d0!important;letter-spacing:0!important}
+.v135-side .v132-live-stat-row>b{font-size:12px!important}
+.v135-side .v132-live-stat-head{font-size:11px!important}
+</style>
+<script id="v146-stability-script">
+(()=>{
+ 'use strict';
+ const V=146, POS=['GK','DF','MF','FW'];
+ const C=(v,a=0,b=100)=>Math.max(a,Math.min(b,Number(v)||0));
+ const E=x=>typeof voltaV117Esc==='function'?voltaV117Esc(String(x??'')):String(x??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
+ const pref=p=>POS.includes(p?.preferredPosition)?p.preferredPosition:(POS.includes(voltaSave?.positions?.[p?.name])?voltaSave.positions[p.name]:(POS.includes(p?.position)?p.position:'MF'));
+ const roleColor={GK:'#f3cf58',DF:'#73c9ff',MF:'#70d99a',FW:'#ff7d87'};
+ const schoolEra=()=>Math.max(0,Number(voltaSave?.leagueIndex)||0)<=2;
+ const isG=()=>voltaLeague?.()?.grade==='G'&&Math.max(0,Number(voltaSave?.leagueIndex)||0)===0;
+ const addDays=(key,n)=>{const d=new Date(String(key)+'T12:00:00');d.setDate(d.getDate()+n);return typeof voltaDateKey==='function'?voltaDateKey(d):d.toISOString().slice(0,10)};
+ const schoolReturn=year=>{const d=new Date(year,7,29,12);while(d.getDay()!==1)d.setDate(d.getDate()+1);return typeof voltaDateKey==='function'?voltaDateKey(d):d.toISOString().slice(0,10)};
+
+ function recalc146(p){
+   const a=p.attributes||{},q=k=>Number(a[k]||1);p.stats=p.stats||{};
+   p.stats.shooting=Math.round(C((q('finishing')*.52+q('longShots')*.25+q('composure')*.13+q('technique')*.10)*5,5,99));
+   p.stats.speed=Math.round(C((q('acceleration')*.45+q('pace')*.38+q('agility')*.17)*5,5,99));
+   p.stats.passing=Math.round(C((q('passing')*.42+q('vision')*.22+q('firstTouch')*.18+q('decisions')*.18)*5,5,99));
+   p.stats.physical=Math.round(C((q('strength')*.30+q('stamina')*.30+q('balance')*.18+q('workRate')*.12+q('aggression')*.10)*5,5,99));
+   p.stats.keeper=Math.round(C((q('reflexes')*.30+q('handling')*.25+q('oneOnOne')*.23+q('gkPositioning')*.22)*5,5,99));
+   p.hidden={...(p.hidden||{}),dribbling:Math.round(C((q('dribbling')*.50+q('technique')*.25+q('agility')*.25)*5,5,99)),judgement:Math.round(C((q('decisions')*.58+q('vision')*.22+q('composure')*.20)*5,5,99)),workrate:Math.round(C(q('workRate')*5,5,99)),concentration:Math.round(C(q('concentration')*5,5,99)),finishing:Math.round(C(q('finishing')*5,5,99))};
+   const core={GK:['reflexes','handling','oneOnOne','gkPositioning','distribution','decisions','concentration'],DF:['tackling','positioning','anticipation','concentration','strength','workRate','balance','decisions'],MF:['passing','vision','decisions','firstTouch','technique','teamwork','workRate','stamina','agility'],FW:['finishing','offBall','composure','dribbling','acceleration','pace','firstTouch','technique','decisions']}[pref(p)]||[];
+   p.currentAbility=Math.round(C(core.reduce((s,k)=>s+Number(a[k]||1),0)/Math.max(1,core.length)*5,1,99));
+   if(Number.isFinite(p.potentialAbility))p.potentialAbility=Math.max(p.currentAbility,Number(p.potentialAbility));
+   return p;
+ }
+
+ /* V142 redistributed positions after attributes had already been generated. Reshape the attribute profile once so the preferred position and the player's strengths actually match. */
+ const ROLE_DELTA={
+  GK:{reflexes:2.8,handling:2.4,oneOnOne:2.2,gkPositioning:2.3,distribution:1.1,kicking:.7,sweeper:.8,decisions:.7,concentration:1.0,finishing:-3.0,longShots:-2.6,dribbling:-2.2,tackling:-1.2,offBall:-2.3},
+  DF:{tackling:2.4,positioning:2.3,anticipation:1.7,concentration:1.4,strength:1.5,workRate:1.3,balance:1.0,decisions:.8,passing:.5,finishing:-1.7,longShots:-1.0,offBall:-1.2,reflexes:-3.0,handling:-3.0,oneOnOne:-3.0,gkPositioning:-3.0},
+  MF:{passing:2.2,vision:2.0,decisions:1.7,firstTouch:1.6,technique:1.4,teamwork:1.2,workRate:1.0,stamina:.8,agility:.7,dribbling:.7,finishing:-.4,tackling:-.2,strength:-.2,reflexes:-3.0,handling:-3.0,oneOnOne:-3.0,gkPositioning:-3.0},
+  FW:{finishing:2.6,offBall:2.3,composure:1.7,dribbling:1.5,acceleration:1.4,pace:1.2,firstTouch:1.1,technique:1.0,decisions:.7,longShots:.8,tackling:-1.8,positioning:-1.4,concentration:-.2,reflexes:-3.0,handling:-3.0,oneOnOne:-3.0,gkPositioning:-3.0}
+ };
+ function alignPreferredProfile(p){
+   if(!p?.attributes)return;const role=pref(p),delta=ROLE_DELTA[role]||{},keys=Object.keys(p.attributes).filter(k=>Number.isFinite(Number(p.attributes[k])));if(!keys.length)return;
+   const gkKeys=['reflexes','handling','oneOnOne','gkPositioning','distribution','kicking','sweeper'],fieldKeys=keys.filter(k=>!gkKeys.includes(k)),pool=role==='GK'?gkKeys.filter(k=>keys.includes(k)):fieldKeys,mean=pool.reduce((s,k)=>s+Number(p.attributes[k]||1),0)/Math.max(1,pool.length);
+   for(const k of keys){const old=Number(p.attributes[k]||1),target=mean+(delta[k]||0),mix=.42*old+.58*target;p.attributes[k]=Math.max(1,Math.min(20,Math.round(mix)))}
+   const a=p.attributes,raise=(k,off,min=1)=>{if(k in a)a[k]=Math.max(Number(a[k])||1,Math.max(min,Math.round(mean+off)))},lower=(k,off,max=20)=>{if(k in a)a[k]=Math.min(Number(a[k])||20,Math.min(max,Math.max(1,Math.round(mean+off))))};
+   if(role==='FW'){
+     raise('finishing',2.1,8);raise('offBall',1.9,8);raise('composure',1.2,7);raise('dribbling',1.0,7);raise('acceleration',1.0,7);raise('pace',.8,7);raise('firstTouch',.8,7);raise('technique',.7,7);raise('decisions',.5,6);lower('tackling',-.9,8);lower('positioning',-.5,9);
+   }else if(role==='DF'){
+     raise('tackling',2.0,8);raise('positioning',1.9,8);raise('anticipation',1.3,7);raise('concentration',1.1,7);raise('strength',1.0,7);raise('workRate',.8,7);raise('decisions',.5,6);lower('finishing',-1.0,8);lower('offBall',-.6,9);
+   }else if(role==='MF'){
+     raise('passing',1.8,8);raise('vision',1.5,8);raise('decisions',1.2,7);raise('firstTouch',1.1,7);raise('technique',1.0,7);raise('teamwork',.8,7);raise('workRate',.6,6);raise('stamina',.5,6);
+   }else if(role==='GK'){
+     raise('reflexes',2.0,8);raise('handling',1.8,8);raise('oneOnOne',1.6,8);raise('gkPositioning',1.8,8);raise('distribution',.7,6);raise('decisions',.5,6);raise('concentration',.8,7);lower('finishing',-2.2,5);lower('dribbling',-1.5,6);lower('offBall',-1.8,6);
+   }
+   p.preferredPosition=role;p.positionFamiliarity={...(p.positionFamiliarity||{}),[role]:100};recalc146(p);
+   const tr=(p.traits||[]).filter(Boolean),must=role==='FW'?'슈팅을 아끼지 않음':role==='DF'?'위치를 지킴':role==='MF'?'전진 패스를 선호':'안정적인 선방을 선호';if(!tr.includes(must))tr.unshift(must);p.traits=tr.slice(0,3);
+ }
+
+ function rebuildStarterFormation146(force=false){
+   if(!voltaSave?.roster?.length)return false;if(!force&&voltaSave.squadConfirmed)return false;
+   const need={GK:1,DF:2,MF:2,FW:1},slotsBy={GK:['G1'],DF:['D2','D3'],MF:['M2','M3'],FW:['F2']},used=new Set(),chosen={GK:[],DF:[],MF:[],FW:[]};
+   const roster=[...voltaSave.roster],young=roster.find(p=>p.name==='고영빈');
+   const add=p=>{if(!p||used.has(p.name))return false;const r=pref(p);if(!need[r]||chosen[r].length>=need[r])return false;chosen[r].push(p);used.add(p.name);return true};
+   add(young);
+   for(const r of ['GK','DF','MF','FW']){const pool=roster.filter(p=>!used.has(p.name)&&pref(p)===r).sort((a,b)=>(Number(b.currentAbility)||0)-(Number(a.currentAbility)||0));while(chosen[r].length<need[r]&&pool.length)add(pool.shift())}
+   for(const r of ['GK','DF','MF','FW'])while(chosen[r].length<need[r]){const p=roster.filter(x=>!used.has(x.name)).sort((a,b)=>(Number(b.positionFamiliarity?.[r])||0)-(Number(a.positionFamiliarity?.[r])||0)||(Number(b.currentAbility)||0)-(Number(a.currentAbility)||0))[0];if(!p)break;p.preferredPosition=r;p.positionFamiliarity={...(p.positionFamiliarity||{}),[r]:100};recalc146(p);chosen[r].push(p);used.add(p.name)}
+   const slots={};for(const r of ['GK','DF','MF','FW'])chosen[r].forEach((p,i)=>{const id=slotsBy[r][i];if(id)slots[id]=p.name});voltaSave.squadSlots=slots;voltaSave.positions=voltaSave.positions||{};for(const p of roster)voltaSave.positions[p.name]=pref(p);voltaSave.squadConfirmed=false;voltaSave.squadSignature='';voltaSave.v146StarterFixed=true;return true;
+ }
+ function playedUserMatches(){return (voltaSave?.season?.history||[]).filter(h=>h.home===voltaSave.teamName||h.away===voltaSave.teamName).length}
+ function roleSignature146(){return (voltaSave?.roster||[]).map(p=>`${p.name}:${pref(p)}`).sort().join('|')}
+ function migrate146(){
+   if(!voltaSave)return false;let dirty=false;const sig=roleSignature146();
+   if(!voltaSave.v146ProfileAlignedV2||voltaSave.v146RoleSignature!==sig){for(const p of voltaSave.roster||[])alignPreferredProfile(p);voltaSave.v146ProfileAligned=true;voltaSave.v146ProfileAlignedV2=true;voltaSave.v146RoleSignature=roleSignature146();dirty=true}
+   if(!voltaSave.v146FreshStartCondition&&playedUserMatches()===0){for(const p of voltaSave.roster||[])p.condition=100;voltaSave.v146FreshStartCondition=true;dirty=true}
+   if(Number(voltaSave.version||0)<V){voltaSave.version=V;dirty=true}
+   if(dirty)try{voltaPersist()}catch(e){}return dirty;
+ }
+
+ /* G is the entry league. The previous build behaved around hard difficulty, so only G receives a match-only AI handicap. */
+ function applyGEasyBalance(){
+   const s=voltaMatchState;if(!s||!isG()||s.v146EasyApplied)return;s.v146EasyApplied=true;const us=s.userSide||'home',ai=us==='home'?'away':'home',team=s.teams?.[ai],user=s.teams?.[us];if(!team||!user)return;
+   const all=[...(team.players||[]),...(team.bench||[])];for(const p of all){
+     if(p.attributes){p.attributes={...p.attributes};for(const k of Object.keys(p.attributes)){const v=Number(p.attributes[k]);if(Number.isFinite(v))p.attributes[k]=Math.max(1,Math.min(20,Math.round(v*.94)))}}
+     if(p.stats){p.stats={...p.stats};for(const k of Object.keys(p.stats)){const v=Number(p.stats[k]);if(Number.isFinite(v))p.stats[k]=Math.max(4,Math.min(99,Math.round(v*.94)))}}
+     if(p.hidden){p.hidden={...p.hidden};for(const k of Object.keys(p.hidden)){const v=Number(p.hidden[k]);if(Number.isFinite(v))p.hidden[k]=Math.max(4,Math.min(99,Math.round(v*.95)))}}
+     p.currentAbility=Math.max(1,Math.round((Number(p.currentAbility)||50)*.95));
+   }
+   team.tactics={...(team.tactics||{})};if(team.tactics.mentality==='attacking')team.tactics.mentality='balanced';if(team.tactics.pressing==='high')team.tactics.pressing='normal';
+   try{
+     team.metrics=voltaTeamMetrics(team.players,team.tactics,'임도현',.99);const um=user.metrics||voltaTeamMetrics(user.players,user.tactics||{},'임도현',1);
+     for(const k of ['attack','defense','build','keeper','organization'])if(Number.isFinite(team.metrics?.[k])&&Number.isFinite(um?.[k]))team.metrics[k]=Math.min(team.metrics[k],um[k]*.98);
+   }catch(e){console.error('[V146 G BALANCE]',e)}
+ }
+ const start146=voltaStartMatch;voltaStartMatch=function(){migrate146();const r=start146.apply(this,arguments);try{applyGEasyBalance()}catch(e){console.error('[V146 START]',e)}return r};
+
+ /* Upper-league compatibility: V142's playoff finalizer only understands rounds with stage. Temporarily mark legacy rounds as regular, then restore and provide the missing season-complete behavior. */
+ function rows146(){return Object.values(voltaSave?.season?.table||{}).sort((a,b)=>b.pts-a.pts||(b.gf-b.ga)-(a.gf-a.ga)||b.gf-a.gf||String(a.name).localeCompare(String(b.name)))}
+ function recordH2H146(home,away,hg,ag,date){if(!voltaSave||home!==voltaSave.teamName&&away!==voltaSave.teamName)return;const opp=home===voltaSave.teamName?away:home,ours=home===voltaSave.teamName?hg:ag,theirs=home===voltaSave.teamName?ag:hg,m=voltaSave.careerH2H||(voltaSave.careerH2H={}),x=m[opp]||(m[opp]={w:0,d:0,l:0,gf:0,ga:0,last:''});x.gf+=ours;x.ga+=theirs;if(ours>theirs)x.w++;else if(ours<theirs)x.l++;else x.d++;x.last=`${ours}:${theirs}`;x.date=date||voltaSave.currentDate}
+ function beginUpperSchoolSummer(round,nextRound){if(!schoolEra()||!round?.date||!nextRound?.date||voltaSave.v143CalendarPhase)return;const a=new Date(round.date+'T12:00:00'),b=new Date(nextRound.date+'T12:00:00');if(a.getMonth()+1>6||b.getMonth()+1<8)return;const year=Number(voltaSave.seasonYear)||a.getFullYear(),ret=schoolReturn(year),text=`전반기 마지막 경기가 끝났습니다. ${voltaDateLabelFull(ret)}에 개학하고 리그 일정을 다시 시작합니다.`;voltaSave.v143CalendarPhase={type:'summer',returnDate:ret,leagueIndex:Number(voltaSave.leagueIndex)||0,year};voltaSave.v143PendingEvent={title:'여름 방학이 시작됩니다',text,kind:'school',id:`${voltaSave.currentDate}|upper-summer`};voltaNotify('schedule','여름 방학이 시작됩니다',text,'info')}
+ const finish146=voltaFinalizeLeagueRound;
+ voltaFinalizeLeagueRound=function(home,away,hg,ag){
+   if(isG())return finish146.apply(this,arguments);
+   voltaEnsureLeagueSeasonV102();const s=voltaSave?.season,idx=Number(s?.round)||0,round=s?.schedule?.[idx];if(!round)return;
+   const had=Object.prototype.hasOwnProperty.call(round,'stage'),old=round.stage;round.stage='regular';let r;
+   try{r=finish146.apply(this,arguments)}finally{if(had)round.stage=old;else delete round.stage}
+   recordH2H146(home,away,hg,ag,round.date);
+   s.completed=Number(s.round)>=Number(s.schedule?.length||0);voltaSave.week=Number(s.round||0)+1;
+   const next=s.schedule?.[s.round];beginUpperSchoolSummer(round,next);
+   if(s.completed){
+     if(!s.championRewarded){const top=rows146()[0];if(top?.name===voltaSave.teamName){const sp=typeof voltaCurrentSponsor==='function'?voltaCurrentSponsor():null;voltaSave.money=(Number(voltaSave.money)||0)+50+(sp?.titleBonus||0);voltaSave.championships=voltaSave.championships||[];if(!voltaSave.championships.includes(voltaLeague().name))voltaSave.championships.push(voltaLeague().name);if(sp)voltaNotify('sponsor','리그 우승 수당',`${sp.name} 우승 수당 +${sp.titleBonus}원`,'good')}s.championRewarded=true}
+     const rows=rows146(),rank=Math.max(1,rows.findIndex(x=>x.name===voltaSave.teamName)+1);voltaSave.v140SeasonOutcome={rank,total:rows.length,champion:rank===1,leagueIndex:Number(voltaSave.leagueIndex)||0,leagueName:voltaLeague()?.name||'',grade:voltaLeague()?.grade||'',year:voltaSave.seasonYear,teamName:voltaSave.teamName};
+   }else if(next){const f=next.fixtures?.find(x=>x.home===voltaSave.teamName||x.away===voltaSave.teamName);if(f){const n=f.home===voltaSave.teamName?f.away:f.home;voltaSave.nextOpponentIndex=Math.max(0,voltaLeague().teams.findIndex(t=>t.name===n))}}
+   try{voltaPersist()}catch(e){}return r;
+ };
+
+ /* Dynamic champion copy after transition, so upper-league titles never say 곡선중 by mistake. */
+ function patchChampionCopy(){const st=voltaSave?.v140ChampionStory;if(!st)return;const g=String(st.league||'').includes('곡선중'),name=voltaSave.teamName||st.teamName||'우리 팀';st.headline=g?`곡선중 교내 풋살 리그 우승팀은 ${name}!`:`${st.league||'리그'} 우승팀은 ${name}!`;const paper=document.querySelector('.v140-season-paper');if(paper){const h=paper.querySelector('h2');if(h)h.textContent=st.headline;const pd=paper.querySelector('.paper-date');if(pd)pd.textContent=`${g?'곡선중학교 교내신문':'수원 스포츠'} · ${voltaDateLabelFull(voltaSave.currentDate)}`}}
+
+ /* Training UI: show each player's preferred position and remove the bottom tutorial sentence. */
+ function patchTraining146(){
+   if(mode!=='volta-training'||!voltaSave)return;document.querySelector('.v126-training-note')?.remove();const head=document.querySelector('.v126-personal-head');if(head&&!head.querySelector('.v146-train-pos-head')){const s=document.createElement('span');s.className='v146-train-pos-head';s.textContent='포지션';head.children[0]?.after(s)}
+   const rows=[...document.querySelectorAll('.v126-personal-row')];rows.forEach((row,i)=>{const p=voltaSave.roster?.[i];if(!p)return;let x=row.querySelector('.v146-train-pos');if(!x){x=document.createElement('span');row.querySelector('b')?.after(x)}const po=pref(p);x.className=`v146-train-pos ${po}`;x.textContent=po});
+ }
+
+ /* Live substitution dropdown: [FW] 이름, with position color on the field itself. */
+ function patchSub146(){
+   if(mode!=='volta-match'||!voltaMatchState)return;const s=voltaMatchState,us=s.userSide||'home',team=s.teams?.[us];if(!team)return;const by=new Map([...(team.players||[]),...(team.bench||[])].map(p=>[p.name,p]));
+   for(const kind of ['out','in']){const sel=document.getElementById(kind==='out'?'voltaSubOut':'voltaSubIn');if(!sel)continue;for(const o of [...sel.options]){const p=by.get(o.value);if(!p)continue;const po=POS.includes(p.position)?p.position:pref(p),fit=Math.round(Number(p.condition)||0);o.dataset.pos=po;o.dataset.fit=String(fit);o.textContent=`[${po}] ${p.name}`;o.style.color=roleColor[po]||''}const o=sel.selectedOptions?.[0],po=o?.dataset.pos||'MF';sel.classList.remove('v146-pos-GK','v146-pos-DF','v146-pos-MF','v146-pos-FW');sel.classList.add(`v146-pos-${po}`);const ps=sel.closest('.v135-sub-row')?.querySelector('.v135-sub-pos');if(ps)ps.style.setProperty('display','none','important')}
+ }
+ const preview146=window.voltaV135SubPreview;window.voltaV135SubPreview=function(){const r=preview146?.apply(this,arguments);patchSub146();return r};
+
+ function patchStats146(){document.querySelectorAll('.v135-side .v132-live-stat-row>span').forEach(x=>{x.style.setProperty('font-size','12px','important');x.style.setProperty('font-weight','500','important')})}
+ function patch146(){try{migrate146();patchTraining146();patchSub146();patchStats146();patchChampionCopy()}catch(e){console.error('[V146 UI]',e)}}
+ const render146=render;render=function(){const r=render146.apply(this,arguments);patch146();requestAnimationFrame(patch146);return r};
+ if(typeof voltaSyncLiveDom==='function'){const sync146=voltaSyncLiveDom;voltaSyncLiveDom=function(){const r=sync146.apply(this,arguments);patchSub146();patchStats146();return r}}
+ const load146=voltaLoad;voltaLoad=function(){const r=load146.apply(this,arguments);if(r!==false&&voltaSave){migrate146();voltaPersist();render()}return r};
+ const create146=voltaCreateTeam;voltaCreateTeam=function(){const before=voltaSave,r=create146.apply(this,arguments);if(voltaSave&&voltaSave!==before){for(const p of voltaSave.roster||[])alignPreferredProfile(p);voltaSave.v146ProfileAligned=true;voltaSave.v146ProfileAlignedV2=true;voltaSave.v146RoleSignature=roleSignature146();for(const p of voltaSave.roster||[])p.condition=100;voltaSave.v146FreshStartCondition=true;rebuildStarterFormation146(true);voltaSave.version=Math.max(V,Number(voltaSave.version)||0);voltaPersist();render()}return r};
+ const back146=voltaBackToClub;voltaBackToClub=function(){const r=back146.apply(this,arguments);patchChampionCopy();try{if(voltaSave){migrate146();voltaPersist()}}catch(e){}return r};
+
+ try{if(voltaSave){migrate146();requestAnimationFrame(patch146)}}catch(e){console.error('[V146 INIT]',e)}
+})();
+</script>
+
+
+<!-- ===== V147 UPPER LEAGUE WORLD / AUTO SCHEDULE ===== -->
+<script id="v147-upper-league-world-js">
+(function(){
+ 'use strict';
+ const V=147,TARGET_TEAMS=7,TARGET_ROSTER=12;
+ const TEAM_POOLS={
+  D:['팔달 FC','영통 유나이티드','광교 풋살클럽','장안 시티','화성 유나이티드','오산 FC','용인 챌린저스'],
+  C:['고양 시티 FC','안산 유나이티드','평택 FC','의정부 FC','부천 시티','김포 유나이티드','하남 FC'],
+  B:['전북 현대','포항 스틸러스','대전 하나','광주 FC','강원 FC','제주 SK','대구 FC'],
+  A:['프리미어 XI','라리가 XI','분데스리가 XI','세리에 XI','리그앙 XI','에레디비시 XI','유럽 올스타'],
+  S:['LEGENDS XI','GALACTICOS','INVINCIBLES','WORLD XI','ICON XI','ALL-TIME XI','CHAMPIONS XI']
+ };
+ const SURN=['김','이','박','최','정','강','조','윤','장','임','한','오','서','신','권','황','안','송','류','홍'];
+ const GIVEN1=['민','준','도','시','현','우','성','태','지','재','승','영','건','진','하','윤','원','찬','규','호'];
+ const GIVEN2=['우','호','준','민','현','진','성','윤','원','찬','훈','빈','석','혁','환','재','수','욱','형','율'];
+ const START_PLANS=[
+  ['GK','DF','DF','MF','MF','FW'],
+  ['GK','DF','DF','MF','FW','FW'],
+  ['GK','DF','MF','MF','FW','FW']
+ ];
+ const TOTAL={GK:2,DF:3,MF:4,FW:3};
+ const ROLE_KEYS={
+  GK:['reflexes','handling','oneOnOne','gkPositioning','distribution','decisions','concentration','composure','kicking','sweeper'],
+  DF:['tackling','positioning','anticipation','concentration','strength','teamwork','stamina','decisions','balance','workRate'],
+  MF:['passing','vision','decisions','firstTouch','technique','teamwork','workRate','anticipation','agility','stamina'],
+  FW:['finishing','offBall','composure','dribbling','acceleration','firstTouch','technique','anticipation','pace','decisions']
+ };
+ const GK_KEYS=new Set(['reflexes','handling','oneOnOne','gkPositioning','distribution','kicking','sweeper']);
+ const C=(v,a,b)=>Math.max(a,Math.min(b,Number(v)||0));
+ const hash=s=>typeof voltaHash==='function'?voltaHash(String(s||'')):(()=>{let h=2166136261>>>0;for(const ch of String(s||'')){h^=ch.charCodeAt(0);h=Math.imul(h,16777619)}return h>>>0})();
+ function usedNames(){const u=new Set((voltaSave?.roster||[]).map(p=>p.name));for(const l of VOLTA_LEAGUES||[])for(const t of l.teams||[])for(const n of t.players||[])u.add(n);return u}
+ function generatedPlayerName(grade,team,i,used){let n=0;while(n<500){const h=hash(`${grade}|${team}|${i}|${n}`),name=SURN[h%SURN.length]+GIVEN1[(h>>>5)%GIVEN1.length]+GIVEN2[(h>>>11)%GIVEN2.length];if(!used.has(name)){used.add(name);return name}n++}const fallback=`${team.replace(/\s/g,'').slice(0,3)}${i+1}`;used.add(fallback);return fallback}
+ function generatedTeamName(league,idx){const pool=TEAM_POOLS[league.grade]||[];for(const n of pool)if(!(league.teams||[]).some(t=>t.name===n))return n;return `${league.name.replace(/\s*리그$/,'')} ${idx+1}팀`}
+ function rolePlanFor(team){const idx=hash(team?.name||'TEAM')%START_PLANS.length,start=START_PLANS[idx].slice(),left={...TOTAL};start.forEach(r=>left[r]--);const bench=[];for(const r of ['GK','DF','MF','FW'])for(let i=0;i<left[r];i++)bench.push(r);return start.concat(bench).slice(0,TARGET_ROSTER)}
+ function normalizeWorld(){
+  if(typeof VOLTA_LEAGUES==='undefined')return false;let changed=false;const used=usedNames();
+  for(let li=0;li<VOLTA_LEAGUES.length;li++){
+   const l=VOLTA_LEAGUES[li];l.teams=Array.isArray(l.teams)?l.teams:[];
+   while(l.teams.length<TARGET_TEAMS){const name=generatedTeamName(l,l.teams.length);l.teams.push({name,players:[],v147GeneratedTeam:true});changed=true}
+   /* Seven AI clubs is the standard world size. Do not destroy an in-progress oversized league; normalize it when a new season is created. */
+   const active=Number(voltaSave?.leagueIndex)===li&&Number(voltaSave?.season?.round||0)>0;
+   if(l.teams.length>TARGET_TEAMS&&!active){l.v147ReserveTeams=(l.v147ReserveTeams||[]).concat(l.teams.slice(TARGET_TEAMS));l.teams=l.teams.slice(0,TARGET_TEAMS);changed=true}
+   for(const t of l.teams){t.players=Array.isArray(t.players)?t.players:[];while(t.players.length<TARGET_ROSTER){t.players.push(generatedPlayerName(l.grade,t.name,t.players.length,used));changed=true}if(t.players.length>TARGET_ROSTER&&!active){t.players=t.players.slice(0,TARGET_ROSTER);changed=true}const roles=rolePlanFor(t);t.v147Roles={};t.players.forEach((n,i)=>t.v147Roles[n]=roles[i]||'MF')}
+  }
+  return changed;
+ }
+ function recalc(p){if(!p?.attributes)return p;const a=p.attributes,q=k=>Number(a[k]||1);p.stats={...(p.stats||{}),shooting:Math.round(C((q('finishing')*.52+q('longShots')*.25+q('composure')*.13+q('technique')*.10)*5,5,99)),speed:Math.round(C((q('acceleration')*.45+q('pace')*.38+q('agility')*.17)*5,5,99)),passing:Math.round(C((q('passing')*.42+q('vision')*.22+q('firstTouch')*.18+q('decisions')*.18)*5,5,99)),physical:Math.round(C((q('strength')*.30+q('stamina')*.30+q('balance')*.18+q('workRate')*.12+q('aggression')*.10)*5,5,99)),keeper:Math.round(C((q('reflexes')*.30+q('handling')*.25+q('oneOnOne')*.23+q('gkPositioning')*.22)*5,5,99))};p.hidden={...(p.hidden||{}),dribbling:Math.round(C((q('dribbling')*.50+q('technique')*.25+q('agility')*.25)*5,5,99)),judgement:Math.round(C((q('decisions')*.58+q('vision')*.22+q('composure')*.20)*5,5,99)),workrate:Math.round(C(q('workRate')*5,5,99)),concentration:Math.round(C(q('concentration')*5,5,99)),finishing:Math.round(C(q('finishing')*5,5,99))};return p}
+ function ability(p,role){if(!p?.attributes)return Number(p?.currentAbility)||50;const ks=ROLE_KEYS[role]||ROLE_KEYS.MF,a=p.attributes;return Math.round(C(ks.reduce((s,k)=>s+Number(a[k]||1),0)/ks.length*5,1,99))}
+ function alignRole(p,role){const q={...p,attributes:p.attributes?{...p.attributes}:p.attributes,stats:{...(p.stats||{})},hidden:{...(p.hidden||{})}};if(q.attributes){const important=new Set(ROLE_KEYS[role]||[]);for(const k of Object.keys(q.attributes)){let v=Number(q.attributes[k]);if(!Number.isFinite(v))continue;if(important.has(k))v+=role==='GK'&&GK_KEYS.has(k)?2.1:1.25;else if(role==='GK'&&!GK_KEYS.has(k))v-=1.25;else if(role!=='GK'&&GK_KEYS.has(k))v-=2.3;else if(role==='FW'&&['tackling','positioning'].includes(k))v-=.8;else if(role==='DF'&&['finishing','offBall'].includes(k))v-=.7;q.attributes[k]=C(Math.round(v),1,20)}recalc(q)}q.preferredPosition=role;q.position=role;q.positionFamiliarity={GK:10,DF:25,MF:25,FW:20,[role]:96};q.currentAbility=ability(q,role);q.condition=100;q.v147LeagueGenerated=true;return q}
+ const opp147=voltaOpponentPlayers;
+ voltaOpponentPlayers=function(team,grade){normalizeWorld();const raw=opp147.apply(this,arguments)||[];if(!team?.players?.length)return raw;const by=new Map(raw.map(p=>[p.name,p])),roles=team.v147Roles||{},ordered=[];for(const n of team.players.slice(0,TARGET_ROSTER)){const p=by.get(n);if(p)ordered.push(alignRole(p,roles[n]||'MF'))}for(const p of raw)if(!ordered.some(x=>x.name===p.name))ordered.push(alignRole(p,roles[p.name]||p.preferredPosition||'MF'));return ordered};
+
+ function dateKey(year,md){return `${year}-${md}`}
+ function upperDates(year){return ['03-07','03-21','04-04','04-18','05-02','05-16','05-30','06-13','06-27','09-05','09-19','10-03','10-17','10-31'].map(x=>dateKey(year,x))}
+ function circleRounds(names){let a=names.slice(),rounds=[];if(a.length%2)a.push('__BYE__');const n=a.length;for(let r=0;r<n-1;r++){const fixtures=[];for(let i=0;i<n/2;i++){let x=a[i],y=a[n-1-i];if(x==='__BYE__'||y==='__BYE__')continue;if((r+i)%2)[x,y]=[y,x];fixtures.push({home:x,away:y})}rounds.push(fixtures);a=[a[0],a[n-1],...a.slice(1,n-1)]}return rounds}
+ function freshUpperSeason(idx){normalizeWorld();const l=VOLTA_LEAGUES[idx],year=Number(voltaSave.seasonYear)||2026,clubs=[voltaSave.teamName,...l.teams.slice(0,TARGET_TEAMS).map(t=>t.name)],leg1=circleRounds(clubs),leg2=leg1.map(fs=>fs.map(f=>({home:f.away,away:f.home}))),all=leg1.concat(leg2),dates=upperDates(year),schedule=all.map((fixtures,i)=>{const uf=fixtures.find(f=>f.home===voltaSave.teamName||f.away===voltaSave.teamName),home=uf?.home===voltaSave.teamName;return {date:dates[i]||dateKey(year,'11-01'),round:i+1,roundLabel:`${i+1} ROUND`,stage:'regular',leg:i<leg1.length?1:2,venue:home?'홈 구장':(uf?(home?uf.home:uf.home):'리그 구장'),venueType:home?'홈':'원정',fixtures}}),table={},playerStats={};clubs.forEach(n=>table[n]={name:n,p:0,w:0,d:0,l:0,gf:0,ga:0,pts:0});for(const p of voltaSave.roster||[])playerStats[p.name]={name:p.name,team:voltaSave.teamName,goals:0,assists:0,apps:0,mom:0,cleanSheets:0};for(const t of l.teams.slice(0,TARGET_TEAMS))for(const n of t.players)playerStats[n]={name:n,team:t.name,goals:0,assists:0,apps:0,mom:0,cleanSheets:0};return {key:`v147:auto:${year}:${idx}:${l.grade}:${l.name}`,v147AutoSchedule:true,round:0,schedule,table,history:[],playerStats,completed:false,championRewarded:false}}
+ const ensure147=voltaEnsureLeagueSeasonV102;
+ voltaEnsureLeagueSeasonV102=function(){normalizeWorld();if(!voltaSave)return;const idx=Math.max(0,Math.min(VOLTA_LEAGUES.length-1,Number(voltaSave.leagueIndex)||0));if(idx===0)return ensure147.apply(this,arguments);const s=voltaSave.season,played=Number(s?.round||0)>0||(s?.history?.length||0)>0;if(!s||(!played&&!s.v147AutoSchedule)||(!played&&s.key!==`v147:auto:${voltaSave.seasonYear}:${idx}:${VOLTA_LEAGUES[idx].grade}:${VOLTA_LEAGUES[idx].name}`)){voltaSave.season=freshUpperSeason(idx);voltaSave.week=1;voltaSave.nextOpponentIndex=0}else{const ps=s.playerStats||(s.playerStats={});for(const t of VOLTA_LEAGUES[idx].teams.slice(0,TARGET_TEAMS))for(const n of t.players)if(!ps[n])ps[n]={name:n,team:t.name,goals:0,assists:0,apps:0,mom:0,cleanSheets:0}}return voltaSave.season};
+ voltaEnsureLeagueSeason=function(){return voltaEnsureLeagueSeasonV102()};
+ function addHistory(s,r,f,hg,ag){s.history.push({date:r.date,round:r.round,stage:'regular',leg:r.leg,home:f.home,away:f.away,hg,ag,venue:r.venue})}
+ function h2h(home,away,hg,ag,date){if(home!==voltaSave.teamName&&away!==voltaSave.teamName)return;const opp=home===voltaSave.teamName?away:home,ours=home===voltaSave.teamName?hg:ag,theirs=home===voltaSave.teamName?ag:hg,m=voltaSave.careerH2H||(voltaSave.careerH2H={}),x=m[opp]||(m[opp]={w:0,d:0,l:0,gf:0,ga:0,last:''});x.gf+=ours;x.ga+=theirs;if(ours>theirs)x.w++;else if(ours<theirs)x.l++;else x.d++;x.last=`${ours}:${theirs}`;x.date=date}
+ function rows(){return Object.values(voltaSave?.season?.table||{}).sort((a,b)=>b.pts-a.pts||(b.gf-b.ga)-(a.gf-a.ga)||b.gf-a.gf||String(a.name).localeCompare(String(b.name)))}
+ function schoolReturn(year){let d=new Date(year,7,25,12);while(d.getDay()!==1)d.setDate(d.getDate()+1);return voltaDateKey(d)}
+ function maybeSummer(round,next){const idx=Number(voltaSave.leagueIndex)||0;if(idx>2||!round?.date||!next?.date||voltaSave.v143CalendarPhase)return;const a=new Date(round.date+'T12:00:00'),b=new Date(next.date+'T12:00:00');if(a.getMonth()!==5||b.getMonth()<7)return;const ret=schoolReturn(a.getFullYear()),text=`전반기 일정이 끝났습니다. ${voltaDateLabelFull(ret)}에 개학하고 리그 일정을 다시 시작합니다.`;voltaSave.v143CalendarPhase={type:'summer',returnDate:ret,leagueIndex:idx,year:a.getFullYear()};voltaSave.v143PendingEvent={title:'여름 방학이 시작됩니다',text,kind:'school',id:`${round.date}|v147-summer`};voltaNotify('schedule','여름 방학이 시작됩니다',text,'info')}
+ function awardAiExtras(teamName,goalsAgainst){if(goalsAgainst!==0)return;const t=voltaLeague()?.teams?.find(x=>x.name===teamName);if(!t)return;const ps=voltaOpponentPlayers(t,voltaLeague().grade),gk=ps.find(p=>p.position==='GK');if(gk)voltaAddPlayerSeasonStat(gk.name,teamName,'cleanSheets')}
+ const finalize147=voltaFinalizeLeagueRound;
+ voltaFinalizeLeagueRound=function(home,away,hg,ag){const idx=Number(voltaSave?.leagueIndex)||0;if(idx===0)return finalize147.apply(this,arguments);voltaEnsureLeagueSeasonV102();const s=voltaSave.season,r=s?.schedule?.[Number(s.round)||0];if(!r)return;voltaRecordTableResult(home,away,hg,ag);h2h(home,away,hg,ag,r.date);for(const f of r.fixtures||[]){if((f.home===home&&f.away===away)||(f.home===away&&f.away===home))continue;const [a,b]=voltaSimulateAIMatch(f.home,f.away);voltaRecordTableResult(f.home,f.away,a,b);voltaDistributeAIGoals?.(f.home,a);voltaDistributeAIGoals?.(f.away,b);awardAiExtras(f.home,b);awardAiExtras(f.away,a);addHistory(s,r,f,a,b)}addHistory(s,r,{home,away},hg,ag);s.round=(Number(s.round)||0)+1;voltaSave.week=s.round+1;s.completed=s.round>=s.schedule.length;const next=s.schedule[s.round];maybeSummer(r,next);if(s.completed){if(!s.championRewarded){const top=rows()[0];if(top?.name===voltaSave.teamName){const sp=typeof voltaCurrentSponsor==='function'?voltaCurrentSponsor():null;voltaSave.money=(Number(voltaSave.money)||0)+50+(sp?.titleBonus||0);voltaSave.championships=voltaSave.championships||[];if(!voltaSave.championships.includes(voltaLeague().name))voltaSave.championships.push(voltaLeague().name)}s.championRewarded=true}const rr=rows(),rank=Math.max(1,rr.findIndex(x=>x.name===voltaSave.teamName)+1);voltaSave.v140SeasonOutcome={rank,total:rr.length,champion:rank===1,leagueIndex:idx,leagueName:voltaLeague().name,grade:voltaLeague().grade,year:voltaSave.seasonYear,teamName:voltaSave.teamName}}else{const uf=next?.fixtures?.find(f=>f.home===voltaSave.teamName||f.away===voltaSave.teamName);if(uf){const n=uf.home===voltaSave.teamName?uf.away:uf.home;voltaSave.nextOpponentIndex=Math.max(0,voltaLeague().teams.findIndex(t=>t.name===n))}}voltaPersist();return s};
+
+ function migrate(){const changed=normalizeWorld();if(!voltaSave)return changed;let dirty=changed;if(Number(voltaSave.version||0)<V){voltaSave.version=V;dirty=true}const idx=Number(voltaSave.leagueIndex)||0;if(idx>0&&(!voltaSave.season||Number(voltaSave.season.round||0)===0)){voltaSave.season=freshUpperSeason(idx);voltaSave.week=1;voltaSave.nextOpponentIndex=0;dirty=true}if(dirty)voltaPersist();return dirty}
+ const load147=voltaLoad;voltaLoad=function(){const r=load147.apply(this,arguments);if(r!==false&&voltaSave){migrate();render()}return r};
+ const create147=voltaCreateTeam;voltaCreateTeam=function(){const r=create147.apply(this,arguments);if(voltaSave){migrate();voltaPersist()}return r};
+ const back147=voltaBackToClub;voltaBackToClub=function(){const r=back147.apply(this,arguments);try{if(voltaSave){normalizeWorld();if((Number(voltaSave.leagueIndex)||0)>0&&!voltaSave.season)voltaEnsureLeagueSeasonV102();voltaSave.version=Math.max(V,Number(voltaSave.version)||0);voltaPersist()}}catch(e){console.error('[V147 BACK]',e)}return r};
+ window.voltaV147LeagueAudit=function(){normalizeWorld();return (VOLTA_LEAGUES||[]).map((l,i)=>{const sample=l.teams[0],ps=sample?voltaOpponentPlayers(sample,l.grade):[],avg=ps.length?ps.reduce((s,p)=>s+(Number(p.currentAbility)||0),0)/ps.length:0;return {index:i,grade:l.grade,league:l.name,teams:l.teams.length,rosterMin:Math.min(...l.teams.map(t=>t.players.length)),rosterMax:Math.max(...l.teams.map(t=>t.players.length)),sampleAvgCA:+avg.toFixed(1)}})};
+ try{normalizeWorld();if(voltaSave)migrate()}catch(e){console.error('[V147 INIT]',e)}
 })();
 </script>
