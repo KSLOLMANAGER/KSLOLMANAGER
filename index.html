@@ -9031,3 +9031,283 @@ linear-gradient(to right, transparent calc(50% - .5px), rgba(255,255,255,.45) ca
  try{if(voltaSave){voltaSave.version=Math.max(136,Number(voltaSave.version)||0);voltaPersist()}}catch(e){}
 })();
 </script>
+
+<!-- ===== V138 MATCH MOTION / FUTSAL SHAPE / UI POLISH ===== -->
+<style id="v138-match-polish-style">
+/* Live substitution: position is shown only inside the select text ([GK] player), not as a duplicate colored box. */
+.v135-sub-row{grid-template-columns:52px minmax(0,1fr) 64px!important}
+.v135-sub-row .v135-sub-pos{display:none!important}
+.v135-sub-row select{grid-column:2!important}
+.v135-sub-row .v135-sub-fit{grid-column:3!important}
+/* Bottom live player record: keep only POS / player / cards. Goals-assists-fitness are already in the detailed result screen. */
+#v120MatchHud .v120-hud-colhead,#v120MatchHud .v120-hud-row{grid-template-columns:42px minmax(100px,1fr) 42px 42px!important}
+#v120MatchHud .v120-hud-colhead>span:nth-child(3),#v120MatchHud .v120-hud-colhead>span:nth-child(4),#v120MatchHud .v120-hud-colhead>span:nth-child(5),
+#v120MatchHud .v120-hud-row>.goal-stat,#v120MatchHud .v120-hud-row>.assist-stat,#v120MatchHud .v120-hud-row>.fit{display:none!important}
+#v120MatchHud .v120-hud-title span:last-child{display:none!important}
+/* Full-time result label. */
+.v136-ft-card.v138-win{border-color:#2e8f55!important}.v136-ft-card.v138-win h2{color:#69df93!important}
+.v136-ft-card.v138-loss{border-color:#a54850!important}.v136-ft-card.v138-loss h2{color:#ff7e88!important}
+.v136-ft-card.v138-draw{border-color:#9f8330!important}.v136-ft-card.v138-draw h2{color:#f0cb59!important}
+@media(max-width:520px){.v135-sub-row{grid-template-columns:46px minmax(0,1fr) 58px!important}}
+</style>
+<script id="v138-match-polish-script">
+(()=>{
+ const C=(v,a=0,b=100)=>Math.max(a,Math.min(b,Number(v)||0));
+ const POS=new Set(['GK','DF','MF','FW']);
+ const safe=s=>String(s??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
+ function pos(p){const x=p?.position||p?.preferredPosition||'MF';return POS.has(x)?x:'MF'}
+ function dir(side){return side==='home'?1:-1}
+ function advX(side,a){return side==='home'?a:100-a}
+ function sideLane(p){const id=String(p?.tacticalSlot||p?.slotId||'');if(!/^[FMD][1-4]$/.test(id))return 0;const n=Number(id.slice(1));return n===1?-1:n===4?1:n===2?-.32:n===3?.32:0}
+ function setIntent(side,p,state,x,y,why='v138 futsal shape',ms=1150){try{voltaV113SetIntent(side,p,state,{targetX:C(x,3,97),targetY:C(y,5,95),reason:why,minCommit:Math.max(400,ms-250),maxCommit:ms},true)}catch(e){}}
+
+ /* 1. The ball visibly crosses the touchline BEFORE the kick-in is prepared. */
+ const kickInBase=typeof voltaV113StartKickIn==='function'?voltaV113StartKickIn:null;
+ if(kickInBase){
+  voltaV113StartKickIn=function(side,x,y,reason='터치라인 아웃'){
+   const s=voltaMatchState;if(!s)return kickInBase.apply(this,arguments);
+   if(s._v138DirectKickIn){return kickInBase.apply(this,arguments)}
+   const b=s.board?.ball||{x:C(x,0,100),y:C(y,0,100)},lineY=Number(y)<50?0:100;
+   const alreadyOut=b.y<=.25||b.y>=99.75||/4초/.test(String(reason));
+   if(alreadyOut)return kickInBase.apply(this,arguments);
+   const now=typeof voltaV113Now==='function'?voltaV113Now():performance.now(),end={x:C(Number(x)||b.x,2,98),y:lineY===0?-2:102};
+   s.playAction={kind:'TOUCH_OUT',side,start:{x:b.x,y:b.y},end,startedAt:now,endAt:now+Math.max(230,430/Math.sqrt(s.speed||1)),restart:{side,x:C(Number(x)||b.x,2,98),y:lineY,reason}};
+   s.ballState={ownerSide:null,ownerName:null,state:'out',targetName:null};s.board.ballTarget={...end};s.highlight='공이 터치라인 밖으로 나갑니다.';
+   return s.playAction;
+  };
+ }
+ const resolveBase138=typeof voltaV113ResolveAction==='function'?voltaV113ResolveAction:null;
+ if(resolveBase138){
+  voltaV113ResolveAction=function(now=(typeof voltaV113Now==='function'?voltaV113Now():performance.now())){
+   const s=voltaMatchState,a=s?.playAction;
+   if(a?.kind==='TOUCH_OUT'){
+    if(now<a.endAt)return false;const r=a.restart;s.playAction=null;s.board.ball={...a.end};s.board.ballTarget={...a.end};
+    if(r&&kickInBase){s._v138DirectKickIn=true;try{return voltaV113StartKickIn(r.side,r.x,r.y,r.reason)}finally{s._v138DirectKickIn=false}}
+    return true;
+   }
+   return resolveBase138.apply(this,arguments);
+  };
+ }
+ const visualBase138=typeof voltaVisualTick==='function'?voltaVisualTick:null;
+ if(visualBase138){
+  voltaVisualTick=function(now=(typeof voltaV113Now==='function'?voltaV113Now():performance.now())){
+   const s=voltaMatchState,a=s?.playAction;if(a?.kind==='TOUCH_OUT'){
+    const t=C((now-a.startedAt)/Math.max(1,a.endAt-a.startedAt),0,1),e=t*t*(3-2*t);s.board.ball.x=a.start.x+(a.end.x-a.start.x)*e;s.board.ball.y=a.start.y+(a.end.y-a.start.y)*e;
+   }
+   return visualBase138.apply(this,arguments);
+  };
+ }
+
+ /* 2. Shot result and visible trajectory are one source of truth. */
+ const shotModelBase138=typeof voltaV113ShotModel==='function'?voltaV113ShotModel:null;
+ if(shotModelBase138){
+  voltaV113ShotModel=function(side,shooter,opt={}){
+   const m=shotModelBase138.apply(this,arguments)||{},goalX=side==='home'?102:-2;
+   if(m.outcome==='GOAL')m.end={x:goalX,y:C(Number(m.end?.y)||50,43,57)};
+   else if(m.outcome==='MISS')m.end={x:goalX,y:Math.random()<.5?C(27+Math.random()*10,20,39):C(63+Math.random()*10,61,80)};
+   else if(m.outcome==='WOODWORK')m.end={x:side==='home'?100.2:-.2,y:Math.random()<.5?41.5:58.5};
+   if(opt.penalty&&m.outcome==='SAVE')m.keeperAction='PARRY';
+   return m;
+  };
+ }
+
+ /* 3-4. Futsal shape: all five field players attack/defend; defenders join build-up near halfway. */
+ const basePoint138=typeof voltaV113BasePoint==='function'?voltaV113BasePoint:null;
+ if(basePoint138){
+  voltaV113BasePoint=function(side,p,attackK=.5){
+   const old=basePoint138.apply(this,arguments),k=C(attackK,0,1),lane=sideLane(p);let defA,attA;
+   if(p?.position==='GK'){defA=6.5;attA=(voltaMatchState?.teams?.[side]?.tactics?.gkBuildUp==='active'?18:13)}
+   else if(p?.position==='DF'){defA=21;attA=48}
+   else if(p?.position==='MF'){defA=31;attA=63}
+   else {defA=39;attA=77}
+   const a=defA+(attA-defA)*k;old.x=advX(side,a);
+   if(p?.position!=='GK'&&lane)old.y=C(50+lane*(p.position==='DF'?21:p.position==='MF'?31:27),9,91);
+   return old;
+  };
+ }
+ const targetBase138=typeof voltaV113IntentTarget==='function'?voltaV113IntentTarget:null;
+ if(targetBase138){
+  voltaV113IntentTarget=function(side,p,ai,base){
+   const q=targetBase138.apply(this,arguments),s=voltaMatchState,own=s?.board?.possession===side||s?.ballState?.ownerSide===side,lane=sideLane(p),id=String(p?.tacticalSlot||p?.slotId||'');
+   if(p?.position!=='GK'){
+    /* Wide slots play the flank often, but periodically rotate into half-space/far post. */
+    if(own&&lane&&/^[FM][14]$/.test(id)){
+     const phase=(Math.floor((Number(s?.time)||0)/7)+String(p.name||'').length)%5,wideY=lane<0?16:84,halfY=lane<0?34:66;
+     q.y=C(phase===0?halfY:wideY,8,92);
+     if(['RUN','FAR_POST','ROTATE'].includes(ai?.state)&&phase===0)q.y=halfY;
+    }
+    /* Futsal recovery: even FW returns behind the ball; when attacking, DF steps to halfway as a recycle option. */
+    const bx=Number(s?.board?.ball?.x??50),bAdv=side==='home'?bx:100-bx,qAdv=side==='home'?q.x:100-q.x;
+    if(!own&&p.position==='FW'&&qAdv>50)q.x=advX(side,42);
+    if(!own&&p.position==='MF'&&qAdv>43)q.x=advX(side,35);
+    if(own&&p.position==='DF'&&bAdv>42&&qAdv<39)q.x=advX(side,43+Math.min(6,(bAdv-42)*.18));
+   }
+   return q;
+  };
+ }
+
+ /* 5. Kick-in spread: no five-player swarm around the ball. */
+ function spreadKickIn(sp){
+  const s=voltaMatchState;if(!s||!sp||sp.type!=='KICK_IN')return;const side=sp.side,other=side==='home'?'away':'home',d=dir(side),top=sp.spot.y<50,inside=top?1:-1,atk=s.teams?.[side],def=s.teams?.[other];if(!atk||!def)return;
+  const field=(atk.players||[]).filter(p=>p.position!=='GK'&&p.name!==sp.kickerName),targets=[
+   [sp.spot.x+d*7,sp.spot.y+inside*12],[sp.spot.x+d*15,sp.spot.y+inside*28],[sp.spot.x+d*9,top?72:28],[sp.spot.x-d*8,50]
+  ];
+  field.forEach((p,i)=>setIntent(side,p,i===3?'HOLD':'KICK_SUPPORT',targets[i%targets.length][0],targets[i%targets.length][1],'kick-in spread',1450));
+  const defs=(def.players||[]).filter(p=>p.position!=='GK'),dx=sp.spot.x+d*5,ys=top?[18,34,52,70,84]:[82,66,48,30,16];defs.forEach((p,i)=>setIntent(other,p,'MARK',dx+d*(i%2)*3,ys[i%ys.length],'kick-in defensive spacing',1400));
+ }
+ const makeSetBase138=typeof voltaV115MakeSetPiece==='function'?voltaV115MakeSetPiece:null;
+ if(makeSetBase138){
+  voltaV115MakeSetPiece=function(type,side,kicker,spot,extra={}){const sp=makeSetBase138.apply(this,arguments);try{if(type==='KICK_IN')spreadKickIn(sp);if(type==='PENALTY')shapePenalty(sp)}catch(e){console.error('[V138 SET PIECE]',e)}return sp};
+ }
+ /* kickInBase may apply an older compact pattern after MakeSetPiece, so spread once again after it returns. */
+ if(kickInBase){const directKick=voltaV113StartKickIn;voltaV113StartKickIn=function(side,x,y,reason='터치라인 아웃'){const r=directKick.apply(this,arguments);try{if(voltaMatchState?.setPiece?.type==='KICK_IN')spreadKickIn(voltaMatchState.setPiece)}catch(e){}return r}}
+
+ /* 6. Penalty: everyone except kicker/GK lines up behind the ball for the rebound. */
+ function shapePenalty(sp){
+  const s=voltaMatchState;if(!s||!sp||sp.type!=='PENALTY')return;const now=typeof voltaV113Now==='function'?voltaV113Now():performance.now();sp.readyAt=Math.max(Number(sp.readyAt)||0,now+1800);sp.forceAt=Math.max(Number(sp.forceAt)||0,now+3000);const side=sp.side,other=side==='home'?'away':'home',d=dir(side),atk=s.teams?.[side],def=s.teams?.[other];if(!atk||!def)return;
+  const ax=sp.spot.x-d*11,dx=sp.spot.x-d*8,ays=[25,38,62,75],dys=[20,34,50,66,80];
+  (atk.players||[]).filter(p=>p.name!==sp.kickerName&&p.position!=='GK').forEach((p,i)=>setIntent(side,p,'HOLD',ax-d*(i%2)*2,ays[i%ays.length],'penalty rebound line',1550));
+  (def.players||[]).filter(p=>p.position!=='GK').forEach((p,i)=>setIntent(other,p,'MARK',dx-d*(i%2)*2,dys[i%dys.length],'penalty defending line',1550));
+  const gk=(def.players||[]).find(p=>p.position==='GK');if(gk)setIntent(other,gk,'GK_HOLD',other==='home'?5.8:94.2,50,'penalty keeper line',1500);
+ }
+ const penBase138=typeof voltaV130StartPenalty==='function'?voltaV130StartPenalty:null;
+ if(penBase138){voltaV130StartPenalty=function(side){const r=penBase138.apply(this,arguments);try{if(r&&voltaMatchState?.setPiece?.type==='PENALTY')shapePenalty(voltaMatchState.setPiece)}catch(e){}return r}}
+
+ /* 7. No duplicate colored position chip next to live OUT/IN selects. */
+ function simplifySub(){document.querySelectorAll('.v135-sub-row .v135-sub-pos').forEach(x=>x.style.display='none')}
+
+ /* 8. Compact live player record: remove goal/assist/fitness columns from the bottom HUD. */
+ function compactHud(){const hud=document.getElementById('v120MatchHud');if(!hud)return;const heads=hud.querySelectorAll('.v120-hud-colhead');heads.forEach(h=>{[...h.children].forEach((x,i)=>{if(i>=2&&i<=4)x.style.display='none'})});hud.querySelectorAll('.goal-stat,.assist-stat,.fit').forEach(x=>x.style.display='none');const sub=hud.querySelector('.v120-hud-title span:last-child');if(sub)sub.style.display='none'}
+
+ /* 9. Speed is always clickable during live play; no full render/reset is needed. */
+ window.voltaSetMatchSpeed=function(v){const s=voltaMatchState;if(!s||s.finished)return;v=[1,2,4].includes(Number(v))?Number(v):1;s.speed=v;try{voltaVisualLast=typeof voltaV113Now==='function'?voltaV113Now():performance.now()}catch(e){}document.querySelectorAll('.v135-hud-actions>button').forEach(b=>{if(/^\d×$/.test((b.textContent||'').trim()))b.classList.toggle('on',Number((b.textContent||'').replace('×',''))===v)})};
+
+ /* 10. Full-time intermediate screen says win/loss/draw. */
+ function finalLabel(){const s=voltaMatchState,card=document.querySelector('.v136-ft-card');if(!s||!card)return;const us=s.userSide||'home',them=us==='home'?'away':'home',a=Number(s.score?.[us]||0),b=Number(s.score?.[them]||0),h=card.querySelector('h2');card.classList.remove('v138-win','v138-loss','v138-draw');if(a>b){card.classList.add('v138-win');if(h)h.textContent='승리!'}else if(a<b){card.classList.add('v138-loss');if(h)h.textContent='패배!'}else{card.classList.add('v138-draw');if(h)h.textContent='무승부'}}
+ function polish(){try{simplifySub();compactHud();finalLabel()}catch(e){console.error('[V138 UI]',e)}}
+ const renderBase138=render;render=function(){const r=renderBase138.apply(this,arguments);polish();return r};
+ if(typeof voltaSyncLiveDom==='function'){const syncBase138=voltaSyncLiveDom;voltaSyncLiveDom=function(){const r=syncBase138.apply(this,arguments);polish();return r}}
+ requestAnimationFrame(polish);
+ try{if(voltaSave){voltaSave.version=Math.max(138,Number(voltaSave.version)||0);voltaPersist()}}catch(e){}
+})();
+</script>
+<!-- ===== V139 MATCH ENGINE 2.0 ===== -->
+<script id="v139-match-engine-2">
+(()=>{
+ const V139={VERSION:'V139-ME2',SPACE_MS:850,TRANSITION_MS:2700,LOOSE_MS:520};
+ const C=(v,a=0,b=100)=>Math.max(a,Math.min(b,Number(v)||0));
+ const A=(p,k,d=10)=>Number(p?.attributes?.[k]??d);
+ const N=(p,k,d=50)=>Number(p?.hidden?.[k]??p?.stats?.[k]??d);
+ const other=s=>s==='home'?'away':'home';
+ const dir=s=>s==='home'?1:-1;
+ const adv=(s,x)=>s==='home'?x:100-x;
+ const ax=(s,a)=>s==='home'?a:100-a;
+ const now=()=>typeof voltaV113Now==='function'?voltaV113Now():performance.now();
+ const pt=(s,p)=>voltaMatchState?.board?.playerPos?.[s]?.[p?.name];
+ const dM=(a,b)=>a&&b?(typeof voltaV113DistM==='function'?voltaV113DistM(a,b):Math.hypot(a.x-b.x,a.y-b.y)*.4):99;
+ function matchPlayers(side){const s=voltaMatchState,t=s?.teams?.[side];return t?.players||[]}
+ function ensure(){const s=voltaMatchState;if(!s)return null;if(!s.v139)s.v139={version:V139.VERSION,phase:{home:'SET_DEFENCE',away:'SET_DEFENCE'},phaseUntil:{home:0,away:0},lastPossession:s.board?.possession||'home',spaceCache:{},decisions:{home:{},away:{}},looseWins:{home:0,away:0},actionCounts:{pass:0,shot:0,dribble:0,reset:0},transitionCount:0};return s.v139}
+ function setPhase(side,phase,ms=0){const s=voltaMatchState,v=ensure();if(!s||!v)return;v.phase[side]=phase;v.phaseUntil[side]=now()+ms;const o=other(side);if(phase==='TRANSITION_ATTACK'){v.phase[o]='TRANSITION_DEFENCE';v.phaseUntil[o]=now()+ms;v.transitionCount++}else if(phase==='POSSESSION'){if(v.phase[o]!=='TRANSITION_DEFENCE'||now()>v.phaseUntil[o])v.phase[o]='SET_DEFENCE'}}
+ function phase(side){const v=ensure();if(!v)return 'SET_DEFENCE';if(now()>Number(v.phaseUntil?.[side]||0)){if(v.phase[side]==='TRANSITION_ATTACK')v.phase[side]='POSSESSION';else if(v.phase[side]==='TRANSITION_DEFENCE')v.phase[side]='SET_DEFENCE'}return v.phase[side]}
+ function slotLane(p){const id=String(p?.tacticalSlot||p?.slotId||'');if(/^[FMD][1-4]$/.test(id)){const n=+id.slice(1);return n===1?-1:n===4?1:n===2?-.34:n===3?.34:0}try{const r=voltaV113RoleInfo?.('home',p);if(Number.isFinite(r?.lane))return C(r.lane,-1,1)}catch(e){}return 0}
+ function roleAdvance(p,ph){if(p?.position==='GK')return ph==='POSSESSION'||ph==='TRANSITION_ATTACK'?15:6.5;if(p?.position==='DF')return ph==='TRANSITION_ATTACK'?53:ph==='POSSESSION'?47:ph==='TRANSITION_DEFENCE'?27:23;if(p?.position==='MF')return ph==='TRANSITION_ATTACK'?69:ph==='POSSESSION'?61:ph==='TRANSITION_DEFENCE'?34:38;return ph==='TRANSITION_ATTACK'?83:ph==='POSSESSION'?75:ph==='TRANSITION_DEFENCE'?40:46}
+ function baseY(p){const lane=slotLane(p);if(!lane)return 50;const spread=p.position==='DF'?22:p.position==='MF'?31:28;return C(50+lane*spread,9,91)}
+ function pressureAt(side,q){try{return Number(voltaV113PressureAt(side,q)||0)}catch(e){return 0}}
+ function laneRisk(side,a,b){try{return Number(voltaV113LanePressure(side,a,b)||0)}catch(e){return 0}}
+ function teammateSpacing(side,p,q){let pen=0;for(const m of matchPlayers(side)){if(m.name===p.name)continue;const z=pt(side,m);if(!z)continue;const d=dM(q,z);if(d<3.2)pen+=(3.2-d)*9;else if(d<5.3)pen+=(5.3-d)*2.2}return pen}
+ function spaceScore(side,p,q,ph,carrier){
+   const lane=slotLane(p),tac=voltaMatchState?.teams?.[side]?.tactics||{},det=tac.detail||{},a=adv(side,q.x),goalDist=Math.abs(91-a),press=pressureAt(side,q),spacing=teammateSpacing(side,p,q);
+   let sc=55-press*34-spacing;
+   const targetAdv=roleAdvance(p,ph);sc-=Math.abs(a-targetAdv)*.58;
+   if(lane){const wideY=lane<0?18:82,halfY=lane<0?34:66;const ballY=Number(voltaMatchState?.board?.ball?.y||50);const blocked=Math.abs(ballY-wideY)<11;const fav=blocked?halfY:wideY;sc-=Math.abs(q.y-fav)*.42;if(det.width==='wide')sc+=Math.max(0,13-Math.abs(q.y-wideY))*.45;if(det.width==='narrow')sc+=Math.max(0,12-Math.abs(q.y-halfY))*.50}
+   else sc-=Math.abs(q.y-50)*.18;
+   if(ph==='TRANSITION_ATTACK')sc+=a*.15+Math.max(0,32-goalDist)*.25;
+   if(ph==='TRANSITION_DEFENCE')sc-=Math.max(0,a-45)*.5;
+   if(carrier){const cp=pt(side,carrier)||voltaMatchState?.board?.ball;if(cp){const dist=dM(cp,q);if(dist<4.5)sc-=18;if(dist>26)sc-=8;const risk=laneRisk(side,cp,q);sc-=risk*17;if(a>adv(side,cp.x)+3)sc+=det.runs==='aggressive'?8:4}}
+   return sc;
+ }
+ function bestSpace(side,p,carrier){
+   const v=ensure(),ph=phase(side),key=`${side}|${p.name}|${ph}`;const cached=v?.spaceCache?.[key];if(cached&&now()-cached.at<V139.SPACE_MS)return cached.q;
+   const ba=roleAdvance(p,ph),by=baseY(p),cands=[];for(const da of [-10,-5,0,5,10])for(const dy of [-16,-8,0,8,16]){let a=C(ba+da,5,94),y=C(by+dy,7,93);if(p.position==='GK'){a=C(ba+da*.2,5,20);y=C(50+dy*.7,27,73)}const q={x:ax(side,a),y};cands.push({q,sc:spaceScore(side,p,q,ph,carrier)})}cands.sort((x,y)=>y.sc-x.sc);const top=cands.slice(0,3),pick=top[Math.floor(Math.random()*Math.min(2,top.length))]||cands[0],q=pick?.q||{x:ax(side,ba),y:by};if(v){v.spaceCache[key]={at:now(),q};const ks=Object.keys(v.spaceCache);if(ks.length>180)for(const k of ks.slice(0,90))delete v.spaceCache[k]}return q;
+ }
+ /* team phase follows actual possession changes */
+ const possessBase=voltaStartPossession;
+ voltaStartPossession=function(side,carrierName=null){const s=voltaMatchState,prev=s?.board?.possession;const r=possessBase.apply(this,arguments);if(s&&side){ensure();if(prev&&prev!==side)setPhase(side,'TRANSITION_ATTACK',V139.TRANSITION_MS);else setPhase(side,'POSSESSION');s.v139.lastPossession=side}return r};
+ /* Space-first off-ball positioning. Existing tactical states remain hints, not hard coordinates. */
+ const targetBase=voltaV113IntentTarget;
+ voltaV113IntentTarget=function(side,p,ai,base){let q=targetBase.apply(this,arguments);const s=voltaMatchState;if(!s||!p||p.position==='GK'||s.setPiece)return q;const ph=phase(side),carrier=s.ballState?.ownerSide===side?voltaGetPlayer(side,s.ballState?.ownerName):null,st=ai?.state||'';
+   if(['KICKER','KICK_SUPPORT','PRESS','MARK','TRACK','COVER'].includes(st))return q;
+   const sp=bestSpace(side,p,carrier),blend=(ph==='TRANSITION_ATTACK'||ph==='TRANSITION_DEFENCE')?.72:.58;q={x:q.x*(1-blend)+sp.x*blend,y:q.y*(1-blend)+sp.y*blend};
+   // Futsal: everyone joins both phases. DF can recycle near halfway; FW must recover goal-side.
+   let qa=adv(side,q.x);if(ph==='POSSESSION'&&p.position==='DF')qa=Math.max(38,qa);if(ph==='TRANSITION_ATTACK'&&p.position==='DF')qa=Math.max(44,qa);if(ph==='TRANSITION_DEFENCE'&&p.position==='FW')qa=Math.min(48,qa);if(ph==='SET_DEFENCE'&&p.position==='FW')qa=Math.min(53,qa);q.x=ax(side,C(qa,4,96));return {x:C(q.x,3,97),y:C(q.y,6,94)};
+ };
+ /* Coordinated rotations: when one flank owns the ball, near support, central recycle and far-post runner separate. */
+ const assignBase=voltaAssignAIStates;
+ voltaAssignAIStates=function(side,carrierName,force=false){const r=assignBase.apply(this,arguments),s=voltaMatchState;if(!s||s.setPiece)return r;const carrier=voltaGetPlayer(side,carrierName),cp=carrier&&pt(side,carrier),ph=phase(side);if(!carrier||!cp)return r;const field=matchPlayers(side).filter(p=>p.position!=='GK'&&p.name!==carrier.name),near=field.slice().sort((a,b)=>dM(pt(side,a),cp)-dM(pt(side,b),cp));
+   if(ph==='TRANSITION_ATTACK'){near.forEach((p,i)=>{if(i===0)voltaV113SetIntent(side,p,'SUPPORT',{reason:'transition support',minCommit:550,maxCommit:900},true);else if(i===1)voltaV113SetIntent(side,p,'RUN',{reason:'transition runner',minCommit:650,maxCommit:1050},true);else if(i===2)voltaV113SetIntent(side,p,'FAR_POST',{reason:'far post transition',minCommit:700,maxCommit:1100},true)})}
+   else if(Math.abs(cp.y-50)>18){const farSign=cp.y<50?1:-1;const far=field.filter(p=>Math.sign(slotLane(p)||farSign)===farSign).sort((a,b)=>adv(side,pt(side,b)?.x||50)-adv(side,pt(side,a)?.x||50))[0];if(far)voltaV113SetIntent(side,far,'FAR_POST',{reason:'opposite flank rotation',minCommit:700,maxCommit:1150},true);const back=field.filter(p=>p.position==='DF').sort((a,b)=>adv(side,pt(side,a)?.x||50)-adv(side,pt(side,b)?.x||50))[0];if(back)voltaV113SetIntent(side,back,'SUPPORT',{reason:'central recycle',minCommit:700,maxCommit:1200},true)}const ds=other(side),pressing=s.teams?.[ds]?.tactics?.pressing||'normal';if(Math.abs(cp.y-50)>31&&(pressing==='high'||phase(ds)==='TRANSITION_DEFENCE')){const d2=matchPlayers(ds).filter(p=>p.position!=='GK').map(p=>({p,q:pt(ds,p)})).filter(x=>x.q).sort((a,b)=>dM(a.q,cp)-dM(b.q,cp))[1];if(d2)voltaV113SetIntent(ds,d2.p,'SCREEN',{targetX:C(cp.x-dir(ds)*2,4,96),targetY:C(cp.y+(cp.y<50?8:-8),7,93),reason:'sideline double-team screen',minCommit:520,maxCommit:900},true)}return r;
+ };
+ function decisionDelay(p,pressure){const dec=A(p,'decisions',10),cmp=A(p,'composure',10),ft=A(p,'firstTouch',10),base=760-(dec+cmp+ft)*12;return C(base+pressure*260,260,780)}
+ function facingQuality(side,p,target){const q=pt(side,p);if(!q||!target)return .5;let fx=Number(q.vx||0),fy=Number(q.vy||0),fm=Math.hypot(fx,fy);if(fm<.02){fx=dir(side);fy=0;fm=1}const tx=target.x-q.x,ty=target.y-q.y,tm=Math.hypot(tx,ty)||1;return C(((fx/fm)*(tx/tm)+(fy/fm)*(ty/tm)+1)/2,0,1)}
+ function shotScore(side,p,pressure){const q=pt(side,p)||voltaMatchState?.board?.ball;if(!q)return -99;let g;try{g=voltaV114GoalGeom(side,q)}catch(e){g={dist:20,angle:.2}}const fin=A(p,'finishing'),ls=A(p,'longShots'),cmp=A(p,'composure'),dec=A(p,'decisions'),tech=A(p,'technique');const skill=g.dist>9?ls*.42+fin*.18+cmp*.18+dec*.12+tech*.10:fin*.42+cmp*.23+dec*.15+tech*.12+ls*.08;const goal={x:side==='home'?100:0,y:50},face=facingQuality(side,p,goal);let sc=skill*3.15-(g.dist||15)*2.0-pressure*25+(g.angle||.25)*28+(face-.5)*12;if(p.position==='FW')sc+=9;else if(p.position==='MF')sc+=3;else if(p.position==='DF')sc-=4;if(g.dist<5)sc+=20;if(g.dist>16)sc-=20;return sc}
+ function dribbleScore(side,p,pressure){const q=pt(side,p)||voltaMatchState?.board?.ball,ap=adv(side,q?.x||50);const f=facingQuality(side,p,{x:side==='home'?100:0,y:q?.y||50});return A(p,'dribbling')*2+A(p,'agility')+A(p,'acceleration')*.8+A(p,'balance')*.7+A(p,'decisions')*.5-pressure*45+(ap<72?7:-8)+(f-.5)*8}
+ function passScore(side,p,o,pressure){const vis=A(p,'vision'),pas=A(p,'passing'),dec=A(p,'decisions'),ft=A(p,'firstTouch'),risk=Number(o?.laneRisk||0),recv=Number(o?.recvPress||0),fwd=Number(o?.forward||0);const face=facingQuality(side,p,o?.target||pt(side,o?.to));let sc=Number(o?.score||0)+pas*.65+vis*.58+dec*.45+ft*.18-risk*17-recv*13-pressure*5+(face-.5)*(4+ft*.25);if(fwd>3)sc+=Math.min(16,fwd*.55);if(phase(side)==='TRANSITION_ATTACK'&&fwd>4)sc+=17;if(o?.to?.position==='GK'&&pressure<.55)sc-=10;return sc}
+ function weightedChoice(arr,p){arr=arr.filter(x=>Number.isFinite(x.score)).sort((a,b)=>b.score-a.score).slice(0,4);if(!arr.length)return null;const dec=A(p,'decisions'),temp=dec>=16?7:dec>=11?10:14,best=arr[0].score,weights=arr.map(x=>Math.exp((x.score-best)/temp)),sum=weights.reduce((a,b)=>a+b,0),r=Math.random()*sum;let n=0;for(let i=0;i<arr.length;i++){n+=weights[i];if(r<=n)return arr[i]}return arr[0]}
+ function nearestDefender(attSide,carrier){const ds=other(attSide),cp=pt(attSide,carrier);if(!cp)return null;return matchPlayers(ds).filter(p=>p.position!=='GK').map(p=>({p,q:pt(ds,p)})).filter(x=>x.q).sort((a,b)=>dM(a.q,cp)-dM(b.q,cp))[0]||null}
+ function startLoose(pos,cause,lastSide,opt={}){const s=voltaMatchState;if(!s)return false;const t=now(),ang=(Math.random()*Math.PI*2),mag=opt.mag??(3+Math.random()*5),end={x:C(pos.x+Math.cos(ang)*mag,3,97),y:C(pos.y+Math.sin(ang)*mag,3,97)};s.playAction={kind:'V139_LOOSE',side:lastSide,start:{x:pos.x,y:pos.y},end,startedAt:t,endAt:t+V139.LOOSE_MS/Math.max(1,Number(s.speed)||1),cause};s.ballState={ownerSide:null,ownerName:null,state:'loose',targetName:null};s.board.ball={x:pos.x,y:pos.y};s.board.ballTarget={...end};s.highlight='세컨드볼 경합!';for(const sd of ['home','away']){const ch=matchPlayers(sd).filter(p=>p.position!=='GK').map(p=>({p,q:pt(sd,p)})).filter(x=>x.q).sort((a,b)=>dM(a.q,end)-dM(b.q,end)).slice(0,2);ch.forEach((x,i)=>{try{voltaV113SetIntent(sd,x.p,'LOOSE_CHASE',{targetX:C(end.x+(i?dir(sd)*1.2:0),4,96),targetY:C(end.y+(i?(x.q.y<end.y?-1.5:1.5):0),6,94),reason:'loose-ball chase',minCommit:260,maxCommit:V139.LOOSE_MS+220},true)}catch(e){}})}return true}
+ function resolveLoose(a){const s=voltaMatchState,pos=a.end||s.board.ball,c=[];for(const side of ['home','away'])for(const p of matchPlayers(side)){const q=pt(side,p);if(!q)continue;const dist=dM(q,pos),ant=A(p,'anticipation'),acc=A(p,'acceleration'),agg=A(p,'aggression'),dec=A(p,'decisions'),score=80-dist*8+ant*1.4+acc*.8+agg*.45+dec*.35+Math.random()*12;c.push({side,p,score})}c.sort((x,y)=>y.score-x.score);const w=c[0];if(!w){voltaStartPossession(Math.random()<.5?'home':'away');return}const v=ensure();v.looseWins[w.side]=(v.looseWins[w.side]||0)+1;s.board.ball={...pos};voltaLog(`⚡ 세컨드볼을 ${w.p.name}이(가) 따냅니다.`,'normal');voltaStartPossession(w.side,w.p.name)}
+ function defensiveContest(side,carrier,pressure){if(pressure<.42||Math.random()>.18)return false;const n=nearestDefender(side,carrier);if(!n||dM(n.q,pt(side,carrier))>2.45)return false;const defSide=other(side),t=n.p,tackle=A(t,'tackling')*1.5+A(t,'anticipation')+A(t,'positioning')*.7+A(t,'aggression')*.25+A(t,'acceleration')*.3,keep=A(carrier,'dribbling')*1.35+A(carrier,'agility')*.8+A(carrier,'balance')*.7+A(carrier,'firstTouch')*.6+A(carrier,'composure')*.35,margin=tackle-keep+Math.random()*18-9;if(margin<3)return false;t.matchTackles=(t.matchTackles||0)+1;t.rating=C((t.rating||6.5)+.08,5,10);voltaLog(`🛡️ ${t.name}이(가) 타이밍 좋게 공을 걷어냅니다.`,'turnover');const cp=pt(side,carrier)||voltaMatchState.board.ball;if(margin>13&&Math.random()<.58)voltaStartPossession(defSide,t.name);else startLoose(cp,'tackle',defSide,{mag:4});return true}
+ /* Action utility AI: evaluate shot/pass/dribble/reset simultaneously. */
+ voltaV113Decision=function(){const s=voltaMatchState;if(!s||s.finished||s.halftime?.active||s.tacticalTimeout?.active||s.setPiece||s.playAction)return;ensure();const tm=now();if(s.keeperHold&&tm<s.keeperHold.until){voltaV113ScheduleDecision(220);return}else if(s.keeperHold)s.keeperHold=null;const side=s.ballState?.ownerSide||s.board.possession,carrier=side?voltaGetPlayer(side,s.ballState?.ownerName):null;if(!side||!carrier){voltaStartPossession(s.board.possession||'home');return}voltaAssignAIStates(side,carrier.name,false);const cp=pt(side,carrier)||s.board.ball,pressure=pressureAt(side,cp);if(typeof voltaV113MaybeFoul==='function'&&voltaV113MaybeFoul(side)){voltaV113ScheduleDecision(520);return}if(defensiveContest(side,carrier,pressure))return;if(typeof voltaV115TryOneTwo==='function'&&voltaV115TryOneTwo(side,carrier))return;
+   const opts=voltaV113PassOptions(side,carrier)||[],acts=[];for(const o of opts.slice(0,7))acts.push({type:o.forward<-3?'reset':'pass',score:passScore(side,carrier,o,pressure),o});if(carrier.position!=='GK'){acts.push({type:'shot',score:shotScore(side,carrier,pressure)});acts.push({type:'dribble',score:dribbleScore(side,carrier,pressure)})}const best=weightedChoice(acts,carrier),v=ensure();if(!best){voltaV113ScheduleDecision(decisionDelay(carrier,pressure));return}v.actionCounts[best.type]=(v.actionCounts[best.type]||0)+1;v.decisions[side][carrier.name]={type:best.type,score:Math.round(best.score),time:s.time};
+   const shotMin=carrier.position==='DF'?25:carrier.position==='MF'?20:23;if(best.type==='shot'&&best.score>shotMin){voltaV113StartShot(side,carrier);return}if((best.type==='pass'||best.type==='reset')&&best.o){voltaV113StartPass(side,carrier,best.o.to,{target:best.o.target});return}const dribMin=carrier.position==='DF'?30:carrier.position==='MF'?25:24;if(best.type==='dribble'&&best.score>dribMin){voltaV113StartDribble(side,carrier);return}const p=opts[0];if(p){voltaV113StartPass(side,carrier,p.to,{target:p.target});return}voltaV113ScheduleDecision(decisionDelay(carrier,pressure));
+ };
+ /* Physical-ish shot model: aim first, then block/keeper/outcome. */
+ voltaV113ShotModel=function(side,shooter,opt={}){const s=voltaMatchState,start=pt(side,shooter)||s.board.ball,def=other(side),goalX=side==='home'?102:-2,goalLineX=side==='home'?100:0,gk=matchPlayers(def).find(p=>p.position==='GK'),gkp=gk&&pt(def,gk),dist=Math.hypot((goalLineX-start.x)*.4,(50-start.y)*.24),fin=A(shooter,'finishing'),ls=A(shooter,'longShots'),cmp=A(shooter,'composure'),tech=A(shooter,'technique'),dec=A(shooter,'decisions'),quality=(dist>9?ls*.42+fin*.18:fin*.45+ls*.12)+cmp*.2+tech*.14+dec*.12+(opt.penalty?2.2:0),err=C((opt.penalty?7.5:12)-quality*.42+(dist>10?(dist-10)*.38:0),.7,11),corner=Math.random()<.5?44:56,aimY=C(corner+(Math.random()*2-1)*err,31,69),aim={x:goalX,y:aimY};
+   // blockers are evaluated against the actual shot segment.
+   let blocker=null,blockScore=0;if(!opt.penalty)for(const p of matchPlayers(def).filter(p=>p.position!=='GK')){const q=pt(def,p);if(!q)continue;const vx=aim.x-start.x,vy=aim.y-start.y,l2=vx*vx+vy*vy||1,t=C(((q.x-start.x)*vx+(q.y-start.y)*vy)/l2,0,1),proj={x:start.x+vx*t,y:start.y+vy*t},dd=dM(q,proj);if(t>.08&&t<.88&&dd<2.25){const bs=(2.25-dd)*18+A(p,'positioning')*.9+A(p,'anticipation')*.75+Math.random()*8;if(bs>blockScore){blockScore=bs;blocker={p,q}}}}
+   if(blocker&&blockScore>24+quality*.28)return {outcome:'BLOCK',end:{x:blocker.q.x,y:blocker.q.y},keeper:gk,keeperDiveY:gkp?.y||50,keeperAction:null,distGoal:dist,aim};
+   const onTarget=aimY>=41.2&&aimY<=58.8;if(!onTarget||Math.random()<C((11-quality*.43)/100,0,.12))return {outcome:'MISS',end:aim,keeper:gk,keeperDiveY:gkp?.y||50,keeperAction:null,distGoal:dist,aim};
+   if(Math.abs(aimY-41.5)<.65||Math.abs(aimY-58.5)<.65)return {outcome:'WOODWORK',end:{x:side==='home'?100.2:-.2,y:aimY},keeper:gk,keeperDiveY:gkp?.y||50,keeperAction:null,distGoal:dist,aim};
+   if(!gk)return {outcome:'GOAL',end:aim,keeper:null,keeperDiveY:50,distGoal:dist,aim};
+   const reflex=A(gk,'reflexes'),pos=A(gk,'gkPositioning'),one=A(gk,'oneOnOne'),handling=A(gk,'handling'),reaction=(reflex*.40+pos*.28+one*.18+handling*.14),keeperY=Number(gkp?.y??50),reach=4.0+reaction*.19+(dist>10?1.1:0),delta=Math.abs(aimY-keeperY),saveProb=C((opt.penalty?.16:.18)+(reaction-quality)*.027+(reach-delta)*.055+(dist-6)*.012,.04,.82);if(Math.random()<saveProb){const catchP=C(.20+handling*.025+(dist>9?.15:0),.20,.72),r=Math.random(),ka=r<catchP?'CATCH':r<catchP+.17?'PUNCH':'PARRY';return {outcome:'SAVE',end:{x:gkp?.x??goalLineX+(side==='home'?-2:2),y:C(aimY*.65+keeperY*.35,39,61)},keeper:gk,keeperDiveY:aimY,keeperAction:ka,distGoal:dist,aim}}
+   return {outcome:'GOAL',end:aim,keeper:gk,keeperDiveY:aimY,keeperAction:null,distGoal:dist,aim};
+ };
+ /* Receive speed: first touch/decision/composure now visibly influence how quickly the next action happens. */
+ const resolveBase=voltaV113ResolveAction;
+ voltaV113ResolveAction=function(t=now()){
+   const s=voltaMatchState,a=s?.playAction?{...s.playAction}:null;if(a?.kind==='V139_LOOSE'){if(t<a.endAt)return false;s.playAction=null;s.board.ball={...a.end};resolveLoose(a);return true}
+   const r=resolveBase.apply(this,arguments);if(!s||!a)return r;
+   try{
+     if(a.kind==='PASS'&&!a.success&&a._v139Deflect&&!s.setPiece&&!s.playAction){startLoose(a.end||s.board.ball,'pass deflection',other(a.side),{mag:3.2})}
+
+     if(a.kind==='PASS'&&a.success){const recv=voltaGetPlayer(a.side,a.to),rp=recv&&pt(a.side,recv),pr=recv&&rp?pressureAt(a.side,rp):0;if(recv&&s.engine)s.engine.nextDecisionAt=Math.max(Number(s.engine.nextDecisionAt||0),t+decisionDelay(recv,pr)/Math.max(1,Math.sqrt(Number(s.speed)||1)))}
+     if(a.kind==='SHOT'&&!s.setPiece&&!s.playAction){
+       if(a.outcome==='SAVE'&&a.keeperAction!=='CATCH'){const pos=s.board.ball||a.end;startLoose(pos,'keeper parry',a.side,{mag:a.keeperAction==='PUNCH'?7:4})}
+       else if(a.outcome==='BLOCK'){startLoose(a.end||s.board.ball,'shot block',Math.random()<.52?a.side:other(a.side),{mag:4})}
+       else if(a.outcome==='WOODWORK'&&Math.random()<.62){s.setPiece=null;startLoose({x:sideGoalBounceX(a.side),y:a.end?.y||50},'woodwork',a.side,{mag:6})}
+     }
+     if(a.kind==='DRIBBLE'&&!a.success&&!s.setPiece&&Math.random()<.55){const q=s.board.ball||a.end||{x:50,y:50};startLoose(q,'tackle ricochet',other(a.side),{mag:3.5})}
+   }catch(e){console.error('[V139 RESOLVE]',e)}return r;
+ };
+ function sideGoalBounceX(side){return side==='home'?96:4}
+ /* Render loose ball trajectory even though legacy renderer only knows pass/shot/dribble. */
+ const visualBase=voltaVisualTick;
+ voltaVisualTick=function(t=now()){const s=voltaMatchState,a=s?.playAction;if(a?.kind==='V139_LOOSE'){const k=C((t-a.startedAt)/Math.max(1,a.endAt-a.startedAt),0,1),e=1-Math.pow(1-k,2);s.board.ball.x=a.start.x+(a.end.x-a.start.x)*e;s.board.ball.y=a.start.y+(a.end.y-a.start.y)*e}return visualBase.apply(this,arguments)};
+ /* Playback speed should not change football density. Legacy actions used sqrt(speed), while the match clock uses speed. Scale final action/decision timings once more so 1x/2x/4x are true playback speeds. */
+ const schedBase139=voltaV113ScheduleDecision;
+ voltaV113ScheduleDecision=function(ms=null){const s=voltaMatchState;if(!s?.engine)return schedBase139.apply(this,arguments);const base=ms==null?(VOLTA_V113.THINK_MIN+Math.random()*(VOLTA_V113.THINK_MAX-VOLTA_V113.THINK_MIN)):Number(ms);s.engine.nextDecisionAt=now()+base/Math.max(1,Number(s.speed)||1)};
+ function speedFix(ok){const s=voltaMatchState,a=s?.playAction;if(!ok||!a||!['PASS','SHOT','DRIBBLE'].includes(a.kind))return ok;const sp=Math.max(1,Number(s.speed)||1);if(sp>1&&!a._v139SpeedFixed){const dur=Math.max(1,a.endAt-a.startedAt);a.endAt=a.startedAt+dur/Math.sqrt(sp);a._v139SpeedFixed=true}return ok}
+ const passStart139=voltaV113StartPass;voltaV113StartPass=function(side,from,to,opt={}){const ok=passStart139.apply(this,arguments),s=voltaMatchState,a=s?.playAction;if(ok&&a?.kind==='PASS'){const start=a.start||pt(side,from)||s.board.ball,end=a.plannedEnd||a.end||pt(side,to),fwd=end?adv(side,end.x)-adv(side,start?.x||50):0,dy=end?Math.abs((end.y||50)-(start?.y||50)):0,dist=end&&start?dM(start,end):0,ai=s.aiStates?.[side]?.[to?.name],type=dy>31&&dist>11?'SWITCH':adv(side,start?.x||50)>73&&fwd<-1?'CUTBACK':fwd>7&&['RUN','FAR_POST','RECEIVE'].includes(ai?.state)?'THROUGH':dist>13&&fwd>2?'DRIVEN':'SHORT';a.passType=type;const labels={SWITCH:'반대편 전환',CUTBACK:'컷백',THROUGH:'공간 패스',DRIVEN:'강한 전진패스',SHORT:'짧은 패스'};try{voltaSetCaption(`${from.name} → ${to.name} · ${labels[type]}`,'normal')}catch(e){}if(!a.success){const risk=laneRisk(side,start,end);a._v139Deflect=risk>.18&&Math.random()<C(.16+risk*.28,.12,.45)}if(type==='DRIVEN'||type==='THROUGH')a.endAt=a.startedAt+(a.endAt-a.startedAt)*.86;else if(type==='SWITCH')a.endAt=a.startedAt+(a.endAt-a.startedAt)*1.05}return speedFix(ok)};
+ const shotStart139=voltaV113StartShot;voltaV113StartShot=function(){return speedFix(shotStart139.apply(this,arguments))};
+ const dribStart139=voltaV113StartDribble;voltaV113StartDribble=function(){return speedFix(dribStart139.apply(this,arguments))};
+ /* Init/reset ME2 state per match. */
+ const startBase=voltaStartMatch;
+ voltaStartMatch=function(){const r=startBase.apply(this,arguments);if(voltaMatchState){voltaMatchState.v139=null;ensure();const side=voltaMatchState.board?.possession||'home';setPhase(side,'POSSESSION');setPhase(other(side),'SET_DEFENCE')}return r};
+ /* Keep the phase machine fresh even across wrappers around the legacy tick. */
+ const tickBase=voltaMatchTick;
+ voltaMatchTick=function(){const s=voltaMatchState;if(s)ensure();const r=tickBase.apply(this,arguments);if(s&&!s.finished){phase('home');phase('away')}return r};
+ window.voltaV139ME2={ensure,phase,setPhase,bestSpace,shotScore,passScore,dribbleScore,startLoose,resolveLoose,decisionDelay,facingQuality};
+ try{if(voltaSave){voltaSave.version=Math.max(139,Number(voltaSave.version)||0);voltaPersist()}}catch(e){}
+})();
+</script>
