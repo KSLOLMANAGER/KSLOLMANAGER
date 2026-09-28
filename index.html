@@ -11114,3 +11114,164 @@ linear-gradient(to right, transparent calc(50% - .5px), rgba(255,255,255,.45) ca
  try{dedupeWorld();if(voltaSave)migrate();requestAnimationFrame(afterRender)}catch(e){console.error('[V149 INIT]',e)}
 })();
 </script>
+
+<!-- ===== V150 LEAGUE UI / MATCH RESTART / TIMEOUT / LOCKER TALK / ENGINE SYMMETRY PACK ===== -->
+<style id="v150-style">
+/* 1. Round result: HOME/AWAY labels sit above each team name. */
+.v149-match-row{grid-template-columns:minmax(150px,1fr) 46px 42px 46px minmax(150px,1fr) 96px!important}
+.v149-match-row>span:first-child{display:none!important}
+.v149-match-row .v149-team-link{display:flex!important;flex-direction:column!important;gap:2px!important;line-height:1.2!important}
+.v149-match-row .v149-team-link.home{align-items:flex-end!important;text-align:right!important}
+.v149-match-row .v149-team-link:not(.home){align-items:flex-start!important;text-align:left!important}
+.v149-match-row .v149-team-link.home:before{content:'홈';font-size:8px;color:#69b9ff;font-weight:900;letter-spacing:.08em}
+.v149-match-row .v149-team-link:not(.home):before{content:'원정';font-size:8px;color:#ff7d84;font-weight:900;letter-spacing:.08em}
+
+/* 2/3. Team/player record alignment + our-team row highlight. */
+.v149-teamstats .v149-table-head>*:nth-child(n+3),.v149-teamstats .v149-table-row>*:nth-child(n+3),
+.v149-playerstats .v149-table-head>*:nth-child(n+4),.v149-playerstats .v149-table-row>*:nth-child(n+4){display:grid!important;place-items:center!important;text-align:center!important;min-width:0!important}
+.v149-teamstats .v149-table-row.v150-mine-record{background:#102d43!important;box-shadow:inset 3px 0 #66c8ff!important}
+.v149-teamstats .v149-table-row.v150-mine-record>span,.v149-teamstats .v149-table-row.v150-mine-record>.v149-team-link{color:#8ed6ff!important}
+.v149-teamstats .v149-table-head,.v149-teamstats .v149-table-row{grid-template-columns:42px minmax(145px,1.35fr) repeat(10,70px)!important}
+.v149-playerstats .v149-table-head,.v149-playerstats .v149-table-row{grid-template-columns:42px minmax(130px,1.4fr) minmax(105px,1fr) repeat(13,72px)!important}
+
+/* 4. TOP 1~3 summary cards. */
+.v150-summary-grid{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:10px;margin-bottom:13px}
+.v150-summary-card{min-height:170px;padding:12px 13px;border:1px solid #2c3d49;background:#111b23;overflow:hidden}
+.v150-summary-card h4{margin:0 0 9px;color:#d8e1e6;font-size:12px}.v150-summary-card .metric{display:block;color:#6ab6ff;font-size:10px;margin-bottom:8px}
+.v150-podium{display:grid;gap:5px}.v150-podium-row{display:grid;grid-template-columns:22px minmax(0,1fr) auto;gap:7px;align-items:center;padding:5px 0;border-top:1px solid #22313a;font-size:10px}.v150-podium-row:first-child{border-top:0}.v150-podium-row .rank{color:#f2c953;font-weight:950}.v150-podium-row b{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:#edf3f6}.v150-podium-row b small{display:block;color:#7e929e;font-size:8px;font-weight:600;margin-top:2px}.v150-podium-row strong{color:#79c4ff;font-size:11px}.v150-podium-row.mine b,.v150-podium-row.mine strong{color:#8cdbff}
+@media(max-width:900px){.v150-summary-grid{grid-template-columns:1fr 1fr}.v149-match-row{grid-template-columns:1fr 36px 30px 36px 1fr!important}.v149-match-row>.stage{display:none!important}}
+
+/* 6/10. Current-player match record only, card icon only. */
+#v120MatchHud .v120-hud-row .yc{font-size:13px!important;text-align:center!important}
+
+/* 7. Pre-match locker room talk. */
+.v150-pretalk{position:fixed;inset:0;z-index:65000;background:rgba(3,7,11,.94);display:grid;place-items:center;padding:18px;backdrop-filter:blur(4px)}
+.v150-pretalk-card{width:min(980px,95vw);max-height:92vh;overflow:auto;background:#10151b;border:1px solid #34414d;box-shadow:0 28px 90px #000d;border-radius:11px;padding:18px}
+.v150-pretalk-head small{color:#8195a1;font-size:9px;letter-spacing:.18em}.v150-pretalk-head h2{margin:5px 0 5px;font-size:25px}.v150-pretalk-head p{margin:0 0 14px;color:#9eabb3;font-size:11px}.v150-talk-options{display:grid;gap:7px}.v150-talk-options button{width:100%;text-align:left;padding:12px 13px;border:1px solid #38434d;background:#1b2229;color:#edf1f4;border-radius:5px;cursor:pointer;font-size:12px}.v150-talk-options button:hover{border-color:#66869c;background:#202b34}.v150-talk-reactions{margin-top:14px;border-top:1px solid #34414a;padding-top:12px}.v150-talk-reactions h3{margin:0 0 8px;font-size:14px}.v150-reaction-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:6px}.v150-reaction{display:grid;grid-template-columns:minmax(90px,1fr) 44px 2fr;gap:8px;align-items:center;padding:8px 9px;border:1px solid #2d3942;background:#141b21;font-size:10px}.v150-reaction .up{color:#62d58b}.v150-reaction .down{color:#ff737c}.v150-reaction .flat{color:#a8b2b8}.v150-talk-start{display:block;margin:14px 0 0 auto;padding:11px 20px;border:1px solid #3b8d5c;background:#17653a;color:#fff;font-weight:900;cursor:pointer}
+@media(max-width:720px){.v150-reaction-grid{grid-template-columns:1fr}}
+
+/* 8. Match statistics: home value -> bar -> away value -> label. */
+.v149-live-stats .v132-live-stat-row{display:grid!important;grid-template-columns:34px minmax(76px,1fr) 34px 78px!important;gap:6px!important;align-items:center!important}
+.v149-live-stats .v132-live-stat-row>b.home{grid-column:1!important;grid-row:1!important;text-align:center!important}
+.v149-live-stats .v132-live-stat-row>.v132-dualbar{grid-column:2!important;grid-row:1!important}
+.v149-live-stats .v132-live-stat-row>b.away{grid-column:3!important;grid-row:1!important;text-align:center!important}
+.v149-live-stats .v132-live-stat-row>span{grid-column:4!important;grid-row:1!important;text-align:right!important;color:#d7e2e8!important;font-size:11px!important}
+.v149-result-stat{display:grid!important;grid-template-columns:38px minmax(100px,1fr) 38px 82px!important;gap:8px!important;align-items:center!important;padding:9px 0!important}.v149-result-stat>.label{grid-column:4!important;grid-row:1!important;text-align:right!important;margin:0!important;color:#fff!important}.v149-result-stat>.values{display:contents!important}.v149-result-stat>.values>.home{grid-column:1!important;grid-row:1!important}.v149-result-stat>.values>.bar{grid-column:2!important;grid-row:1!important}.v149-result-stat>.values>.away{grid-column:3!important;grid-row:1!important}
+
+/* 9. Wrong-position players are red in timeout / halftime just like setup. */
+.v132-break-slot.v150-wrong{border-color:#b94e56!important;background:#2b1519!important;box-shadow:inset 0 0 0 1px rgba(255,91,99,.25)!important}.v132-break-slot.v150-wrong b,.v132-player-row.v150-wrong b,.v132-player-row.v150-wrong .v132-pos{color:#ff737b!important}
+
+/* 15. Restart wait state. */
+.v150-restart-note{color:#f0d36d!important}
+
+/* 16. Monthly team meeting calendar marker. */
+.cal-day.meeting-day{box-shadow:inset 0 -3px #8c6acb}.cal-day.meeting-day .meeting-label{color:#c7a7ff!important;font-weight:900!important}.cal-day .v150-cal-events{display:grid;gap:2px;margin-top:3px}.cal-day .v150-cal-events span{display:block!important}
+</style>
+<script id="v150-script">
+(()=>{
+'use strict';
+const V=150, POS=['GK','DF','MF','FW'];
+const C=(v,a=0,b=100)=>Math.max(a,Math.min(b,Number(v)||0));
+const E=x=>typeof voltaV117Esc==='function'?voltaV117Esc(String(x??'')):String(x??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
+const O=s=>s==='home'?'away':'home', D=s=>s==='home'?1:-1, A=(s,x)=>s==='home'?x:100-x, X=(s,a)=>s==='home'?a:100-a;
+const H=s=>typeof voltaHash==='function'?Math.abs(voltaHash(String(s||''))):[...String(s||'')].reduce((a,c)=>((a*33)^c.charCodeAt(0))>>>0,5381);
+const teamName=(s,side)=>side==='home'?s.homeName:s.awayName;
+const nowMatch=()=>typeof voltaV113Now==='function'?voltaV113Now():performance.now();
+const pref=p=>POS.includes(p?.preferredPosition)?p.preferredPosition:(POS.includes(voltaSave?.positions?.[p?.name])?voltaSave.positions[p.name]:(POS.includes(p?.position)?p.position:'MF'));
+const fitClass=n=>(Number(n)||0)<=30?'v142-fit-low':(Number(n)||0)<=60?'v142-fit-mid':'v142-fit-good';
+
+function migrate(){if(!voltaSave)return;let dirty=false;if(Number(voltaSave.version||0)<V){voltaSave.version=V;dirty=true}if(dirty)try{voltaPersist()}catch(e){}}
+
+/* 1/2/3/4. League-center polish and new top summaries. */
+function allTeams(){const l=voltaLeague?.();return [voltaSave?.teamName,...(l?.teams||[]).map(t=>t.name)].filter((x,i,a)=>x&&a.indexOf(x)===i)}
+function hist(){return voltaSave?.season?.history||[]}
+function histKey(h,i=0){return `${h.date||''}|${h.round||i}|${h.home}|${h.away}|${h.hg}:${h.ag}`}
+function teamRecordData(){
+ const names=allTeams(),m=Object.fromEntries(names.map(n=>[n,{name:n,matches:0,gf:0,ga:0,posSum:0,clean:0,scoreless:0}]));
+ hist().forEach((h,i)=>{
+  const ex=voltaSave?.season?.v149Exact?.[histKey(h,i)]||{},seed=H(histKey(h,i));
+  let hp=Number(ex.home?.possession),ap=Number(ex.away?.possession);
+  if(!Number.isFinite(hp)||!Number.isFinite(ap)){hp=C(50+(Number(h.hg||0)-Number(h.ag||0))*1.8+((seed%13)-6),34,66);ap=100-hp}
+  for(const row of [[h.home,Number(h.hg)||0,Number(h.ag)||0,hp],[h.away,Number(h.ag)||0,Number(h.hg)||0,ap]]){
+   const x=m[row[0]]||(m[row[0]]={name:row[0],matches:0,gf:0,ga:0,posSum:0,clean:0,scoreless:0});x.matches++;x.gf+=row[1];x.ga+=row[2];x.posSum+=row[3];if(row[2]===0)x.clean++;if(row[1]===0)x.scoreless++;
+  }
+ });
+ return Object.values(m).map(x=>({...x,avgGF:x.matches?x.gf/x.matches:0,avgGA:x.matches?x.ga/x.matches:0,pos:x.matches?x.posSum/x.matches:50}));
+}
+function leagueRoster(team){if(team===voltaSave?.teamName)return voltaSave?.roster||[];const t=voltaLeague?.()?.teams?.find(x=>x.name===team);try{return t?voltaOpponentPlayers(t,voltaLeague().grade):[]}catch(e){return[]}}
+function playerData(){const base=voltaSave?.season?.playerStats||{},ep=voltaSave?.season?.v149PlayerExact||{},out=[];for(const t of allTeams()){const names=new Set(leagueRoster(t).map(p=>p.name));for(const [n,st] of Object.entries(base))if(st.team===t)names.add(n);for(const n of names){const st=base[n]||{},x=ep[n]||{},apps=Number(st.apps||x.apps||0),goals=Number(st.goals||0),assists=Number(st.assists||0),mom=Number(st.mom||x.mom||0),yellow=Number(x.yellow||0);const rating=apps?C(6.35+Math.min(1.15,goals/apps*.28+assists/apps*.19+mom/apps*.14)-yellow/apps*.05,5,10):0;out.push({name:n,team:t,goals,assists,points:goals+assists,mom,rating})}}return out}
+function podRow(rank,name,value,mine=false,team=''){return `<div class="v150-podium-row ${mine?'mine':''}"><span class="rank">${rank}</span><b>${E(name||'-')}${team?`<small>${E(team)}</small>`:''}</b><strong>${E(value)}</strong></div>`}
+function topCard(title,metric,rows){return `<article class="v150-summary-card"><h4>${E(title)}</h4><span class="metric">${E(metric)}</span><div class="v150-podium">${rows.map((r,i)=>podRow(i+1,r.name,r.value,r.name===voltaSave?.teamName||r.team===voltaSave?.teamName,r.team||'')).join('')}</div></article>`}
+function teamTopHtml(){const xs=teamRecordData();const top=(key,fmt,asc=false)=>[...xs].sort((a,b)=>(asc?a[key]-b[key]:b[key]-a[key])||String(a.name).localeCompare(String(b.name))).slice(0,3).map(x=>({name:x.name,value:fmt(x[key])}));return `<div class="v150-summary-grid">${topCard('평균득점','경기당 득점',top('avgGF',v=>Number(v).toFixed(2)))}${topCard('평균실점','경기당 실점 · 낮을수록 상위',top('avgGA',v=>Number(v).toFixed(2),true))}${topCard('점유율','평균 점유율',top('pos',v=>Number(v).toFixed(1)))}${topCard('무실점 경기수','클린시트',top('clean',v=>`${v}경기`))}${topCard('무득점 경기수','득점 없이 끝난 경기',top('scoreless',v=>`${v}경기`))}</div>`}
+function playerTopHtml(){const xs=playerData(),top=(key,fmt)=>[...xs].sort((a,b)=>b[key]-a[key]||String(a.name).localeCompare(String(b.name))).slice(0,3).map(x=>({name:x.name,team:x.team,value:fmt(x[key])}));return `<div class="v150-summary-grid">${topCard('득점','TOP 1~3',top('goals',v=>`${v}골`))}${topCard('도움','TOP 1~3',top('assists',v=>`${v}개`))}${topCard('공격포인트','득점 + 도움',top('points',v=>`${v}P`))}${topCard('MOM','경기 최우수 선수',top('mom',v=>`${v}회`))}${topCard('평균평점','평균 경기 평점',top('rating',v=>Number(v).toFixed(1)))}</div>`}
+function patchLeague(){if(mode!=='volta-league'||!voltaSave)return;const tab=window.voltaV149LeagueTabState||'standings';document.querySelectorAll('.v149-teamstats .v149-table-row').forEach(r=>{const name=r.querySelector('.v149-team-link')?.textContent?.trim();r.classList.toggle('v150-mine-record',name===voltaSave.teamName)});if(tab==='teams'||tab==='players'){const old=document.querySelector('.v149-summary-grid,.v150-summary-grid');if(old)old.outerHTML=tab==='teams'?teamTopHtml():playerTopHtml()}}
+
+/* V150 exact possession snapshot for future team summaries. */
+const finalize150Base=voltaFinalizeLeagueRound;
+voltaFinalizeLeagueRound=function(home,away,hg,ag){const s=voltaMatchState,snap=s?{home:Math.round(voltaMatchPossessionPct('home')),away:Math.round(voltaMatchPossessionPct('away'))}:null,before=hist().length;const r=finalize150Base.apply(this,arguments);try{if(snap&&voltaSave?.season){const hs=voltaSave.season.history||[],added=hs.slice(before),h=added.find(x=>(x.home===home&&x.away===away)||(x.home===away&&x.away===home));if(h){const i=hs.indexOf(h),key=histKey(h,i),ex=voltaSave.season.v149Exact||(voltaSave.season.v149Exact={}),row=ex[key]||(ex[key]={home:{},away:{}});row.home=row.home||{};row.away=row.away||{};if(h.home===home){row.home.possession=snap.home;row.away.possession=snap.away}else{row.home.possession=snap.away;row.away.possession=snap.home}voltaPersist()}}}catch(e){console.error('[V150 POSSESSION SNAP]',e)}return r};
+
+/* 5. A keeper holding the ball in the hands cannot be dispossessed; once released to feet, normal pressure applies. */
+function protectKeeperHands(){const s=voltaMatchState,h=s?.keeperHold;if(!s||!h)return;const n=nowMatch();if(!h.v150Hands){h.v150Hands=true;h.until=Math.max(Number(h.until)||0,n+1350)}if(n<h.until){s.ballState=s.ballState||{};s.ballState.ownerSide=h.side;s.ballState.ownerName=h.keeperName;s.ballState.state='keeperHands';const kp=s.board?.playerPos?.[h.side]?.[h.keeperName];if(kp)s.board.ball={x:kp.x,y:kp.y};const def=O(h.side);for(const p of s.teams?.[def]?.players||[]){if(p.position==='GK')continue;const q=s.board?.playerPos?.[def]?.[p.name];if(!q)continue;const tx=X(def,C(A(def,q.x)-3,12,58)),ty=C(q.y,8,92);try{voltaV113SetIntent(def,p,'RECOVER',{targetX:tx,targetY:ty,reason:'keeper holding ball in hands',minCommit:350,maxCommit:650},true)}catch(e){}}}else if(s.ballState?.state==='keeperHands')s.ballState.state='controlled'}
+
+/* 6/10. Live match record shows only the six players currently on the pitch; yellow card has no number. */
+function liveHudRows(side){const s=voltaMatchState,ps=s?.teams?.[side]?.players||[];return ps.map(p=>{const fit=C(Math.round(Number(p.condition)||0)),yc=Number(p.yellowCards||0)>0,rc=!!p.sentOff;return `<div class="v120-hud-row ${yc?'warn':''} ${rc?'sentoff':''}" data-v150-player="${E(p.name)}"><span class="pos ${E(p.position||pref(p))}">${E(p.position||pref(p))}</span><span class="name">${E(p.name)}</span><span class="num goal-stat">${p.matchGoals||0}</span><span class="num assist-stat">${p.matchAssists||0}</span><span class="fit ${fitClass(fit)}"><b>${fit}%</b><i><u style="width:${fit}%"></u></i></span><span class="yc">${yc?'🟨':'-'}</span><span class="rc">${rc?'🟥':'-'}</span></div>`}).join('')}
+function patchLiveHud(){const hud=document.getElementById('v120MatchHud'),s=voltaMatchState;if(!hud||!s)return;for(const side of ['home','away']){const el=hud.querySelector(`[data-v120-team="${side}"]`);if(el)el.innerHTML=liveHudRows(side)}hud.querySelectorAll('.yc').forEach(x=>{if((x.textContent||'').includes('🟨'))x.textContent='🟨'})}
+
+/* 7. Pre-match locker-room talk with player reactions. */
+const TALKS=[
+ {id:'fire',icon:'🔥',text:'오늘 반드시 잡아야 할 경기입니다! 처음부터 강하게 밀어붙입시다!',base:2,tags:['다혈질','자신감형','야심가']},
+ {id:'calm',icon:'⚖️',text:'평소 준비한 대로만 하면 됩니다. 침착하게 갑시다.',base:1,tags:['프로페셔널','팀플레이어','소극적']},
+ {id:'enjoy',icon:'🙂',text:'편하게 즐기고 옵시다. 너무 부담 갖지 마세요.',base:1,tags:['소극적','균형형']},
+ {id:'trust',icon:'🤝',text:'저는 여러분을 믿습니다. 자신 있게 하세요.',base:2,tags:['팀플레이어','프로페셔널','자신감형']},
+ {id:'focus',icon:'🎯',text:'오늘 할 일은 단순합니다. 약속한 움직임과 전술만 지킵시다.',base:2,tags:['프로페셔널','균형형']},
+ {id:'warning',icon:'⚠️',text:'집중하지 않으면 바로 흔들립니다. 첫 휘슬부터 정신 차리세요.',base:0,tags:['다혈질','야심가']},
+ {id:'joke',icon:'😄',text:'밖에 저 사람들, 오늘 하루 벌어서 여기 온 겁니다. 짧게 하고 나옵시다.',base:1,tags:['자신감형','균형형']},
+ {id:'silent',icon:'🤫',text:'별다른 말 없이 조용히 선수들을 지켜봅니다.',base:0,tags:[]}
+];
+let start150Base=voltaStartMatch;
+function matchTalkKey(){let opp='';try{opp=voltaNextOpponent?.()?.name||voltaCurrentFixture?.()?.home||''}catch(e){}return `${voltaSave?.currentDate||''}|${opp}`}
+function showPreTalk(){document.querySelector('.v150-pretalk')?.remove();document.body.insertAdjacentHTML('beforeend',`<div class="v150-pretalk"><div class="v150-pretalk-card"><div class="v150-pretalk-head"><small>LOCKER ROOM · KICKOFF</small><h2>🚪 라커룸 — 킥오프 전</h2><p>선수들이 마지막 지시를 기다리고 있습니다. 한마디를 남기세요.</p></div><div class="v150-talk-options">${TALKS.map(x=>`<button onclick="voltaV150ChooseTalk('${x.id}')">${x.icon} “${E(x.text)}”</button>`).join('')}</div></div></div>`)}
+window.voltaV150ChooseTalk=function(id){const c=TALKS.find(x=>x.id===id);if(!c||!voltaSave)return;const reactions=[];let sum=0;for(const p of voltaSave.roster||[]){const st=typeof voltaPlayerState==='function'?voltaPlayerState(p.name):(voltaSave.playerState?.[p.name]||(voltaSave.playerState[p.name]={happiness:70})),person=p.personality||'균형형',noise=(H(`${matchTalkKey()}|${id}|${p.name}`)%3)-1;let d=c.base+noise;if(c.tags.includes(person))d+=1;if(id==='warning'&&['소극적','팀플레이어'].includes(person))d-=2;if(id==='fire'&&person==='소극적')d-=2;if(id==='silent')d=noise>0?1:0;d=C(d,-3,4);st.happiness=C((Number(st.happiness)||70)+d,1,100);const msg=d>=3?'강하게 고무되었습니다.':d>=1?'긍정적으로 받아들였습니다.':d===0?'담담하게 받아들였습니다.':'압박을 느끼는 모습입니다.';st.lastReaction=`경기 전 팀 토크 · ${msg}`;reactions.push({name:p.name,d,msg});sum+=d}const avg=reactions.length?sum/reactions.length:0;voltaSave.teamMorale=C((Number(voltaSave.teamMorale)||65)+Math.round(avg*1.4),1,100);voltaSave.v150PreTalkDoneKey=matchTalkKey();try{voltaPersist()}catch(e){}const box=document.querySelector('.v150-pretalk-card');if(box)box.innerHTML=`<div class="v150-pretalk-head"><small>PLAYER REACTIONS</small><h2>선수단 반응</h2><p>${c.icon} ${E(c.text)} · 팀 사기 ${avg>=0?'+':''}${Math.round(avg*1.4)}</p></div><div class="v150-talk-reactions"><div class="v150-reaction-grid">${reactions.map(r=>`<div class="v150-reaction"><b>${E(r.name)}</b><strong class="${r.d>0?'up':r.d<0?'down':'flat'}">${r.d>0?'+':''}${r.d}</strong><span>${E(r.msg)}</span></div>`).join('')}</div></div><button class="v150-talk-start" onclick="voltaV150StartAfterTalk()">경기장으로 이동 · 킥오프 준비 ▶</button>`};
+window.voltaV150StartAfterTalk=function(){document.querySelector('.v150-pretalk')?.remove();return start150Base.call(window)};
+voltaStartMatch=function(){if(mode==='volta-match-setup'&&voltaSave&&voltaSave.v150PreTalkDoneKey!==matchTalkKey()){showPreTalk();return}return start150Base.apply(this,arguments)};
+
+/* 8. Match stats layout + possession value without % sign. */
+function patchStatsLayout(){document.querySelectorAll('.v149-live-stats .v132-live-stat-row').forEach(row=>{const label=row.querySelector('span')?.textContent?.trim();if(label==='점유율')row.querySelectorAll(':scope>b').forEach(b=>b.textContent=(b.textContent||'').replace('%',''))});document.querySelectorAll('.v149-result-stat').forEach(row=>{if(row.querySelector('.label')?.textContent?.trim()==='점유율')row.querySelectorAll('b').forEach(b=>b.textContent=(b.textContent||'').replace('%',''))});document.querySelectorAll('.v149-result-player-row .yellow').forEach(x=>{const n=Number((x.textContent||'').trim())||0;x.textContent=n>0?'🟨':'-'});document.querySelectorAll('.v149-result-player-row .red').forEach(x=>{const n=Number((x.textContent||'').trim())||0;x.textContent=n>0?'🟥':'-'})}
+
+/* 9. Wrong-position highlight in halftime / timeout. */
+function patchBreakWrong(){const s=voltaMatchState;if(!s||( !s.halftime?.active && !s.tacticalTimeout?.active))return;const us=s.userSide||'home',team=s.teams?.[us];if(!team)return;const target={};document.querySelectorAll('.v132-break-slot').forEach(slot=>{const name=slot.querySelector('b')?.textContent?.trim(),pos=POS.find(x=>slot.classList.contains(x));if(!name||name==='+'||!pos)return;target[name]=pos;const p=[...(team.players||[]),...(team.bench||[])].find(x=>x.name===name);slot.classList.toggle('v150-wrong',!!p&&pref(p)!==pos)});document.querySelectorAll('.v132-player-row').forEach(row=>{const name=row.querySelector('b')?.textContent?.trim(),p=team.players?.find(x=>x.name===name);row.classList.toggle('v150-wrong',!!p&&!!target[name]&&pref(p)!==target[name])})}
+
+/* 11. Defensive shape on dangerous opponent free kicks: no attacking step-up commentary/positioning. */
+function enforceFreeKickShape(){const s=voltaMatchState,sp=s?.setPiece;if(!s||!sp||!['FREE_KICK','TEN_METER'].includes(sp.type))return;const atk=sp.side,def=O(atk),spot=sp.spot||s.board.ball||{x:50,y:50},towardGoal=D(atk),wallX=C(spot.x+towardGoal*4.2,5,95),ys=[43,57,35,65,50],field=(s.teams?.[def]?.players||[]).filter(p=>p.position!=='GK');field.forEach((p,i)=>{const deeper=i>=2?wallX+towardGoal*(3+(i-2)*1.3):wallX,tx=C(deeper,5,95),ty=C(ys[i%ys.length],12,88);try{voltaV113SetIntent(def,p,i<2?'MARK':'RECOVER',{targetX:tx,targetY:ty,reason:'free-kick defensive wall',minCommit:350,maxCommit:850},true)}catch(e){}});const gk=s.teams?.[def]?.players?.find(p=>p.position==='GK');if(gk){try{voltaV113SetIntent(def,gk,'GK_HOLD',{targetX:X(def,6.5),targetY:C(50+(spot.y-50)*.18,35,65),reason:'free-kick goal cover',minCommit:350,maxCommit:850},true)}catch(e){}}s.highlight=`${teamName(s,atk)} 프리킥 · ${teamName(s,def)} 수비진이 내려서서 벽을 세웁니다.`}
+
+/* 12/13. Off-ball attacking movement never performs a pointless long backwards run. Symmetric for both teams. */
+const target150Base=voltaV113IntentTarget;
+voltaV113IntentTarget=function(side,p,ai,basePoint){const q=target150Base.apply(this,arguments),s=voltaMatchState;if(!q||!s||s.setPiece||s.board?.possession!==side||p?.position==='GK'||s.ballState?.ownerName===p?.name)return q;const st=ai?.state||'',attackStates=new Set(['RUN','SUPPORT','PIVO_PIN','WIDE_SHOW','OVERLAP','UNDERLAP','FAR_POST','BUILD_UP']);if(!attackStates.has(st))return q;const pt=s.board?.playerPos?.[side]?.[p.name];if(!pt)return q;const cur=A(side,pt.x),tar=A(side,q.x),allow=p.position==='DF'?5:2.5;if(tar<cur-allow)q.x=X(side,C(cur-allow,5,94));return q};
+
+/* 14. Timeout can only open at a newly-created dead ball. Hide pending state from all legacy tick wrappers until that condition is true. */
+voltaV114CallTimeout=function(){const s=voltaMatchState;if(!s||s.finished||s.halftime?.active||s.tacticalTimeout?.active)return;const us=s.userSide||'home',half=(s.time||0)<1200?0:1;s.timeouts=s.timeouts||{home:[false,false],away:[false,false]};s.timeouts[us]=s.timeouts[us]||[false,false];if(s.timeouts[us][half]){alert(`${half===0?'전반':'후반'} 작전타임은 이미 사용했습니다.`);return}if(s.timeoutPending?.side===us){s.timeoutPending=null;s.highlight='작전타임 대기 취소';render();return}s.timeoutPending={side:us,half,requestedAtSetPiece:s.setPiece||null,requestedAtAction:s.playAction||null,requestedAt:Number(s.time||0),requestedWall:performance.now(),v150:true};s.highlight='작전타임 요청 · 다음 데드볼에 실시';voltaLog('⏱ 작전타임 요청 — 현재 플레이가 완전히 끝난 뒤 새 킥인·코너킥·프리킥·골킥 등 데드볼에서만 실시합니다.','timeout');render()};
+
+/* 15. Kickoff restart: instant formation reset, 2~3s goal screen, whistle wait, then kickoff pass. */
+try{if(typeof VOLTA_V115==='object'&&VOLTA_V115)VOLTA_V115.GOAL_FX_MS=2700}catch(e){}
+function snapKickoff(sp){const s=voltaMatchState;if(!s||!sp||sp.type!=='KICKOFF'||!s.board?.playerPos)return;for(const side of ['home','away'])for(const p of s.teams?.[side]?.players||[]){let q=null;try{q=voltaV115RestartAnchor(side,p,'KICKOFF',side===sp.side?sp.kickerName:null,sp.spot,sp.side)}catch(e){}if(!q)try{q=voltaV113BasePoint(side,p,.1)}catch(e){};if(!q)continue;if(p.name===sp.kickerName&&side===sp.side)q={x:50,y:50};else q={x:side==='home'?Math.min(q.x,48.2):Math.max(q.x,51.8),y:q.y};const pt=s.board.playerPos?.[side]?.[p.name];if(pt){pt.x=C(q.x,4,96);pt.y=C(q.y,6,94);pt.vx=0;pt.vy=0;pt.targetX=pt.x;pt.targetY=pt.y;pt.dirX=D(side);pt.dirY=0}const ai=s.aiStates?.[side]?.[p.name];if(ai){ai.targetX=C(q.x,4,96);ai.targetY=C(q.y,6,94);ai.state=p.name===sp.kickerName&&side===sp.side?'KICKER':'KICK_SUPPORT'}}s.board.ball={x:50,y:50};s.ballState={ownerSide:null,ownerName:null,state:'setpiece',targetName:null};if(s.matchEngine){s.matchEngine.renderedPositions={};s.matchEngine.spaceCache={}}}
+const kickoff150Base=voltaV113StartKickoff;
+voltaV113StartKickoff=function(side,label='킥오프'){const sp=kickoff150Base.apply(this,arguments),s=voltaMatchState;if(!sp||sp.type!=='KICKOFF'||!s)return sp;const n=nowMatch(),goalWait=s.goalFx&&Number(s.goalFx.until)>n?Number(s.goalFx.until)-n:0,baseWait=goalWait>0?goalWait:0;sp.v150Restart=true;sp.v150WhistleAt=n+baseWait+(goalWait?450:1100);sp.readyAt=sp.v150WhistleAt+650;sp.forceAt=sp.readyAt+2400;sp.v150Whistled=false;if(s.goalFx&&goalWait>0)s.goalFx.until=Math.max(Number(s.goalFx.until)||0,n+2700);snapKickoff(sp);s.highlight=goalWait>0?'골 장면 · 양 팀이 중앙 재개 위치로 돌아갑니다.':'양 팀이 자기 위치에서 심판의 휘슬을 기다립니다.';return sp};
+
+function kickoffWhistle(){const s=voltaMatchState,sp=s?.setPiece;if(!s||sp?.type!=='KICKOFF'||!sp.v150Restart||sp.v150Whistled)return;const n=nowMatch();if(n>=sp.v150WhistleAt){sp.v150Whistled=true;s.highlight='📣 휘슬! 킥오프 — 공격 팀이 동료에게 공을 연결하면 경기가 재개됩니다.';voltaLog('📣 심판의 휘슬이 울립니다. 킥오프 준비가 끝났습니다.','start')}}
+
+/* One final tick owner: timeout gate + keeper hands + set-piece defensive shape + whistle. */
+const tick150Base=voltaMatchTick;
+voltaMatchTick=function(){const s=voltaMatchState;if(!s)return tick150Base.apply(this,arguments);protectKeeperHands();enforceFreeKickShape();kickoffWhistle();const p=s.timeoutPending;if(p&&!s.finished&&!s.halftime?.active&&!s.tacticalTimeout?.active){if(!p.v150){p.v150=true;p.requestedAtSetPiece=s.setPiece||null;p.requestedAtAction=s.playAction||null;p.requestedWall=performance.now()}const deadType=!!s.setPiece&&['KICK_IN','CORNER','FREE_KICK','GOAL_CLEARANCE','TEN_METER','PENALTY'].includes(s.setPiece.type),eligible=deadType&&s.setPiece!==p.requestedAtSetPiece&&!s.playAction&&performance.now()-Number(p.requestedWall||0)>80;if(eligible){s.timeoutPending=null;try{voltaV114OpenTimeout(p.side,true);voltaSyncLiveDom?.(true);return}catch(e){console.error('[V150 TIMEOUT OPEN]',e)}}s.timeoutPending=null;const r=tick150Base.apply(this,arguments);if(!s.tacticalTimeout?.active&&!s.finished&&!s.timeoutPending)s.timeoutPending=p;protectKeeperHands();enforceFreeKickShape();kickoffWhistle();return r}const r=tick150Base.apply(this,arguments);protectKeeperHands();enforceFreeKickShape();kickoffWhistle();return r};
+
+/* 16. Calendar: monthly meeting on the 1st of every month, while preserving playoffs and no December training. */
+voltaMonthCalendarHtml=function(year,month){const first=new Date(year,month-1,1),days=new Date(year,month,0).getDate(),start=first.getDay(),current=voltaSave?.currentDate||`${year}-01-01`,matchMap={};for(const r of voltaSave?.season?.schedule||[])matchMap[r.date]=r;const cells=[];for(let i=0;i<start;i++)cells.push('<div class="cal-day blank"></div>');for(let day=1;day<=days;day++){const key=`${year}-${String(month).padStart(2,'0')}-${String(day).padStart(2,'0')}`,past=voltaDateCmp(key,current)<0,today=key===current,round=matchMap[key],fixture=round?.fixtures?.find(f=>f.home===voltaSave.teamName||f.away===voltaSave.teamName),opp=fixture?(fixture.home===voltaSave.teamName?fixture.away:fixture.home):'',playoff=round?.stage==='semifinal'||round?.stage==='final',wed=new Date(key+'T12:00:00').getDay()===3&&month!==12,meeting=day===1,events=[];if(meeting)events.push('<span class="meeting-label">🗣 월간 미팅</span>');if(playoff)events.push(`<span>${round.stage==='semifinal'?'준결승':'결승'}</span>`);else if(round)events.push(`<span>⚽ ${E(opp||'리그 경기')}</span>`);else if(wed)events.push('<span>🏋 주간 훈련</span>');cells.push(`<div class="cal-day ${past?'past':''} ${today?'today':''} ${round?'match':''} ${playoff?'playoff-day':''} ${meeting?'meeting-day':''} ${wed&&!round?'training-day':''}"><b>${day}</b>${events.length?`<div class="v150-cal-events">${events.join('')}</div>`:''}</div>`)}return `<section class="volta-month"><h3>${month}월</h3><div class="cal-week"><span>일</span><span>월</span><span>화</span><span>수</span><span>목</span><span>금</span><span>토</span></div><div class="cal-grid">${cells.join('')}</div></section>`};
+
+/* UI post-processing. */
+function patchLive(){patchLiveHud();patchStatsLayout();patchBreakWrong();if(voltaMatchState?.setPiece?.type==='KICKOFF'&&voltaMatchState.setPiece.v150Restart){const cap=document.getElementById('voltaLiveCaption');if(cap)cap.classList.add('v150-restart-note')}}
+function after(){try{migrate();patchLeague();patchLive();patchStatsLayout()}catch(e){console.error('[V150 UI]',e)}}
+const render150Base=render;render=function(){const r=render150Base.apply(this,arguments);after();requestAnimationFrame(after);return r};
+const sync150Base=typeof voltaSyncLiveDom==='function'?voltaSyncLiveDom:null;if(sync150Base){voltaSyncLiveDom=function(){const r=sync150Base.apply(this,arguments);patchLive();return r}}
+const load150Base=voltaLoad;voltaLoad=function(){const r=load150Base.apply(this,arguments);if(r!==false&&voltaSave){migrate();render()}return r};
+try{if(voltaSave)migrate();requestAnimationFrame(after)}catch(e){console.error('[V150 INIT]',e)}
+})();
+</script>
