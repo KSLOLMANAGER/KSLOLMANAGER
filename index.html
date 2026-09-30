@@ -4935,8 +4935,96 @@ window.voltaMatchEngineV153={version:VERSION,
 })();
 
 </script>
-</body>
-</html><style>
+
+
+<!-- ===== V154 GOAL RESTART DEADLOCK HOTFIX ===== -->
+<script id="v154-goal-restart-hotfix">
+(()=>{
+'use strict';
+const VERSION=154;
+const wallNow=()=>performance.now();
+const matchNow=()=>typeof voltaV113Now==='function'?voltaV113Now():wallNow();
+
+/*
+ V152 keeps the goal overlay alive with a wall-clock guard, but temporarily
+ stretches goalFx.until in virtual match time. V150 interpreted that display
+ timestamp as a restart delay and could schedule kickoff ~60 seconds later.
+ Keep presentation time and football restart time completely separate.
+*/
+const kickoffBase=voltaV113StartKickoff;
+voltaV113StartKickoff=function(side,label='킥오프'){
+  const sp=kickoffBase.apply(this,arguments),s=voltaMatchState;
+  if(!s||sp?.type!=='KICKOFF')return sp;
+  const isGoalRestart=/실점|골\s*후|중앙\s*킥오프/.test(String(label||'')) && !!s.v152GoalWallUntil;
+  if(!isGoalRestart)return sp;
+
+  const goalUntil=Math.max(wallNow()+120,Number(s.v152GoalWallUntil)||wallNow()+2800);
+  sp.v154GoalRestart={
+    goalUntilWall:goalUntil,
+    whistleWall:goalUntil+260,
+    kickWall:goalUntil+720,
+    whistled:false
+  };
+
+  // Never inherit the presentation-only +60 s goalFx timestamp.
+  const n=matchNow();
+  sp.readyAt=n+650;
+  sp.forceAt=n+2600;
+  sp.v150WhistleAt=n+500;
+  sp.v150Whistled=false;
+  // V154 owns the real-time gate for a goal restart.
+  sp.v152WallReady=0;
+  s.highlight='골 장면 · 양 팀이 중앙 재개 위치에서 대기합니다.';
+  return sp;
+};
+
+const setPieceBase=voltaV113HandleSetPiece;
+voltaV113HandleSetPiece=function(t){
+  const s=voltaMatchState,sp=s?.setPiece,gr=sp?.v154GoalRestart;
+  if(sp?.type==='KICKOFF'&&gr){
+    const w=wallNow();
+    if(w<gr.goalUntilWall)return true;
+    if(!gr.whistled){
+      if(w<gr.whistleWall)return true;
+      gr.whistled=true;
+      sp.v150Whistled=true;
+      s.highlight='📣 휘슬! 득점 후 중앙에서 경기를 재개합니다.';
+      try{voltaLog('📣 심판의 휘슬이 울립니다. 중앙 킥오프를 준비합니다.','start')}catch(e){}
+    }
+    if(w<gr.kickWall)return true;
+
+    // Release every legacy virtual-time gate immediately before the kick.
+    sp.readyAt=0;
+    sp.forceAt=0;
+    sp.v150WhistleAt=0;
+    sp.v152WallReady=0;
+    sp.v154GoalRestart=null;
+    if(s.goalFx)s.goalFx.until=matchNow()-1;
+    s.v152GoalWallUntil=0;
+    try{voltaSyncLiveDom?.(true)}catch(e){}
+    return setPieceBase.apply(this,arguments);
+  }
+  return setPieceBase.apply(this,arguments);
+};
+
+/* Safety watchdog: a goal kickoff may never remain locked indefinitely even
+   if a legacy wrapper mutates a timestamp again. */
+const tickBase=voltaMatchTick;
+voltaMatchTick=function(){
+  const s=voltaMatchState,sp=s?.setPiece,gr=sp?.v154GoalRestart;
+  if(sp?.type==='KICKOFF'&&gr&&wallNow()>Number(gr.kickWall||0)+1800){
+    sp.readyAt=0;sp.forceAt=0;sp.v150WhistleAt=0;sp.v152WallReady=0;
+    gr.goalUntilWall=0;gr.whistleWall=0;gr.kickWall=0;gr.whistled=true;
+  }
+  return tickBase.apply(this,arguments);
+};
+
+try{
+  if(voltaSave){voltaSave.version=Math.max(VERSION,Number(voltaSave.version)||0);voltaPersist?.()}
+}catch(e){console.error('[V154 GOAL RESTART INIT]',e)}
+})();
+</script>
+<style>
 /* ===== V33 PICK SCREEN SCALE-UP ===== */
 @media (min-width:1101px){
   .final-top{height:128px!important;flex:0 0 128px!important;padding:10px 30px 14px!important;align-items:center!important}
@@ -11697,3 +11785,129 @@ const syncBase=typeof voltaSyncLiveDom==='function'?voltaSyncLiveDom:null;if(syn
 try{if(voltaSave)migrate();after()}catch(e){console.error('[V152 INIT]',e)}
 })();
 </script>
+
+<!-- ===== V155 FINAL GOAL RESTART OWNER ===== -->
+<script id="v155-final-goal-restart">
+(()=>{
+'use strict';
+const VERSION=155;
+const wallNow=()=>performance.now();
+const matchNow=()=>typeof voltaV113Now==='function'?voltaV113Now():wallNow();
+const C=(v,a=0,b=100)=>Math.max(a,Math.min(b,Number(v)||0));
+const dist=(a,b)=>{const dx=(Number(a?.x)||0)-(Number(b?.x)||0),dy=(Number(a?.y)||0)-(Number(b?.y)||0);return Math.hypot(dx,dy)};
+
+/*
+  This script is deliberately the LAST live-match binding in the file.
+  V150 calculated goalWait from goalFx.until; V152 temporarily extends that
+  virtual timestamp for the wall-clock goal overlay, so the old chain could
+  schedule a restart tens of seconds later. Goal presentation and football
+  restart are completely separated here.
+*/
+const kickoffBase=voltaV113StartKickoff;
+voltaV113StartKickoff=function(side,label='킥오프'){
+  const sp=kickoffBase.apply(this,arguments),s=voltaMatchState;
+  if(!s||sp?.type!=='KICKOFF')return sp;
+
+  const wallGoalUntil=Number(s.v152GoalWallUntil||0);
+  const goalLabel=/실점|골\s*후|득점\s*후/.test(String(label||''));
+  const isGoalRestart=wallGoalUntil>wallNow() || goalLabel;
+  if(!isGoalRestart)return sp; // first-half / second-half opening kickoff untouched
+
+  const overlayUntil=wallGoalUntil>wallNow()?wallGoalUntil:wallNow()+2800;
+  sp.v155GoalRestart={
+    overlayUntil,
+    whistleAt:overlayUntil+180,
+    kickAt:overlayUntil+520,
+    whistled:false,
+    released:false
+  };
+
+  // Kill every legacy virtual-time gate immediately. V155 uses wall time only.
+  const n=matchNow();
+  sp.readyAt=n;
+  sp.forceAt=n+5000;
+  sp.v150WhistleAt=n;
+  sp.v150Whistled=false;
+  sp.v150Restart=false;
+  sp.v152WallReady=0;
+  if(sp.v153SM)sp.v153SM={stage:'LIVE',at:n,whistled:true};
+
+  // Ball and players are already snapped by the existing kickoff setup.
+  s.board.ball={x:50,y:50};
+  s.board.ballTarget={x:50,y:50};
+  s.ballState={ownerSide:null,ownerName:null,state:'setpiece',targetName:null};
+  s.highlight='골 장면 · 중앙 킥오프 위치에서 재개를 기다립니다.';
+  return sp;
+};
+
+function releaseGoalKickoff(sp){
+  const s=voltaMatchState;if(!s||!sp||sp.type!=='KICKOFF')return false;
+  const side=sp.side,team=s.teams?.[side],players=team?.players||[];
+  let kicker=players.find(p=>p.name===sp.kickerName&&p.position!=='GK')||players.find(p=>p.position!=='GK');
+  if(!kicker){s.setPiece=null;try{voltaStartPossession(side)}catch(e){}return true}
+
+  const kp=s.board?.playerPos?.[side]?.[kicker.name];
+  if(kp){kp.x=50;kp.y=50;kp.vx=0;kp.vy=0;kp.targetX=50;kp.targetY=50}
+  s.board.ball={x:50,y:50};s.board.ballTarget={x:50,y:50};
+
+  const mates=players.filter(p=>p.name!==kicker.name&&p.position!=='GK')
+    .map(p=>({p,q:s.board?.playerPos?.[side]?.[p.name]})).filter(x=>x.q)
+    .sort((a,b)=>dist(a.q,{x:50,y:50})-dist(b.q,{x:50,y:50}));
+  const recv=mates[0];
+
+  // Clear the set piece BEFORE starting the pass so no legacy gate can relock it.
+  s.setPiece=null;
+  s.v152GoalWallUntil=0;
+  if(s.goalFx)s.goalFx.until=matchNow()-1;
+  s.highlight='📣 휘슬! 중앙 킥오프로 경기가 재개됩니다.';
+
+  if(recv){
+    const target={x:C(recv.q.x,4,96),y:C(recv.q.y,6,94)};
+    try{
+      const ok=voltaV113StartPass(side,kicker,recv.p,{target,setPiece:'KICKOFF'});
+      if(ok)return true;
+    }catch(e){console.error('[V155 KICKOFF PASS]',e)}
+  }
+  try{voltaStartPossession(side,kicker.name)}catch(e){}
+  try{voltaV113ScheduleDecision?.(180)}catch(e){}
+  return true;
+}
+
+const setPieceBase=voltaV113HandleSetPiece;
+voltaV113HandleSetPiece=function(t){
+  const s=voltaMatchState,sp=s?.setPiece,gr=sp?.v155GoalRestart;
+  if(sp?.type==='KICKOFF'&&gr){
+    const w=wallNow();
+    if(w<gr.overlayUntil)return true;
+    if(!gr.whistled){
+      if(w<gr.whistleAt)return true;
+      gr.whistled=true;
+      s.highlight='📣 휘슬! 공격 팀이 중앙에서 패스를 준비합니다.';
+      try{voltaSetCaption?.('📣 심판의 휘슬이 울립니다. 중앙에서 경기를 재개합니다.','normal')}catch(e){}
+      try{voltaLog?.('📣 심판의 휘슬이 울립니다. 중앙 킥오프를 준비합니다.','start')}catch(e){}
+    }
+    if(w<gr.kickAt)return true;
+    if(!gr.released){gr.released=true;return releaseGoalKickoff(sp)}
+    return true;
+  }
+  return setPieceBase.apply(this,arguments);
+};
+
+/* Hard watchdog: even if another stale state is injected, a goal restart is
+   forcibly released after 4.5 real seconds from the goal overlay deadline. */
+const tickBase=voltaMatchTick;
+voltaMatchTick=function(){
+  const s=voltaMatchState,sp=s?.setPiece,gr=sp?.v155GoalRestart;
+  if(sp?.type==='KICKOFF'&&gr&&wallNow()>Number(gr.overlayUntil||0)+1700){
+    try{return releaseGoalKickoff(sp)}catch(e){console.error('[V155 WATCHDOG]',e)}
+  }
+  return tickBase.apply(this,arguments);
+};
+
+try{
+  if(voltaSave){voltaSave.version=Math.max(VERSION,Number(voltaSave.version)||0);voltaPersist?.()}
+}catch(e){console.error('[V155 INIT]',e)}
+})();
+</script>
+</body>
+</html>
