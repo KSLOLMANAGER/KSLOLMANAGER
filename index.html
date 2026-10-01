@@ -12180,5 +12180,107 @@ requestAnimationFrame(after);
 
 <!-- V158 CONTENT PATCH END -->
 
+
+<!-- V159 BATTLE MAP PATCH START -->
+<style id="v159-battle-style">
+.b2-stage{background:
+ radial-gradient(circle at 50% 50%,rgba(47,82,122,.16),transparent 36%),
+ linear-gradient(180deg,#06111a,#071521 55%,#07111a)!important}
+.b2-map{
+  inset:0!important;
+  background:
+   radial-gradient(circle at 50% 50%,rgba(164,213,255,.06),transparent 22%),
+   linear-gradient(180deg,rgba(1,7,12,.20),rgba(1,7,12,.38)),
+   url('v159_aram_pixel_map.png') center center / contain no-repeat,
+   linear-gradient(180deg,#07111a,#0a1721 52%,#07111a)!important;
+  background-repeat:no-repeat!important;
+  overflow:hidden!important;
+  filter:none!important;
+  transform:none!important;
+}
+.b2-map:before{content:""!important;position:absolute!important;inset:0!important;background:
+ radial-gradient(circle at 50% 50%,transparent 24%,rgba(3,8,12,.12) 64%,rgba(1,4,9,.42) 100%)!important;pointer-events:none}
+.b2-map:after{display:none!important}
+.clean-bridge{display:none!important}
+.structure-track{position:absolute;inset:0;pointer-events:none}
+.b2-structure{z-index:9!important;filter:drop-shadow(0 0 10px rgba(0,0,0,.42))}
+.b2-structure .sicon{display:grid;place-items:center;color:#f4f9ff;font-weight:1000;text-shadow:0 0 8px rgba(255,255,255,.18);background:linear-gradient(180deg,#193c52,#0b1821 70%)!important;border:2px solid #80c7ea!important;box-shadow:0 0 14px rgba(83,183,234,.40), inset 0 0 10px rgba(166,231,255,.10)!important}
+.b2-structure.red .sicon{background:linear-gradient(180deg,#55202c,#1b0d13 70%)!important;border-color:#f08b96!important;box-shadow:0 0 14px rgba(234,83,104,.35), inset 0 0 10px rgba(255,194,201,.08)!important}
+.b2-structure.tower .sicon{width:30px!important;height:46px!important;border-radius:6px!important}
+.b2-structure.inhib .sicon{width:38px!important;height:38px!important;border-radius:50%!important;font-size:18px!important}
+.b2-structure.nexus .sicon{width:56px!important;height:56px!important;border-radius:18px!important;font-size:22px!important}
+.b2-structure .sname{display:block!important;position:relative!important;left:50%!important;transform:translateX(-50%)!important;margin-top:6px!important;font-size:9px!important;font-weight:800!important;color:#eef7fb!important;background:rgba(4,13,22,.82)!important;border:1px solid rgba(98,150,176,.42)!important;border-radius:999px!important;padding:2px 8px!important;box-shadow:0 2px 8px rgba(0,0,0,.22)!important;white-space:nowrap!important}
+.b2-structure.red .sname{border-color:rgba(182,93,104,.42)!important}
+.b2-structure.dead{opacity:.22!important;filter:grayscale(1) drop-shadow(0 0 6px rgba(0,0,0,.24))!important}
+.b2-token{box-shadow:0 8px 18px rgba(0,0,0,.25)!important}
+.b2-token .token-portrait{border:2px solid rgba(112,195,234,.8)!important;background:#0b1821!important}
+.b2-token.enemy .token-portrait{border-color:rgba(240,126,138,.85)!important;background:#1d0d13!important}
+@media (max-width: 700px){
+  .b2-structure .sname{display:none!important}
+  .b2-structure.tower .sicon{width:24px!important;height:36px!important}
+  .b2-structure.inhib .sicon{width:28px!important;height:28px!important}
+  .b2-structure.nexus .sicon{width:40px!important;height:40px!important}
+}
+</style>
+<script id="v159-battle-script">
+(()=>{
+  const LANE_PATH = [
+    {p:5,left:9.2,top:80.6},
+    {p:12,left:14.6,top:74.8},
+    {p:17,left:18.6,top:71.0},
+    {p:28,left:28.0,top:62.7},
+    {p:40,left:38.2,top:54.8},
+    {p:50,left:48.1,top:47.2},
+    {p:60,left:58.0,top:39.6},
+    {p:72,left:68.1,top:31.5},
+    {p:83,left:77.6,top:24.1},
+    {p:88,left:81.6,top:20.3},
+    {p:91,left:84.1,top:17.8},
+    {p:95,left:87.8,top:13.8}
+  ];
+  function lerp(a,b,t){return a+(b-a)*t}
+  function lanePoint(progress){
+    const p=Math.max(LANE_PATH[0].p,Math.min(LANE_PATH[LANE_PATH.length-1].p,progress));
+    for(let i=1;i<LANE_PATH.length;i++){
+      const a=LANE_PATH[i-1], b=LANE_PATH[i];
+      if(p<=b.p){
+        const t=(p-a.p)/(b.p-a.p||1);
+        return {left:lerp(a.left,b.left,t), top:lerp(a.top,b.top,t)};
+      }
+    }
+    const last=LANE_PATH[LANE_PATH.length-1];
+    return {left:last.left, top:last.top};
+  }
+  const newScreenPos=function(x,y){
+    const base=lanePoint(Number(x)||0);
+    const offset=((Number(y)||50)-50);
+    const lateral=offset*0.16;
+    return {
+      left: Math.max(4,Math.min(96, base.left + lateral)),
+      top: Math.max(7,Math.min(92, base.top + lateral*1.45))
+    };
+  };
+  window.screenPos=newScreenPos;
+  if(typeof screenPos!=='undefined') screenPos=newScreenPos;
+  const oldSyncStatic = window.syncStaticBattlePositions;
+  if(typeof oldSyncStatic==='function'){
+    window.syncStaticBattlePositions=function(){ return oldSyncStatic.apply(this,arguments); };
+  }
+  const oldRender = window.render;
+  if(typeof oldRender==='function'){
+    window.render=function(){
+      const r = oldRender.apply(this,arguments);
+      try{
+        if(window.mode==='battle' && typeof syncStaticBattlePositions==='function'){
+          requestAnimationFrame(()=>{ try{ syncStaticBattlePositions(); if(typeof syncBattleDom==='function') syncBattleDom(); }catch(e){} });
+        }
+      }catch(e){}
+      return r;
+    }
+  }
+})();
+</script>
+<!-- V159 BATTLE MAP PATCH END -->
+
 </body>
 </html>
