@@ -12181,106 +12181,7 @@ requestAnimationFrame(after);
 <!-- V158 CONTENT PATCH END -->
 
 
-<!-- V159 BATTLE MAP PATCH START -->
-<style id="v159-battle-style">
-.b2-stage{background:
- radial-gradient(circle at 50% 50%,rgba(47,82,122,.16),transparent 36%),
- linear-gradient(180deg,#06111a,#071521 55%,#07111a)!important}
-.b2-map{
-  inset:0!important;
-  background:
-   radial-gradient(circle at 50% 50%,rgba(164,213,255,.06),transparent 22%),
-   linear-gradient(180deg,rgba(1,7,12,.20),rgba(1,7,12,.38)),
-   url('v159_aram_pixel_map.png') center center / contain no-repeat,
-   linear-gradient(180deg,#07111a,#0a1721 52%,#07111a)!important;
-  background-repeat:no-repeat!important;
-  overflow:hidden!important;
-  filter:none!important;
-  transform:none!important;
-}
-.b2-map:before{content:""!important;position:absolute!important;inset:0!important;background:
- radial-gradient(circle at 50% 50%,transparent 24%,rgba(3,8,12,.12) 64%,rgba(1,4,9,.42) 100%)!important;pointer-events:none}
-.b2-map:after{display:none!important}
-.clean-bridge{display:none!important}
-.structure-track{position:absolute;inset:0;pointer-events:none}
-.b2-structure{z-index:9!important;filter:drop-shadow(0 0 10px rgba(0,0,0,.42))}
-.b2-structure .sicon{display:grid;place-items:center;color:#f4f9ff;font-weight:1000;text-shadow:0 0 8px rgba(255,255,255,.18);background:linear-gradient(180deg,#193c52,#0b1821 70%)!important;border:2px solid #80c7ea!important;box-shadow:0 0 14px rgba(83,183,234,.40), inset 0 0 10px rgba(166,231,255,.10)!important}
-.b2-structure.red .sicon{background:linear-gradient(180deg,#55202c,#1b0d13 70%)!important;border-color:#f08b96!important;box-shadow:0 0 14px rgba(234,83,104,.35), inset 0 0 10px rgba(255,194,201,.08)!important}
-.b2-structure.tower .sicon{width:30px!important;height:46px!important;border-radius:6px!important}
-.b2-structure.inhib .sicon{width:38px!important;height:38px!important;border-radius:50%!important;font-size:18px!important}
-.b2-structure.nexus .sicon{width:56px!important;height:56px!important;border-radius:18px!important;font-size:22px!important}
-.b2-structure .sname{display:block!important;position:relative!important;left:50%!important;transform:translateX(-50%)!important;margin-top:6px!important;font-size:9px!important;font-weight:800!important;color:#eef7fb!important;background:rgba(4,13,22,.82)!important;border:1px solid rgba(98,150,176,.42)!important;border-radius:999px!important;padding:2px 8px!important;box-shadow:0 2px 8px rgba(0,0,0,.22)!important;white-space:nowrap!important}
-.b2-structure.red .sname{border-color:rgba(182,93,104,.42)!important}
-.b2-structure.dead{opacity:.22!important;filter:grayscale(1) drop-shadow(0 0 6px rgba(0,0,0,.24))!important}
-.b2-token{box-shadow:0 8px 18px rgba(0,0,0,.25)!important}
-.b2-token .token-portrait{border:2px solid rgba(112,195,234,.8)!important;background:#0b1821!important}
-.b2-token.enemy .token-portrait{border-color:rgba(240,126,138,.85)!important;background:#1d0d13!important}
-@media (max-width: 700px){
-  .b2-structure .sname{display:none!important}
-  .b2-structure.tower .sicon{width:24px!important;height:36px!important}
-  .b2-structure.inhib .sicon{width:28px!important;height:28px!important}
-  .b2-structure.nexus .sicon{width:40px!important;height:40px!important}
-}
-</style>
-<script id="v159-battle-script">
-(()=>{
-  const LANE_PATH = [
-    {p:5,left:9.2,top:80.6},
-    {p:12,left:14.6,top:74.8},
-    {p:17,left:18.6,top:71.0},
-    {p:28,left:28.0,top:62.7},
-    {p:40,left:38.2,top:54.8},
-    {p:50,left:48.1,top:47.2},
-    {p:60,left:58.0,top:39.6},
-    {p:72,left:68.1,top:31.5},
-    {p:83,left:77.6,top:24.1},
-    {p:88,left:81.6,top:20.3},
-    {p:91,left:84.1,top:17.8},
-    {p:95,left:87.8,top:13.8}
-  ];
-  function lerp(a,b,t){return a+(b-a)*t}
-  function lanePoint(progress){
-    const p=Math.max(LANE_PATH[0].p,Math.min(LANE_PATH[LANE_PATH.length-1].p,progress));
-    for(let i=1;i<LANE_PATH.length;i++){
-      const a=LANE_PATH[i-1], b=LANE_PATH[i];
-      if(p<=b.p){
-        const t=(p-a.p)/(b.p-a.p||1);
-        return {left:lerp(a.left,b.left,t), top:lerp(a.top,b.top,t)};
-      }
-    }
-    const last=LANE_PATH[LANE_PATH.length-1];
-    return {left:last.left, top:last.top};
-  }
-  const newScreenPos=function(x,y){
-    const base=lanePoint(Number(x)||0);
-    const offset=((Number(y)||50)-50);
-    const lateral=offset*0.16;
-    return {
-      left: Math.max(4,Math.min(96, base.left + lateral)),
-      top: Math.max(7,Math.min(92, base.top + lateral*1.45))
-    };
-  };
-  window.screenPos=newScreenPos;
-  if(typeof screenPos!=='undefined') screenPos=newScreenPos;
-  const oldSyncStatic = window.syncStaticBattlePositions;
-  if(typeof oldSyncStatic==='function'){
-    window.syncStaticBattlePositions=function(){ return oldSyncStatic.apply(this,arguments); };
-  }
-  const oldRender = window.render;
-  if(typeof oldRender==='function'){
-    window.render=function(){
-      const r = oldRender.apply(this,arguments);
-      try{
-        if(window.mode==='battle' && typeof syncStaticBattlePositions==='function'){
-          requestAnimationFrame(()=>{ try{ syncStaticBattlePositions(); if(typeof syncBattleDom==='function') syncBattleDom(); }catch(e){} });
-        }
-      }catch(e){}
-      return r;
-    }
-  }
-})();
-</script>
-<!-- V159 BATTLE MAP PATCH END -->
+
 
 
 <!-- V160 SPECTATOR HUD PATCH START -->
@@ -12428,6 +12329,127 @@ requestAnimationFrame(after);
 })();
 </script>
 <!-- V160 SPECTATOR HUD PATCH END -->
+
+
+<!-- V161 PROCEDURAL ABYSS PATCH START -->
+<style id="v161-procedural-abyss-style">
+/* V161: no battle-map image. The arena is built from CSS/DOM geometry. */
+.b2-stage{background:#06101a!important;isolation:isolate!important}
+.b2-map{position:absolute!important;inset:0!important;background:
+ radial-gradient(circle at 14% 84%,rgba(39,111,164,.22) 0 5%,transparent 20%),
+ radial-gradient(circle at 86% 16%,rgba(126,30,46,.17) 0 5%,transparent 20%),
+ linear-gradient(135deg,#07131f 0%,#0a1c2b 43%,#0a1723 57%,#100c18 100%)!important;
+ filter:none!important;transform:none!important;overflow:hidden!important;z-index:0!important}
+.b2-map:before,.b2-map:after{display:none!important}.clean-bridge{display:none!important}
+.v161-world{position:absolute;inset:0;overflow:hidden;pointer-events:none}
+.v161-void{position:absolute;inset:0;background:
+ radial-gradient(ellipse at 25% 28%,rgba(32,77,117,.34),transparent 23%),
+ radial-gradient(ellipse at 76% 72%,rgba(27,65,101,.31),transparent 26%),
+ repeating-linear-gradient(135deg,rgba(118,181,219,.025) 0 2px,transparent 2px 42px),
+ linear-gradient(180deg,#071522 0%,#06101a 58%,#07131f 100%)}
+.v161-cliff{position:absolute;background:
+ repeating-linear-gradient(90deg,#20394b 0 14px,#142b3a 14px 29px,#0e2230 29px 43px);
+ border:2px solid #365368;box-shadow:0 12px 28px #000b,inset 0 0 0 3px rgba(173,218,240,.025)}
+.v161-cliff.c1{left:-8%;top:-8%;width:44%;height:31%;transform:rotate(-7deg);clip-path:polygon(0 0,100% 0,84% 40%,92% 58%,68% 100%,0 91%)}
+.v161-cliff.c2{right:-9%;bottom:-9%;width:44%;height:34%;transform:rotate(-7deg);clip-path:polygon(25% 0,100% 8%,100% 100%,0 100%,13% 55%,5% 36%)}
+.v161-cliff.c3{right:-7%;top:-4%;width:28%;height:34%;clip-path:polygon(16% 0,100% 0,100% 100%,38% 84%,48% 55%,0 35%)}
+.v161-cliff.c4{left:-7%;bottom:-5%;width:29%;height:35%;clip-path:polygon(0 0,66% 11%,100% 48%,61% 67%,75% 100%,0 100%)}
+.v161-snow{position:absolute;background:rgba(154,210,238,.12);border-radius:50%;filter:blur(.4px)}
+.v161-snow.s1{left:6%;top:69%;width:22%;height:7%;transform:rotate(-39deg)}
+.v161-snow.s2{right:7%;top:22%;width:23%;height:7%;transform:rotate(-39deg)}
+.v161-snow.s3{left:38%;top:44%;width:25%;height:6%;transform:rotate(-39deg)}
+.v161-bridge-shadow,.v161-bridge-wall-a,.v161-bridge-wall-b,.v161-bridge,.v161-road{position:absolute;inset:0}
+.v161-bridge-shadow{clip-path:polygon(0 81%,7% 97%,100% 26%,93% 8%);background:#02080e;filter:drop-shadow(0 18px 20px #000d)}
+.v161-bridge{clip-path:polygon(0 79%,8% 94%,100% 23%,92% 9%);background:
+ repeating-linear-gradient(135deg,rgba(174,210,225,.08) 0 2px,transparent 2px 52px),
+ linear-gradient(135deg,#243f50,#1a3241 48%,#203b4c);box-shadow:inset 0 0 50px rgba(126,190,220,.10)}
+.v161-road{clip-path:polygon(2.8% 80.7%,8.5% 90.3%,97.3% 22%,91.5% 12.2%);background:
+ repeating-linear-gradient(45deg,transparent 0 35px,rgba(167,205,221,.08) 36px 38px),
+ repeating-linear-gradient(135deg,#2b4655 0 34px,#243d4c 35px 70px);box-shadow:inset 0 0 30px rgba(133,203,233,.08)}
+.v161-road:before{content:"";position:absolute;inset:0;background:linear-gradient(135deg,rgba(75,169,226,.12),transparent 43%,transparent 57%,rgba(211,67,86,.10));clip-path:inherit}
+.v161-bridge-wall-a{clip-path:polygon(0 78.5%,7.5% 82.5%,99.2% 12.7%,91.7% 8.6%);background:repeating-linear-gradient(135deg,#456777 0 22px,#203947 23px 33px);filter:drop-shadow(0 4px 5px #000b)}
+.v161-bridge-wall-b{clip-path:polygon(.8% 92%,8% 95.7%,100% 25.2%,92.7% 21.2%);background:repeating-linear-gradient(135deg,#456777 0 22px,#203947 23px 33px);filter:drop-shadow(0 5px 6px #000b)}
+.v161-base{position:absolute;width:25%;height:29%;background:
+ repeating-linear-gradient(45deg,rgba(186,219,232,.07) 0 2px,transparent 2px 38px),
+ linear-gradient(145deg,#274554,#1a3140);border:3px solid #446878;box-shadow:0 18px 30px #000a,inset 0 0 35px rgba(132,202,230,.08)}
+.v161-base.blue{left:-3%;bottom:-5%;clip-path:polygon(0 20%,47% 0,100% 44%,82% 100%,0 100%)}
+.v161-base.red{right:-3%;top:-5%;clip-path:polygon(18% 0,100% 0,100% 80%,53% 100%,0 56%);background:
+ repeating-linear-gradient(45deg,rgba(225,194,203,.055) 0 2px,transparent 2px 38px),
+ linear-gradient(145deg,#4a2631,#2b1821)}
+.v161-center-rune{position:absolute;left:50%;top:48%;width:72px;height:72px;transform:translate(-50%,-50%) rotate(45deg);border:2px solid rgba(116,190,221,.35);box-shadow:0 0 0 6px rgba(10,26,37,.65),0 0 18px rgba(67,170,216,.20);background:#17354566}
+.v161-center-rune:before,.v161-center-rune:after{content:"";position:absolute;inset:15px;border:1px solid rgba(149,214,237,.28)}
+.v161-center-rune:after{inset:28px;background:#7edcff33;box-shadow:0 0 12px #64cfff55}
+.v161-torch{position:absolute;width:8px;height:8px;border-radius:2px;background:#ffb449;box-shadow:0 0 5px #ff942c,0 0 13px #ff6b1f,0 0 24px #ff4e1c88;transform:translate(-50%,-50%)}
+.v161-torch:after{content:"";position:absolute;left:2px;top:7px;width:4px;height:8px;background:#6a4d3e;border:1px solid #1d2429}
+.v161-ice{position:absolute;width:5px;height:32px;background:linear-gradient(#bcf2ff,#4eb6e5 55%,#195c8b);clip-path:polygon(50% 0,100% 85%,66% 100%,0 86%);opacity:.7;filter:drop-shadow(0 0 5px #4dcfff55)}
+.v161-ice.i1{left:19%;top:73%;transform:rotate(-18deg)}.v161-ice.i2{left:25%;top:68%;height:22px}.v161-ice.i3{right:20%;top:24%;transform:rotate(12deg)}.v161-ice.i4{right:25%;top:31%;height:24px}
+.v161-crack{position:absolute;height:2px;width:8%;background:#7acdf266;box-shadow:0 0 6px #62c8f077;transform-origin:left center}.v161-crack:after{content:"";position:absolute;left:52%;top:0;width:58%;height:2px;background:inherit;transform:rotate(31deg);transform-origin:left}.v161-crack.k1{left:31%;top:62%;transform:rotate(-37deg)}.v161-crack.k2{left:58%;top:36%;transform:rotate(-37deg)}
+/* Structure track no longer rotates the objects; screenPos supplies actual map coordinates. */
+.structure-track{position:absolute!important;inset:0!important;left:0!important;top:0!important;width:100%!important;height:100%!important;transform:none!important;z-index:9!important;pointer-events:none!important}
+.structure-track .b2-structure{position:absolute!important;top:0;transform:translate(-50%,-50%)!important}
+.structure-track .b2-structure .sicon,.structure-track .b2-structure .sname{transform:none!important}
+/* Procedural structures */
+.b2-structure .sicon{font-size:0!important;color:transparent!important;position:relative!important;display:block!important;background:none!important;border:0!important;box-shadow:none!important;overflow:visible!important}
+.b2-structure.tower .sicon{width:30px!important;height:45px!important;border-radius:0!important;background:linear-gradient(90deg,#0b1d29,#31536a 35%,#41697f 50%,#263f50 68%,#081821)!important;border:2px solid #67b2db!important;box-shadow:0 0 12px #47a9dc66,0 6px 10px #0008!important;clip-path:polygon(22% 0,78% 0,100% 22%,82% 100%,18% 100%,0 22%)!important}
+.b2-structure.tower .sicon:before{content:"";position:absolute;left:50%;top:6px;transform:translateX(-50%) rotate(45deg);width:9px;height:9px;background:#66d2ff;box-shadow:0 0 10px #5bd2ff}
+.b2-structure.red.tower .sicon{background:linear-gradient(90deg,#241016,#5a2833 35%,#70404a 50%,#44222b 68%,#1c0b10)!important;border-color:#e46c78!important;box-shadow:0 0 12px #e54e6266,0 6px 10px #0008!important}.b2-structure.red.tower .sicon:before{background:#ff6d79;box-shadow:0 0 10px #ff5264}
+.b2-structure.inhib .sicon{width:38px!important;height:38px!important;border-radius:50%!important;background:radial-gradient(circle,#72ddff 0 18%,#1a5572 19% 36%,#0b2432 38% 58%,#4c839b 60% 65%,#0a1821 66%)!important;border:2px solid #6fc8e8!important;box-shadow:0 0 14px #55c8ff66!important}.b2-structure.red.inhib .sicon{background:radial-gradient(circle,#ff7684 0 18%,#7b2836 19% 36%,#2f1218 38% 58%,#97515a 60% 65%,#1c0b10 66%)!important;border-color:#f0818b!important;box-shadow:0 0 14px #ef566866!important}
+.b2-structure.nexus .sicon{width:58px!important;height:58px!important;border-radius:50%!important;background:radial-gradient(circle at 50% 42%,#adf0ff 0 11%,#55cfff 12% 24%,#174a6b 25% 42%,#0a2231 44% 63%,#5a93ad 64% 68%,#091820 69%)!important;border:2px solid #7ed9f4!important;box-shadow:0 0 20px #4ccaff77,0 7px 16px #0009!important}.b2-structure.red.nexus .sicon{background:radial-gradient(circle at 50% 42%,#ffd0d4 0 11%,#ff6a79 12% 24%,#6d2635 25% 42%,#2b1017 44% 63%,#a64c59 64% 68%,#1b0a0e 69%)!important;border-color:#f28d97!important;box-shadow:0 0 20px #f2526577,0 7px 16px #0009!important}
+.b2-structure .sname{display:block!important;position:absolute!important;left:50%!important;top:calc(100% + 7px)!important;transform:translateX(-50%)!important;min-width:max-content!important;margin:0!important;padding:2px 6px!important;border-radius:999px!important;background:rgba(3,11,18,.82)!important;border:1px solid rgba(100,159,188,.36)!important;color:#dcebf2!important;font-size:8px!important;font-weight:900!important;white-space:nowrap!important}.b2-structure.red .sname{border-color:rgba(189,83,99,.42)!important}
+.b2-structure.dead{opacity:.18!important;filter:grayscale(1)!important}
+@media(max-width:800px){.b2-structure .sname{display:none!important}.b2-structure.tower .sicon{width:20px!important;height:31px!important}.b2-structure.inhib .sicon{width:26px!important;height:26px!important}.b2-structure.nexus .sicon{width:38px!important;height:38px!important}.v161-center-rune{width:45px;height:45px}.v161-torch{width:5px;height:5px}}
+</style>
+<script id="v161-procedural-abyss-script">
+(()=>{
+ const VERSION=161;
+ const PATH=[
+  {p:5,x:8.5,y:84.5},{p:11,x:13.3,y:80.6},{p:17,x:18.7,y:76.0},{p:28,x:28.6,y:67.5},
+  {p:40,x:39.8,y:58.3},{p:50,x:49.5,y:50.2},{p:60,x:59.7,y:42.1},{p:72,x:70.8,y:32.8},
+  {p:83,x:80.8,y:24.4},{p:89,x:86.0,y:20.1},{p:95,x:91.1,y:15.8}
+ ];
+ const VISUAL={
+  tn1:{p:5,o:0},tt1:{p:11,o:-7},tt2:{p:11,o:7},ti:{p:17,o:0},t2:{p:28,o:0},t1:{p:40,o:0},
+  e1:{p:60,o:0},e2:{p:72,o:0},ei:{p:83,o:0},et1:{p:89,o:-7},et2:{p:89,o:7},en1:{p:95,o:0}
+ };
+ function pathPoint(progress,offset=0){
+  const p=Math.max(PATH[0].p,Math.min(PATH[PATH.length-1].p,Number(progress)||0));
+  let a=PATH[0],b=PATH[1];
+  for(let i=1;i<PATH.length;i++){if(p<=PATH[i].p){a=PATH[i-1];b=PATH[i];break}a=PATH[i-1];b=PATH[i]}
+  const t=(p-a.p)/(b.p-a.p||1),x=a.x+(b.x-a.x)*t,y=a.y+(b.y-a.y)*t;
+  const dx=b.x-a.x,dy=b.y-a.y,len=Math.hypot(dx,dy)||1,px=-dy/len,py=dx/len;
+  return {left:x+px*offset*.42,top:y+py*offset*.42};
+ }
+ const proceduralScreenPos=(x,y)=>{
+   const off=(Number(y??50)-50)*.46;
+   const q=pathPoint(Number(x)||0,off);
+   return {left:Math.max(3,Math.min(97,q.left)),top:Math.max(5,Math.min(95,q.top))};
+ };
+ window.screenPos=proceduralScreenPos;try{screenPos=proceduralScreenPos}catch(e){}
+ function worldMarkup(){
+  const torches=[[8,85],[13,78],[19,73],[25,68],[33,62],[42,55],[58,43],[67,36],[75,29],[82,24],[88,19],[93,14]];
+  return `<div class="v161-world"><div class="v161-void"></div><div class="v161-cliff c1"></div><div class="v161-cliff c2"></div><div class="v161-cliff c3"></div><div class="v161-cliff c4"></div><div class="v161-snow s1"></div><div class="v161-snow s2"></div><div class="v161-snow s3"></div><div class="v161-bridge-shadow"></div><div class="v161-bridge"></div><div class="v161-road"></div><div class="v161-bridge-wall-a"></div><div class="v161-bridge-wall-b"></div><div class="v161-base blue"></div><div class="v161-base red"></div><div class="v161-center-rune"></div><div class="v161-ice i1"></div><div class="v161-ice i2"></div><div class="v161-ice i3"></div><div class="v161-ice i4"></div><div class="v161-crack k1"></div><div class="v161-crack k2"></div>${torches.map(([l,t])=>`<i class="v161-torch" style="left:${l}%;top:${t}%"></i>`).join('')}</div>`;
+ }
+ function ensureWorld(){const map=document.querySelector('.b2-map');if(map&&!map.querySelector('.v161-world')){map.innerHTML=worldMarkup();}}
+ const staticFn=function(){
+  const bs=battleState;if(!bs)return;
+  for(const st of bs.structures||[]){const el=document.querySelector(`[data-structure="${st.id}"]`);if(!el)continue;const v=VISUAL[st.id];const q=v?pathPoint(v.p,v.o):proceduralScreenPos(st.x,st.y||50);el.style.left=q.left+'%';el.style.top=q.top+'%';}
+  const rs=[...document.querySelectorAll('.b2-relic')];(bs.relics||[]).forEach((r,i)=>{if(rs[i]){const q=proceduralScreenPos(r.x,50);rs[i].style.left=q.left+'%';rs[i].style.top=q.top+'%'}});
+ };
+ window.syncStaticBattlePositions=staticFn;try{syncStaticBattlePositions=staticFn}catch(e){}
+ function verifyStructureOrder(){
+  const bs=battleState;if(!bs?.structures)return;
+  const required=['tn1','tt1','tt2','ti','t2','t1','e1','e2','ei','et1','et2','en1'];
+  const ids=new Set(bs.structures.map(s=>s.id));
+  bs.v161StructureLayoutOk=required.every(id=>ids.has(id));
+ }
+ const baseRender=window.render;
+ if(typeof baseRender==='function')window.render=function(){const r=baseRender.apply(this,arguments);if(mode==='battle')requestAnimationFrame(()=>{try{ensureWorld();verifyStructureOrder();staticFn();if(typeof syncBattleDom==='function')syncBattleDom()}catch(e){console.error('[V161 MAP]',e)}});return r};
+ const baseStart=window.startBattle;
+ if(typeof baseStart==='function')window.startBattle=function(){const r=baseStart.apply(this,arguments);try{verifyStructureOrder()}catch(e){}return r};
+ window.V161_PROCEDURAL_ABYSS={version:VERSION,path:PATH,visualStructures:VISUAL,screenPos:proceduralScreenPos,verify:verifyStructureOrder};
+})();
+</script>
+<!-- V161 PROCEDURAL ABYSS PATCH END -->
 
 </body>
 </html>
