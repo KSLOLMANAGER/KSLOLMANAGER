@@ -682,6 +682,58 @@ button{font:inherit}.app{min-height:100vh;width:100%;max-width:1240px;margin:0 a
 .augment-reroll{width:38px!important;height:34px!important;padding:0!important;font-size:22px!important;line-height:1!important}
 @media(max-width:800px){.augment-reroll{width:34px!important;height:30px!important;font-size:19px!important}}
 </style>
+
+<!-- V164 CANVAS ARAM RESET START -->
+<style id="v164-aram-canvas-style">
+.aram-canvas-ui{position:fixed;inset:0;z-index:70;overflow:hidden;background:#02070d;color:#edf7ff;font-family:Inter,Arial,"Noto Sans KR",sans-serif}
+.aram-canvas-ui *{box-sizing:border-box}
+.aram-canvas-stage{position:absolute;inset:0;overflow:hidden;background:#030811}
+#aramCanvasV164{position:absolute;inset:0;width:100%;height:100%;display:block}
+
+/* top score */
+.aram-canvas-score{position:absolute;z-index:120;top:8px;left:50%;transform:translateX(-50%);width:210px;text-align:center;pointer-events:none;filter:drop-shadow(0 7px 12px #000b)}
+.aram-canvas-kills{height:58px;display:grid;grid-template-columns:1fr 34px 1fr;align-items:center;background:linear-gradient(180deg,rgba(9,32,47,.98),rgba(2,12,20,.98));clip-path:polygon(13% 0,87% 0,100% 46%,88% 100%,12% 100%,0 46%);border-top:2px solid #52768a;color:#dbe9ef;font-size:34px;font-weight:1000;text-shadow:0 3px 8px #000}
+.aram-canvas-kills .ally{color:#57c4ff}.aram-canvas-kills .enemy{color:#ff5f72}.aram-canvas-kills .sword{font-size:18px;color:#c6d5db}
+.aram-canvas-clock{display:block;margin-top:3px;font-size:13px;font-weight:900;letter-spacing:1px;color:#e3edf1;text-shadow:0 2px 5px #000}
+
+/* side team HUD, overlays the game view */
+.aram-canvas-roster{position:absolute;z-index:110;top:110px;width:218px;display:grid;gap:6px;pointer-events:none}
+.aram-canvas-roster.ally{left:10px}.aram-canvas-roster.enemy{right:10px}
+.aram-canvas-player{height:82px;padding:7px;border:1px solid #315f7a;background:linear-gradient(90deg,rgba(5,23,37,.96),rgba(2,11,18,.82));box-shadow:inset 4px 0 #39aef3,0 7px 17px #0008;display:grid;grid-template-columns:52px 1fr;grid-template-rows:52px 15px;gap:4px 8px}
+.aram-canvas-roster.enemy .aram-canvas-player{grid-template-columns:1fr 52px;background:linear-gradient(270deg,rgba(49,12,20,.96),rgba(14,5,10,.82));border-color:#7f3542;box-shadow:inset -4px 0 #e44d63,0 7px 17px #0008;text-align:right}
+.aram-canvas-player.dead{opacity:.34;filter:grayscale(1)}
+.aram-canvas-portrait{position:relative;width:52px;height:52px;border:2px solid #52bdf5;background:#06131d;overflow:hidden;display:grid;place-items:center;font-size:20px}
+.aram-canvas-roster.enemy .aram-canvas-portrait{order:2;border-color:#f06475}.aram-canvas-roster.enemy .aram-canvas-info{order:1}
+.aram-canvas-portrait img{width:100%;height:100%;object-fit:cover}
+.aram-canvas-level{position:absolute;left:-1px;bottom:-1px;min-width:18px;height:18px;padding:0 3px;display:grid;place-items:center;background:#03090e;border:1px solid #a8c5d2;font-size:9px;font-weight:1000;color:#fff}
+.aram-canvas-roster.enemy .aram-canvas-level{left:auto;right:-1px}
+.aram-canvas-info{min-width:0;padding-top:2px}.aram-canvas-info strong{display:block;font-size:11px;line-height:14px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.aram-canvas-info small{display:block;margin-top:1px;font-size:8px;color:#89a2ad;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.aram-canvas-hp{height:8px;margin-top:7px;background:#030b11;border:1px solid #263f4c;overflow:hidden}.aram-canvas-hp-fill{display:block;height:100%;background:linear-gradient(90deg,#13a95e,#53e194);box-shadow:0 0 8px #37d78288}.aram-canvas-roster.enemy .aram-canvas-hp-fill{background:linear-gradient(90deg,#a71f37,#ee596b);box-shadow:0 0 8px #ef536688}
+.aram-canvas-augs{grid-column:1/-1;height:15px;display:grid;grid-template-columns:repeat(6,1fr);gap:3px}.aram-canvas-aug{height:15px;border:1px solid #294c60;background:#041019;overflow:hidden;display:grid;place-items:center}.aram-canvas-roster.enemy .aram-canvas-aug{border-color:#5e2933}.aram-canvas-aug img{width:100%;height:100%;object-fit:cover}.aram-canvas-aug.silver{border-color:#95a6ad}.aram-canvas-aug.gold{border-color:#dab44f}.aram-canvas-aug.prismatic{border-color:#b67af0}
+
+/* lower center scoreboard */
+.aram-canvas-scoreboard{position:absolute;z-index:115;left:50%;bottom:12px;transform:translateX(-50%);width:min(920px,64vw);background:linear-gradient(180deg,rgba(3,13,20,.97),rgba(2,8,13,.96));border:1px solid #405c6c;box-shadow:0 16px 45px #000c, inset 0 1px rgba(150,210,235,.08)}
+.aram-canvas-scoreboard-title{height:25px;display:grid;place-items:center;border-bottom:1px solid #263c48;font-size:10px;font-weight:1000;letter-spacing:2px;color:#d0dee4}
+.aram-canvas-scoreboard-body{padding:4px 9px 7px}
+.aram-canvas-score-row{height:34px;display:grid;grid-template-columns:176px 62px 32px 32px 62px 176px;gap:8px;align-items:center;justify-content:center;border-top:1px solid #142630}.aram-canvas-score-row:first-child{border-top:0}
+.aram-canvas-score-row .score-items{display:grid;grid-template-columns:repeat(6,24px);gap:5px}.aram-canvas-score-row .enemy-items{direction:rtl}
+.aram-canvas-score-row .score-item{width:24px;height:24px;border:1px solid #355160;background:#06131b;display:grid;place-items:center;overflow:hidden}.aram-canvas-score-row .enemy-items .score-item{border-color:#65323c}.aram-canvas-score-row .score-item.filled{box-shadow:inset 0 0 8px #73c9f322}.aram-canvas-score-row .score-item img{width:100%;height:100%;object-fit:cover}.score-item-fallback{width:100%;height:100%;place-items:center;font-size:8px;color:#e7f4fa}
+.aram-canvas-score-champ{width:32px;height:32px;border:2px solid #50bdf6;background:#07141c;overflow:hidden;display:grid;place-items:center;font-size:12px}.aram-canvas-score-champ.enemy{border-color:#ec5a6d}.aram-canvas-score-champ img{width:100%;height:100%;object-fit:cover}
+.aram-canvas-score-row .score-kda{font-size:9px;font-weight:900;color:#dbe8ed;text-align:center}.aram-canvas-score-row .score-kda.enemy{color:#f3d7db}
+
+.aram-canvas-speed{position:absolute;z-index:118;top:76px;left:50%;transform:translateX(-50%);display:flex;gap:3px;padding:4px;background:rgba(2,10,15,.82);border:1px solid #2c4655;box-shadow:0 5px 15px #0008}
+.aram-canvas-speed button{height:23px;min-width:29px;padding:0 6px;border:1px solid #345262;background:#071720;color:#9eb4be;font-size:8px;font-weight:900;cursor:pointer}.aram-canvas-speed button:hover,.aram-canvas-speed button.active{color:#fff;border-color:#d2ae52;background:#4b3d18}
+
+/* V164 intentionally has no minimap, sponsor block, DOM map, structure DOM or DOM units. */
+@media(max-width:900px){
+ .aram-canvas-score{top:4px;width:150px}.aram-canvas-kills{height:42px;font-size:24px;grid-template-columns:1fr 24px 1fr}.aram-canvas-clock{font-size:9px}
+ .aram-canvas-roster{top:62px;width:86px;gap:2px}.aram-canvas-roster.ally{left:3px}.aram-canvas-roster.enemy{right:3px}.aram-canvas-player,.aram-canvas-roster.enemy .aram-canvas-player{height:59px;padding:3px;display:block;text-align:center}.aram-canvas-portrait{width:31px;height:31px;margin:auto;border-radius:50%}.aram-canvas-info strong{font-size:6px;line-height:8px}.aram-canvas-info small{display:none}.aram-canvas-hp{height:3px;margin-top:2px}.aram-canvas-level{width:12px;min-width:12px;height:12px;font-size:6px}.aram-canvas-augs{height:8px;gap:1px;margin-top:2px}.aram-canvas-aug{height:8px}
+ .aram-canvas-scoreboard{width:96vw;bottom:39px}.aram-canvas-scoreboard-title{height:19px;font-size:7px}.aram-canvas-score-row{height:27px;grid-template-columns:104px 40px 23px 23px 40px 104px;gap:2px}.aram-canvas-score-row .score-items{grid-template-columns:repeat(6,15px);gap:2px}.aram-canvas-score-row .score-item{width:15px;height:15px}.aram-canvas-score-champ{width:23px;height:23px}.aram-canvas-score-row .score-kda{font-size:7px}.aram-canvas-speed{top:auto;bottom:5px;transform:translateX(-50%) scale(.78)}
+}
+</style>
+<!-- V164 CANVAS ARAM RESET END -->
+
+<!-- V164 Canvas 2D battle renderer: true reset / no external map image -->
 </head>
 <body>
 <div class="app" id="app"></div>
@@ -712,37 +764,16 @@ let battleRafPending=false, battleWatchdogTimer=null, battleUiSyncTimer=null;
 let developerTestConfig=null;
 
 function syncLiveBattleHud(){
-  const bs=battleState;
-  if(mode!=='battle'||!bs)return;
-
-  // 상단 킬 수 + 전투 현황.
-  // 이 함수들은 전역 스코프에 있어야 하며, UI 동기화 오류가 전투 엔진을 멈추지 않게 분리한다.
-  try{syncBattleScoreboard();}catch(err){console.error('[battle-ui-score]',err);}
-
-  // LIVE MATCH LOG
-  const log=document.querySelector('.b2-log');
-  if(log){
-    const version=bs.logVersion||0;
-    if(Number(log.dataset.version||-1)!==version){
-      log.innerHTML=(bs.log||[]).slice(-40).map(x=>`<div>${x}</div>`).join('');
-      log.dataset.version=String(version);
-      log.scrollTop=log.scrollHeight;
-    }
+  const bs=battleState;if(mode!=='battle'||!bs)return;
+  try{syncBattleScoreboard();}catch(err){console.error('[battle-ui-score]',err)}
+  const clock=document.querySelector('.aram-canvas-clock');if(clock)clock.textContent=formatBattleTime(bs.time||0);
+  for(const u of bs.team.concat(bs.enemy)){
+    const hud=document.querySelector(`[data-aram-hud-unit="${u.id}"]`);if(!hud)continue;
+    hud.classList.toggle('dead',!u.alive);
+    const hp=hud.querySelector('.aram-canvas-hp-fill');if(hp)hp.style.width=Math.max(0,Math.min(100,u.hp/u.maxHp*100))+'%';
+    const lv=hud.querySelector('.aram-canvas-level');if(lv)lv.textContent=u.level;
   }
-
-  // 전체 채팅
-  const chat=document.querySelector('.match-all-chat-body');
-  if(chat){
-    const count=(bs.chat||[]).length;
-    if(Number(chat.dataset.count||-1)!==count){
-      chat.innerHTML=(bs.chat||[]).slice(-30).map(x=>`<div>${x}</div>`).join('');
-      chat.dataset.count=String(count);
-      chat.scrollTop=chat.scrollHeight;
-    }
-  }
-
-  const clock=document.querySelector('.b2-clock');
-  if(clock)clock.textContent=formatBattleTime(bs.time||0);
+  ensureAramRendererV164();
 }
 function armBattleUiSync(){
   clearInterval(battleUiSyncTimer);
@@ -752,6 +783,7 @@ function armBattleUiSync(){
 function stopBattleUiSync(){
   clearInterval(battleUiSyncTimer);
   battleUiSyncTimer=null;
+  if(window.__aramRendererV164){window.__aramRendererV164.destroy();window.__aramRendererV164=null;}
 }
 
 function scheduleBattleFrame(){
@@ -943,7 +975,7 @@ function scoreItemsHtml(u, enemy=false){
  const cnt=battleItemCount(u);
  return `<div class="score-items ${enemy?'enemy-items':''}">${[0,1,2,3,4,5].map(i=>{
    const item=u?.inventory?.[i];
-   return `<i class="score-item ${i<cnt?'filled':''}" data-item="${i}" title="${item?`${item.name} · ${Number(item.cost||0).toLocaleString()}G`:''}">${item?`<img src="${battleItemImagePath(item)}" alt="${item.name}" onerror="this.style.display='none';this.nextElementSibling.style.display='grid'"><span class="score-item-fallback" style="display:none">${battleItemSymbol(u,i)}</span>`:''}</i>`;
+   return `<i class="score-item ${i<cnt?'filled':''}" data-item="${i}" title="${item?`${item.name} · ${Number(item.cost||0).toLocaleString()}G`:''}">${item?`<img src="${battleItemImagePath(item)}" alt="${item.name}" onerror="this.style.display='none';if(this.nextElementSibling)this.nextElementSibling.style.display='grid'"><span class="score-item-fallback" style="display:none">${battleItemSymbol(u,i)}</span>`:''}</i>`;
  }).join('')}</div>`;
 }
 function scorePortraitHtml(u, enemy=false){
@@ -1006,7 +1038,7 @@ function syncBattleScoreboard(){
        el.classList.toggle('filled',n<cnt);
        el.title=item?`${item.name} · ${Number(item.cost||0).toLocaleString()}G`:'';
        if(item){
-         el.innerHTML=`<img src="${battleItemImagePath(item)}" alt="${item.name}" onerror="this.style.display='none';this.nextElementSibling.style.display='grid'"><span class="score-item-fallback" style="display:none">${battleItemSymbol(u,n)}</span>`;
+         el.innerHTML=`<img src="${battleItemImagePath(item)}" alt="${item.name}" onerror="this.style.display='none';if(this.nextElementSibling)this.nextElementSibling.style.display='grid'"><span class="score-item-fallback" style="display:none">${battleItemSymbol(u,n)}</span>`;
        }else{
          el.innerHTML='';
        }
@@ -2795,18 +2827,20 @@ if(mode==="loading"){
 body=`<div class="loading-screen"><div class="loading-inner"><div class="loading-kicker">무작위 총력전 · 아수라장</div><h2>게임을 불러오는 중</h2><div class="loading-vs"><div class="loading-team"><div class="loading-title">우리 팀</div>${teamPicks.map((c,i)=>`<div class="loading-card blue-card"><div class="loading-art"><img src="assets/champions/${championImageId(c.id)}_0.jpg" onerror="this.style.display='none';this.parentElement.innerHTML='<span>${c.icon}</span>'"></div><div class="loading-champ">${c.name}</div><div class="loading-nick">${party[i].nickname}</div></div>`).join("")}</div><div class="vs-mark">VS</div><div class="loading-team enemy-loading"><div class="loading-title">적 팀</div>${enemyTeam.map((e,i)=>`<div class="loading-card red-card"><div class="loading-art"><img src="assets/champions/${championImageId(e.champ.id)}_0.jpg" onerror="this.style.display='none';this.parentElement.innerHTML='<span>${e.champ.icon}</span>'"></div><div class="loading-champ">${e.champ.name}</div><div class="loading-nick">${e.nick}</div></div>`).join("")}</div></div><div class="loading-count">${loadingSeconds}</div><div class="loading-bar"><div style="width:${((10-loadingSeconds)/10)*100}%"></div></div><p>전장이 준비되고 있습니다...</p></div></div>`;
 }
 if(mode==="battle"){
-const bs=battleState || {time:0,status:"전투 준비 중",team:[],enemy:[],log:[],speed:1,structures:[],relics:[],fx:[]};
-const portrait=(u)=>`<div class="portrait"><img src="assets/champions/${championImageId(u.champ.id)}_0.jpg" onerror="this.style.display='none';this.parentElement.textContent='${u.icon}'"></div>`;
-const augSlots=(u)=>{
- const shown=allOwnedAugments(u).slice(0,5);
- return `<div class="unit-augments">${[0,1,2,3,4].map(i=>{const a=shown[i];return a?`<span class="unit-augment filled ${a.tier}" title="${a.name} · ${a.desc}"><img src="assets/augments/${a.tier}/${a.name}.jpg" alt="${a.name}" onerror="this.style.display='none';this.nextElementSibling.style.display='grid'"><i style="display:none">◆</i></span>`:`<span class="unit-augment" title="미선택"><i>+</i></span>`}).join('')}</div>`;
-};
-const row=(u,right=false)=>`<div class="b2-unit ${u.alive?"":"dead"}" data-hud-unit="${u.id}">${right?`<div class="unit-info"><strong>${u.nick}</strong><small>${u.champ.name} · Lv.${u.level}</small><div class="b2-hp"><i style="width:${Math.max(0,u.hp/u.maxHp*100)}%"></i></div><div class="b2-gold">${Math.floor(u.gold).toLocaleString()} G</div>${augSlots(u)}</div>${portrait(u)}`:`${portrait(u)}<div class="unit-info"><strong>${u.nick}</strong><small>${u.champ.name} · Lv.${u.level}</small><div class="b2-hp"><i style="width:${Math.max(0,u.hp/u.maxHp*100)}%"></i></div><div class="b2-gold">${Math.floor(u.gold).toLocaleString()} G</div>${augSlots(u)}</div>`}</div>`;
-body=`<div class="battle-v2"><div class="b2-head"><div></div><div><div class="b2-score"><span class="blue" data-team-kills>${bs.teamKills||0}</span> &nbsp; ⚔ &nbsp; <span class="red" data-enemy-kills>${bs.enemyKills||0}</span></div><div class="b2-clock">${formatBattleTime(bs.time)}</div></div><div class="b2-right">${bs.status}</div></div><div class="b2-main"><aside class="b2-side"><div class="b2-side-title">우리 팀</div>${bs.team.map(u=>row(u,false)).join("")}</aside><div class="b2-stage"><div class="b2-map"><div class="clean-bridge"></div></div>
-<div class="structure-track">${bs.structures.map(st=>`<div class="b2-structure ${st.team==='enemy'?'red':''} ${st.type} ${st.alive?'':'dead'}" data-structure="${st.id}" style="left:${st.x}%"><div class="sicon">${st.type==='nexus'?'◆':st.type==='inhib'?'✦':'▥'}</div><div class="sname">${st.name} · ${Math.max(0,Math.round(st.hp))}%</div></div>`).join("")}</div>
-${bs.units.filter(u=>u.kind==='champ').map(u=>unitV2Html(u)).join("")}
-${battleScoreboardHtml(bs)}
-<div class="b2-speed-dock">${[.5,1,2,4,8,16,32].map(v=>`<button class="${bs.speed===v?'active':''}" onclick="setBattleSpeed(${v})">${v}×</button>`).join('')}</div><div class="b2-panel"><div class="b2-panel-head"><span>LIVE MATCH LOG</span><span>${formatBattleTime(bs.time)}</span></div><div class="b2-log">${bs.log.slice(-9).map(x=>`<div>${x}</div>`).join("")}</div><div class="b2-controls"><button class="${bs.speed===.5?'active':''}" onclick="setBattleSpeed(.5)">0.5×</button><button class="${bs.speed===1?'active':''}" onclick="setBattleSpeed(1)">1×</button><button class="${bs.speed===2?'active':''}" onclick="setBattleSpeed(2)">2×</button><button class="${bs.speed===4?'active':''}" onclick="setBattleSpeed(4)">4×</button><button class="${bs.speed===8?'active':''}" onclick="setBattleSpeed(8)">8×</button><button class="${bs.speed===16?'active':''}" onclick="setBattleSpeed(16)">16×</button><button class="${bs.speed===32?'active':''}" onclick="setBattleSpeed(32)">32×</button></div></div><div class="match-all-chat"><div class="match-all-chat-head">전체 채팅</div><div class="match-all-chat-body">${(bs.chat||[]).slice(-7).map(x=>`<div>${x}</div>`).join("")}</div></div>${bs.jaebinEventOpen?`<div class="chat-event-overlay"><div class="chat-event-card"><div class="event-mark">!</div><h2>이재빈이 전체 채팅을 시도하려고 합니다</h2><p>허락하시겠습니까?</p><div class="warn">‼️ 상대방의 멘탈이 흔들리거나 오히려 각성할 수 있습니다.</div><div class="chat-event-actions"><button onclick="allowJaebinChat()">허락하기</button><button class="deny" onclick="denyJaebinChat()">반대하기</button></div></div></div>`:""}${bs.jaebinHealOpen?`<div class="chat-event-overlay"><div class="chat-event-card"><div class="event-mark">✚</div><h2>힐팩을 어떻게 하시겠습니까?</h2><p>당신은 이재빈보다 체력이 많습니다.<br>하지만 힐팩을 빼앗아 먹을 수 있습니다.</p><div class="warn">힐팩을 빼앗아 먹을 시 자신의 플레이가 향상되거나 이재빈의 플레이가 하향됩니다.</div><div class="chat-event-actions"><button onclick="confirmJaebinHealpackSteal()">빼앗아 먹기</button><button class="deny" onclick="confirmJaebinHealpackYield()">양보하기</button></div></div></div>`:""}${bs.jaebinBadAugmentOpen?`<div class="chat-event-overlay"><div class="chat-event-card"><div class="event-mark">◆</div><h2>이재빈이 증강을 망했습니다</h2><p>첫 번째와 두 번째 증강이 모두 B티어 이하입니다.</p><div class="warn">이재빈이 증강 망해서 기분이 안 좋아집니다.<br>플레이가 소폭 하향됩니다. 경기력 0.8배.</div><div class="chat-event-actions"><button onclick="confirmJaebinBadAugment()">확인</button></div></div></div>`:""}${bs.molchoPhoneOpen?`<div class="chat-event-overlay"><div class="chat-event-card"><div class="event-mark">☎</div><h2>김병욱이 전화를 하러 갔습니다</h2><p>갑자기 여자친구에게 전화가 왔습니다.</p><div class="warn">10분간 소통이 안되어 플레이에 영향이 갑니다.<br>몰초의 경기력이 0.8배로 감소합니다.</div><div class="chat-event-actions"><button onclick="confirmMolchoPhone()">확인</button></div></div></div>`:""}${bs.molchoDrunkOpen?`<div class="chat-event-overlay"><div class="chat-event-card"><div class="event-mark">🍺</div><h2>김병욱이 사실 술 한 잔 하고 왔습니다.</h2><p>경기 시작 전에 술을 마시고 온 사실이 밝혀졌습니다.</p><div class="warn">몰초의 경기력이 대폭 하향됩니다.<br>이번 경기 동안 경기력 0.5배.</div><div class="chat-event-actions"><button onclick="confirmMolchoDrunk()">확인</button></div></div></div>`:""}${bs.molchoAugmentScamOpen?`<div class="chat-event-overlay"><div class="chat-event-card"><div class="event-mark">◆</div><h2>김병욱이 증강 사기 치고 있습니다.</h2><p>첫 번째와 두 번째 증강에서 연속으로 S급 증강을 뽑았습니다.</p><div class="warn">몰초의 플레이가 소폭 상향됩니다.<br>경기력 1.3배.</div><div class="chat-event-actions"><button onclick="confirmMolchoAugmentScam()">확인</button></div></div></div>`:""}${bs.galioSleepOpen?`<div class="chat-event-overlay"><div class="chat-event-card"><div class="event-mark">💤</div><h2>24시가 넘었습니다.</h2><p>김정운이 슬슬 졸음이 쏟아집니다.</p><div class="warn">플레이가 대폭 하향됩니다.<br>갈리오의 경기력 0.5배.</div><div class="chat-event-actions"><button onclick="confirmGalioSleep()">확인</button></div></div></div>`:""}${bs.siljeomPenaltyOpen?`<div class="chat-event-overlay"><div class="chat-event-card"><div class="event-mark">⚽</div><h2>오늘 수원 삼성 경기가 있었습니다.</h2><p>경기 결과에 따라 박성진의 기분이 좌우됩니다.</p><div class="penalty-mini"><div class="penalty-keeper">${bs.siljeomPenaltyResult?(bs.siljeomPenaltyKeeper===0?"🧤←":bs.siljeomPenaltyKeeper===1?"🧤":"→🧤"):"🧤"}</div></div>${bs.siljeomPenaltyResult?`<div class="penalty-result">${bs.siljeomPenaltyResult}</div><div class="warn">${bs.siljeomPenaltyOutcome==="win"?"박성진의 경기력이 1.2배 향상됩니다.":"박성진의 경기력이 0.8배로 하향됩니다."}</div><div class="chat-event-actions"><button onclick="confirmSiljeomPenalty()">확인</button></div>`:`<div class="warn">승부차기 방향을 선택하세요. 골키퍼는 좌 / 가운데 / 우 중 한 방향을 1/3 확률로 막습니다.</div><div class="penalty-choices"><button onclick="takeSiljeomPenaltyShot(0)">왼쪽</button><button onclick="takeSiljeomPenaltyShot(1)">가운데</button><button onclick="takeSiljeomPenaltyShot(2)">오른쪽</button></div>`}</div></div>`:""}${bs.munchulOpen?`<div class="chat-event-overlay"><div class="chat-event-card"><div class="event-mark">⚖</div><h2>문철 이벤트</h2>${bs.munchulResult?`<p>${bs.munchulResult}</p><div class="warn">${bs.munchulMultiplier>1?"플레이가 상향되었습니다.":"플레이가 하향되었습니다."} · 경기력 ${bs.munchulMultiplier}배</div><div class="chat-event-actions"><button onclick="confirmMunchulResult()">확인</button></div>`:(bs.munchulScenario==="dage"?`<p>김병욱이 스킬을 자주 맞는 것 같아서 구박 줬더니 <b>문철 할래?</b>라고 대답이 왔습니다.</p><div class="warn">문철 하시겠습니까?</div><div class="chat-event-actions"><button onclick="answerMunchulEvent(true)">예</button><button class="deny" onclick="answerMunchulEvent(false)">아니오</button></div>`:`<p>황재윤이 스킬 자주 맞는다고 구박합니다.</p><div class="warn">문철 뜨자고 하시겠습니까?</div><div class="chat-event-actions"><button onclick="answerMunchulEvent(true)">예</button><button class="deny" onclick="answerMunchulEvent(false)">아니오</button></div>`)}</div></div>`:""}${augmentOverlayHtml(bs)}</div><aside class="b2-side right"><div class="b2-side-title">적 팀</div>${bs.enemy.map(u=>row(u,true)).join("")}</aside></div></div>`;
+const bs=battleState || {time:0,status:"전투 준비 중",team:[],enemy:[],units:[],log:[],speed:1,structures:[],relics:[],fx:[]};
+const augSlots=(u)=>{const shown=allOwnedAugments(u).slice(0,6);return `<div class="aram-canvas-augs">${[0,1,2,3,4,5].map(i=>{const a=shown[i];return a?`<span class="aram-canvas-aug ${a.tier}" title="${a.name} · ${a.desc}"><img src="assets/augments/${a.tier}/${a.name}.jpg" onerror="this.style.display='none'"></span>`:`<span class="aram-canvas-aug"></span>`}).join('')}</div>`};
+const rosterCard=(u)=>`<div class="aram-canvas-player ${u.alive?'':'dead'}" data-aram-hud-unit="${u.id}"><div class="aram-canvas-portrait"><img src="assets/champions/${championImageId(u.champ.id)}_0.jpg" onerror="this.style.display='none';this.parentElement.textContent='${u.icon}'"><span class="aram-canvas-level">${u.level}</span></div><div class="aram-canvas-info"><strong>${u.nick}</strong><small>${u.champ.name}</small><div class="aram-canvas-hp"><span class="aram-canvas-hp-fill" style="width:${Math.max(0,u.hp/u.maxHp*100)}%"></span></div></div>${augSlots(u)}</div>`;
+const items=(u,enemy=false)=>`<div class="score-items ${enemy?'enemy-items':''}">${[0,1,2,3,4,5].map(i=>{const item=u?.inventory?.[i];return `<i class="score-item ${item?'filled':''}" title="${item?`${item.name} · ${Number(item.cost||0).toLocaleString()}G`:''}">${item?`<img src="${battleItemImagePath(item)}" alt="${item.name}" onerror="this.style.display='none';if(this.nextElementSibling)this.nextElementSibling.style.display='grid'"><span class="score-item-fallback" style="display:none">${battleItemSymbol(u,i)}</span>`:''}</i>`}).join('')}</div>`;
+const scoreRows=[0,1,2,3,4].map(i=>{const a=bs.team[i],e=bs.enemy[i];return `<div class="score-pair aram-canvas-score-row" data-score-pair="${a.id}|${e.id}">${items(a,false)}<span class="score-kda" data-score-kda="${a.id}">${a.kills||0}/${a.deaths||0}/${a.assists||0}</span><div class="aram-canvas-score-champ"><img src="assets/champions/${championImageId(a.champ.id)}_0.jpg" onerror="this.style.display='none';this.parentElement.textContent='${a.icon}'"></div><div class="aram-canvas-score-champ enemy"><img src="assets/champions/${championImageId(e.champ.id)}_0.jpg" onerror="this.style.display='none';this.parentElement.textContent='${e.icon}'"></div><span class="score-kda enemy" data-score-kda="${e.id}">${e.kills||0}/${e.deaths||0}/${e.assists||0}</span>${items(e,true)}</div>`}).join('');
+body=`<div class="aram-canvas-ui">
+ <div class="aram-canvas-stage"><canvas id="aramCanvasV164" aria-label="칼바람 나락 전장"></canvas></div>
+ <div class="aram-canvas-score"><div class="aram-canvas-kills"><span class="ally" data-team-kills>${bs.teamKills||0}</span><span class="sword">⚔</span><span class="enemy" data-enemy-kills>${bs.enemyKills||0}</span></div><span class="aram-canvas-clock">${formatBattleTime(bs.time)}</span></div>
+ <div class="aram-canvas-roster ally">${bs.team.map(rosterCard).join('')}</div>
+ <div class="aram-canvas-roster enemy">${bs.enemy.map(rosterCard).join('')}</div>
+ <div class="aram-canvas-scoreboard" id="battleScoreboard"><div class="aram-canvas-scoreboard-title">전투 현황</div><div class="aram-canvas-scoreboard-body">${scoreRows}</div></div>
+ <div class="aram-canvas-speed">${[.5,1,2,4,8,16,32].map(v=>`<button class="${bs.speed===v?'active':''}" onclick="setBattleSpeed(${v})">${v}×</button>`).join('')}</div>
+ ${bs.jaebinEventOpen?`<div class="chat-event-overlay"><div class="chat-event-card"><div class="event-mark">!</div><h2>이재빈이 전체 채팅을 시도하려고 합니다</h2><p>허락하시겠습니까?</p><div class="warn">‼️ 상대방의 멘탈이 흔들리거나 오히려 각성할 수 있습니다.</div><div class="chat-event-actions"><button onclick="allowJaebinChat()">허락하기</button><button class="deny" onclick="denyJaebinChat()">반대하기</button></div></div></div>`:""}${bs.jaebinHealOpen?`<div class="chat-event-overlay"><div class="chat-event-card"><div class="event-mark">✚</div><h2>힐팩을 어떻게 하시겠습니까?</h2><p>당신은 이재빈보다 체력이 많습니다.<br>하지만 힐팩을 빼앗아 먹을 수 있습니다.</p><div class="warn">힐팩을 빼앗아 먹을 시 자신의 플레이가 향상되거나 이재빈의 플레이가 하향됩니다.</div><div class="chat-event-actions"><button onclick="confirmJaebinHealpackSteal()">빼앗아 먹기</button><button class="deny" onclick="confirmJaebinHealpackYield()">양보하기</button></div></div></div>`:""}${bs.jaebinBadAugmentOpen?`<div class="chat-event-overlay"><div class="chat-event-card"><div class="event-mark">◆</div><h2>이재빈이 증강을 망했습니다</h2><p>첫 번째와 두 번째 증강이 모두 B티어 이하입니다.</p><div class="warn">이재빈이 증강 망해서 기분이 안 좋아집니다.<br>플레이가 소폭 하향됩니다. 경기력 0.8배.</div><div class="chat-event-actions"><button onclick="confirmJaebinBadAugment()">확인</button></div></div></div>`:""}${bs.molchoPhoneOpen?`<div class="chat-event-overlay"><div class="chat-event-card"><div class="event-mark">☎</div><h2>김병욱이 전화를 하러 갔습니다</h2><p>갑자기 여자친구에게 전화가 왔습니다.</p><div class="warn">10분간 소통이 안되어 플레이에 영향이 갑니다.<br>몰초의 경기력이 0.8배로 감소합니다.</div><div class="chat-event-actions"><button onclick="confirmMolchoPhone()">확인</button></div></div></div>`:""}${bs.molchoDrunkOpen?`<div class="chat-event-overlay"><div class="chat-event-card"><div class="event-mark">🍺</div><h2>김병욱이 사실 술 한 잔 하고 왔습니다.</h2><p>경기 시작 전에 술을 마시고 온 사실이 밝혀졌습니다.</p><div class="warn">몰초의 경기력이 대폭 하향됩니다.<br>이번 경기 동안 경기력 0.5배.</div><div class="chat-event-actions"><button onclick="confirmMolchoDrunk()">확인</button></div></div></div>`:""}${bs.molchoAugmentScamOpen?`<div class="chat-event-overlay"><div class="chat-event-card"><div class="event-mark">◆</div><h2>김병욱이 증강 사기 치고 있습니다.</h2><p>첫 번째와 두 번째 증강에서 연속으로 S급 증강을 뽑았습니다.</p><div class="warn">몰초의 플레이가 소폭 상향됩니다.<br>경기력 1.3배.</div><div class="chat-event-actions"><button onclick="confirmMolchoAugmentScam()">확인</button></div></div></div>`:""}${bs.galioSleepOpen?`<div class="chat-event-overlay"><div class="chat-event-card"><div class="event-mark">💤</div><h2>24시가 넘었습니다.</h2><p>김정운이 슬슬 졸음이 쏟아집니다.</p><div class="warn">플레이가 대폭 하향됩니다.<br>갈리오의 경기력 0.5배.</div><div class="chat-event-actions"><button onclick="confirmGalioSleep()">확인</button></div></div></div>`:""}${bs.siljeomPenaltyOpen?`<div class="chat-event-overlay"><div class="chat-event-card"><div class="event-mark">⚽</div><h2>오늘 수원 삼성 경기가 있었습니다.</h2><p>경기 결과에 따라 박성진의 기분이 좌우됩니다.</p><div class="penalty-mini"><div class="penalty-keeper">${bs.siljeomPenaltyResult?(bs.siljeomPenaltyKeeper===0?"🧤←":bs.siljeomPenaltyKeeper===1?"🧤":"→🧤"):"🧤"}</div></div>${bs.siljeomPenaltyResult?`<div class="penalty-result">${bs.siljeomPenaltyResult}</div><div class="warn">${bs.siljeomPenaltyOutcome==="win"?"박성진의 경기력이 1.2배 향상됩니다.":"박성진의 경기력이 0.8배로 하향됩니다."}</div><div class="chat-event-actions"><button onclick="confirmSiljeomPenalty()">확인</button></div>`:`<div class="warn">승부차기 방향을 선택하세요. 골키퍼는 좌 / 가운데 / 우 중 한 방향을 1/3 확률로 막습니다.</div><div class="penalty-choices"><button onclick="takeSiljeomPenaltyShot(0)">왼쪽</button><button onclick="takeSiljeomPenaltyShot(1)">가운데</button><button onclick="takeSiljeomPenaltyShot(2)">오른쪽</button></div>`}</div></div>`:""}${bs.munchulOpen?`<div class="chat-event-overlay"><div class="chat-event-card"><div class="event-mark">⚖</div><h2>문철 이벤트</h2>${bs.munchulResult?`<p>${bs.munchulResult}</p><div class="warn">${bs.munchulMultiplier>1?"플레이가 상향되었습니다.":"플레이가 하향되었습니다."} · 경기력 ${bs.munchulMultiplier}배</div><div class="chat-event-actions"><button onclick="confirmMunchulResult()">확인</button></div>`:(bs.munchulScenario==="dage"?`<p>김병욱이 스킬을 자주 맞는 것 같아서 구박 줬더니 <b>문철 할래?</b>라고 대답이 왔습니다.</p><div class="warn">문철 하시겠습니까?</div><div class="chat-event-actions"><button onclick="answerMunchulEvent(true)">예</button><button class="deny" onclick="answerMunchulEvent(false)">아니오</button></div>`:`<p>황재윤이 스킬 자주 맞는다고 구박합니다.</p><div class="warn">문철 뜨자고 하시겠습니까?</div><div class="chat-event-actions"><button onclick="answerMunchulEvent(true)">예</button><button class="deny" onclick="answerMunchulEvent(false)">아니오</button></div>`)}</div></div>`:""}${augmentOverlayHtml(bs)}
+ </div>`;
 }
 if(mode==="battleEnd"){
  const win=matchResult?.winner==='team';
@@ -2850,7 +2884,7 @@ const voltaCareerModes=['volta-club','volta-news','volta-locker','volta-squad','
 if(voltaSave&&voltaCareerModes.includes(mode))body=voltaWrapCareer(body,mode);
 const stepLabel=mode==="select"?"01 / CHARACTER":mode==="method"?"02 / CALL":mode==="volta"?"VOLTA / HOME":mode==="volta-character"?"VOLTA / HEAD COACH":mode==="volta-coach"?"VOLTA / PHYSICAL COACH":mode==="volta-manager"?"VOLTA / MANAGER":mode==="volta-teamname"?"VOLTA / CLUB":mode==="volta-match"?"VOLTA / MATCH":mode==="volta-match-setup"?"VOLTA / TACTICS":mode==="volta-match-result"?"VOLTA / RESULT":String(mode).startsWith("volta-")?"VOLTA / CAREER":"03 / PARTY";
 app.innerHTML=((mode==="hub"||mode==="volta-club"||mode==="volta-match"||(voltaSave&&voltaCareerModes.includes(mode)))?"":header(stepLabel))+`<main class="${mode==="volta-club"|| (voltaSave&&voltaCareerModes.includes(mode))?'volta-fm-mainwrap':''}">${body}</main>`;
-if(mode==='battle')setTimeout(syncLiveBattleHud,0);
+if(mode==='battle')setTimeout(()=>{syncLiveBattleHud();syncBattleDom();},0);
 // V51: 새 카톡 메시지가 렌더링될 때 항상 최신 메시지가 보이도록 자동 스크롤
 if(mode==="group" || mode==="private"){
   requestAnimationFrame(()=>{const chat=app.querySelector('.phone .chat');if(chat){chat.scrollTop=chat.scrollHeight;requestAnimationFrame(()=>chat.scrollTop=chat.scrollHeight);setTimeout(()=>{chat.scrollTop=chat.scrollHeight},80);}});
@@ -3313,8 +3347,8 @@ function startBattle(){
  const enemyComp=compositionMultiplier(enemyTeam.map(e=>e.champ),teamPicks);
  team.forEach(u=>u.compositionMultiplier=teamComp);enemy.forEach(u=>u.compositionMultiplier=enemyComp);
  const structures=[
- {id:'tn1',team:'team',type:'nexus',name:'넥서스',x:5,y:50,hp:100,alive:true},{id:'tt1',team:'team',type:'tower',name:'쌍둥이 포탑',x:9,y:50,hp:100,alive:true},{id:'tt2',team:'team',type:'tower',name:'쌍둥이 포탑',x:12,y:50,hp:100,alive:true},{id:'ti',team:'team',type:'inhib',name:'억제기',x:17,y:50,hp:100,alive:true},{id:'t2',team:'team',type:'tower',name:'2차 포탑',x:28,y:50,hp:100,alive:true},{id:'t1',team:'team',type:'tower',name:'1차 포탑',x:40,y:50,hp:100,alive:true},
- {id:'e1',team:'enemy',type:'tower',name:'1차 포탑',x:60,y:50,hp:100,alive:true},{id:'e2',team:'enemy',type:'tower',name:'2차 포탑',x:72,y:50,hp:100,alive:true},{id:'ei',team:'enemy',type:'inhib',name:'억제기',x:83,y:50,hp:100,alive:true},{id:'et1',team:'enemy',type:'tower',name:'쌍둥이 포탑',x:88,y:50,hp:100,alive:true},{id:'et2',team:'enemy',type:'tower',name:'쌍둥이 포탑',x:91,y:50,hp:100,alive:true},{id:'en1',team:'enemy',type:'nexus',name:'넥서스',x:95,y:50,hp:100,alive:true}];
+ {id:'tn1',team:'team',type:'nexus',name:'넥서스',x:5,y:50,hp:100,alive:true},{id:'tt1',team:'team',type:'tower',name:'쌍둥이 포탑',x:10.5,y:43,hp:100,alive:true},{id:'tt2',team:'team',type:'tower',name:'쌍둥이 포탑',x:10.5,y:57,hp:100,alive:true},{id:'ti',team:'team',type:'inhib',name:'억제기',x:17,y:50,hp:100,alive:true},{id:'t2',team:'team',type:'tower',name:'2차 포탑',x:28,y:50,hp:100,alive:true},{id:'t1',team:'team',type:'tower',name:'1차 포탑',x:40,y:50,hp:100,alive:true},
+ {id:'e1',team:'enemy',type:'tower',name:'1차 포탑',x:60,y:50,hp:100,alive:true},{id:'e2',team:'enemy',type:'tower',name:'2차 포탑',x:72,y:50,hp:100,alive:true},{id:'ei',team:'enemy',type:'inhib',name:'억제기',x:83,y:50,hp:100,alive:true},{id:'et1',team:'enemy',type:'tower',name:'쌍둥이 포탑',x:89.5,y:43,hp:100,alive:true},{id:'et2',team:'enemy',type:'tower',name:'쌍둥이 포탑',x:89.5,y:57,hp:100,alive:true},{id:'en1',team:'enemy',type:'nexus',name:'넥서스',x:95,y:50,hp:100,alive:true}];
  battleState={time:0,lastTs:performance.now(),lastUiSync:0,status:'시작 증강체 선택 중',speed:1,team,enemy,units:[...team,...enemy],structures,relics:[],fx:[],fxSeq:0,log:[],logVersion:0,chat:[],teamKills:0,enemyKills:0,nextWaveAt:60,pushMomentumUntil:{team:0,enemy:0},waveCount:0,superTeam:false,superEnemy:false,paused:true,engineStarted:false,jaebinRandomEventEnabled:(Math.random()<.80),jaebinRandomEventType:(me?.id!=='nguyen'&&Math.random()<.5?'healpack':'taunt'),jaebinRandomEventAt:180+Math.random()*300,jaebinRandomEventDone:false,jaebinEventOpen:false,jaebinHealOpen:false,jaebinEventResult:null,jaebinChatAttempted:false,jaebinBadAugmentOpen:false,jaebinBadAugmentDone:false,jaebinBadAugmentActive:false,playerHealpackBoostActive:false,jaebinHealpackDebuffActive:false,
 molchoRandomEventEnabled:(Math.random()<.80),molchoRandomEventType:(Math.random()<.5?'phone':'drunk'),
 molchoRandomEventAt:0,molchoRandomEventDone:false,molchoPhoneOpen:false,molchoPhoneUntil:0,molchoDrunkOpen:false,molchoDrunkActive:false,
@@ -3339,18 +3373,9 @@ augmentOpen:true,augmentStage:'start',augmentChoices:[],augments:[],augmentDone:
  armBattleUiSync();
 }
 function formatBattleTime(t){const m=String(Math.floor(t/60)).padStart(2,"0"),s=String(Math.floor(t%60)).padStart(2,"0");return `${m}:${s}`}
-function unitV2Html(u){const p=screenPos(u.x,u.y);return `<div class="b2-token ${u.team==='enemy'?'enemy':''} ${u.alive?'':'dead'}" data-unit="${u.id}" style="left:${p.left}%;top:${p.top}%"><span class="token-portrait"><img src="assets/champions/${championImageId(u.champ.id)}_0.jpg" onerror="this.style.display='none';this.parentElement.textContent='${u.icon}'"></span><b>${u.nick}</b><span class="t-hp"><em style="width:${Math.max(0,u.hp/u.maxHp*100)}%"></em></span></div>`}
-function setBattleSpeed(v){if(battleState){battleState.speed=v;render()}}
-function living(arr){return arr.filter(u=>u.alive)}
-function nearestEnemy(u){const es=battleState.units.filter(e=>e.alive&&e.team!==u.team);return es.reduce((best,e)=>!best||Math.hypot(e.x-u.x,e.y-u.y)<Math.hypot(best.x-u.x,best.y-u.y)?e:best,null)}
-function structureTierOpen(team){
- const bs=battleState, enemy=team==='team'?'enemy':'team';
- const ids=enemy==='enemy'
-  ? [['e1'],['e2'],['ei'],['et1','et2'],['en1']]
-  : [['t1'],['t2'],['ti'],['tt1','tt2'],['tn1']];
- for(const tier of ids){const alive=tier.map(id=>bs.structures.find(s=>s.id===id)).filter(s=>s&&s.alive);if(alive.length)return alive}
- return [];
-}
+function setBattleSpeed(v){const bs=battleState;if(!bs)return;const n=Number(v);if(![.5,1,2,4,8,16,32].includes(n))return;bs.speed=n;document.querySelectorAll('.aram-canvas-speed button').forEach(b=>b.classList.toggle('active',b.textContent===`${n}×`));if(!bs.paused){bs.lastTs=performance.now();scheduleBattleFrame();}}
+function unitV2Html(u){return `<div></div>`}
+
 function isStructureTargetable(st,attackerTeam){return structureTierOpen(attackerTeam).some(s=>s.id===st.id)}
 function nearestStructure(u){const ss=structureTierOpen(u.team);return ss.reduce((best,e)=>!best||Math.abs(e.x-u.x)<Math.abs(best.x-u.x)?e:best,null)}
 function addFx(x,y,text,team){const bs=battleState;bs.fx.push({id:++bs.fxSeq,x,y,text,team,ttl:.65})}
@@ -3377,7 +3402,7 @@ function championKillXp(level){return Math.round(42+Math.max(0,Math.min(15,(leve
 function teamAvgXp(team){const bs=battleState;if(!bs)return 0;const a=bs.units.filter(u=>u.kind==='champ'&&u.team===team);return a.length?a.reduce((sum,u)=>sum+(u.xp||0),0)/a.length:0}
 function teamXpCatchup(team){const own=teamAvgXp(team),opp=teamAvgXp(team==='team'?'enemy':'team'),gap=opp-own;if(gap<=180)return 1;return 1+Math.min(.35,(gap-180)/4200*.35)}
 function killXpCatchup(attacker,target){if(!attacker||attacker.kind!=='champ')return 1;const teamBoost=teamXpCatchup(attacker.team);const levelGap=(target.level||3)-(attacker.level||3);const levelBoost=levelGap>0?Math.min(.18,levelGap*.045):levelGap<0?Math.max(-.12,levelGap*.03):0;return Math.max(.88,Math.min(1.45,teamBoost+levelBoost))}
-function grantMinionXp(minion){const bs=battleState;if(!bs)return;const nearby=bs.units.filter(u=>u.kind==='champ'&&u.alive&&u.team!==minion.team&&Math.hypot(u.x-minion.x,u.y-minion.y)<=14);if(!nearby.length)return;const base=minion.xpValue||32;const team=nearby[0].team;const catchup=Math.min(1.28,teamXpCatchup(team));const each=(nearby.length===1?base*.95:(base*1.24/nearby.length))*catchup;nearby.forEach(u=>u.xp+=each)}
+function grantMinionXp(minion){const bs=battleState;if(!bs)return;const nearby=bs.units.filter(u=>u.kind==='champ'&&u.alive&&u.team!==minion.team&&Math.hypot(u.x-minion.x,u.y-minion.y)<=(battleState?.engineV2Active?285:14));if(!nearby.length)return;const base=minion.xpValue||32;const team=nearby[0].team;const catchup=Math.min(1.28,teamXpCatchup(team));const each=(nearby.length===1?base*.95:(base*1.24/nearby.length))*catchup;nearby.forEach(u=>u.xp+=each)}
 
 function respawnSeconds(u){
  const lv=(u.level||1);
@@ -3399,7 +3424,7 @@ function killLog(attacker,target){
    attacker.kills=(attacker.kills||0)+1; attacker.gold+=300; attacker.xp+=(target.kind==='champ'?championKillXp(target.level)*killXpCatchup(attacker,target):0);
  }
  target.deaths=(target.deaths||0)+1;
- const allies=bs.units.filter(u=>u.kind==='champ'&&u.team===attacker.team&&u!==attacker&&u.alive&&Math.hypot(u.x-target.x,u.y-target.y)<14); allies.forEach(u=>u.assists=(u.assists||0)+1);
+ const allies=bs.units.filter(u=>u.kind==='champ'&&u.team===attacker.team&&u!==attacker&&u.alive&&Math.hypot(u.x-target.x,u.y-target.y)<(battleState?.engineV2Active?285:14)); allies.forEach(u=>u.assists=(u.assists||0)+1);
  addBattleLog(`[${formatBattleTime(bs.time)}] <span class="${at}">${attacker.nick||attacker.name||'포탑'}</span> → <span class="${tt}">${target.nick}</span> 처치`);
  if(attacker.kind==='champ'){
    const deadOpp=bs.units.filter(u=>u.kind==='champ'&&u.team!==attacker.team&&!u.alive).length;
@@ -3703,83 +3728,268 @@ function confirmMunchulResult(){
 
 function finalizeBattleEnd(expectedState=battleState){const bs=expectedState;if(!bs||battleState!==bs||mode!=='battle'||bs.endFinalized||!bs.endPending)return false;bs.endFinalized=true;if(bs.endTimer){clearTimeout(bs.endTimer);bs.endTimer=null;}bs.engineStarted=false;const winner=bs.endPending.winner;bs.status=winner==='team'?'우리 팀 승리':'적 팀 승리';if(winner==='team'){if(party.some(c=>c.id==='siljeom'))bs.chat.push(`<span class="all-tag">[전체]</span> <span class="ally-chat">실점:</span> 죽어 그냥 ㅋㅋ`);if(party.some(c=>c.id==='nguyen'))bs.chat.push(`<span class="all-tag">[전체]</span> <span class="ally-chat">Nguyen Ngoc Tu:</span> 나1가`);if(party.some(c=>c.id==='3patourwan'))for(let i=0;i<4;i++)bs.chat.push(`<span class="all-tag">[전체]</span> <span class="ally-chat">쓰리빠뚜르완:</span> ㅋ`);if(party.some(c=>c.id==='joguk'))bs.chat.push(`<span class="all-tag">[전체]</span> <span class="ally-chat">조국:</span> 븅`);if(party.some(c=>c.id==='molcho'))bs.chat.push(`<span class="all-tag">[팀원]</span> <span class="ally-chat">몰초:</span> 쉽네 쉬워`);}else{if(bs.jaebinChatAttempted){const jaebinUnit=bs.team.find(u=>u.realName==='이재빈'||u.nick==='Nguyen Ngoc Tu');const champName=jaebinUnit?.champ?.name||'그 챔피언';const taunts=['이기고 자라 ㅋㅋㅋㅋㅋㅋㅋㅋㅋ',`${champName} 너는 진짜 접어라 ㅇㅇ`,'그 조합으로 쳐지네 ㅋㅋㅋㅋㅋㅋㅋㅋㅋㅋ','ez','븅신 ㅋㅋㅋㅋㅋㅋㅋㅋㅋㅋㅋㅋ'];bs.enemy.slice(0,5).forEach((u,i)=>bs.chat.push(`<span class="all-tag">[전체]</span> <span class="enemy-chat">${u.nick}:</span> ${taunts[i]}`));}}matchResult={winner,time:bs.time,teamKills:bs.teamKills,enemyKills:bs.enemyKills,team:bs.team.map(u=>({...u})),enemy:bs.enemy.map(u=>({...u})),chat:[...(bs.chat||[])]};stopBattleUiSync();mode='battleEnd';render();return true}
 function checkEnd(){const bs=battleState;if(!bs||!bs.endPending)return false;if(performance.now()>=bs.endPending.realAt)return finalizeBattleEnd(bs);return false}
+
+// ===== V167 ARAM MATCH ENGINE V2 =====
+const ARAM_V167_SIM_DT=1/30;
+const ARAM_V167_WORLD={WIDTH:2400,HEIGHT:900,BASE_Y:450};
+const ARAM_V167_STRUCTURE_LAYOUT=[
+ {id:'tn1',team:'team',type:'nexus',name:'넥서스',x:255,y:450},
+ {id:'tt1',team:'team',type:'tower',name:'쌍둥이 포탑',x:370.5,y:376},
+ {id:'tt2',team:'team',type:'tower',name:'쌍둥이 포탑',x:370.5,y:524},
+ {id:'ti',team:'team',type:'inhib',name:'억제기',x:507,y:450},
+ {id:'t2',team:'team',type:'tower',name:'2차 포탑',x:738,y:450},
+ {id:'t1',team:'team',type:'tower',name:'1차 포탑',x:990,y:450},
+ {id:'e1',team:'enemy',type:'tower',name:'1차 포탑',x:1410,y:450},
+ {id:'e2',team:'enemy',type:'tower',name:'2차 포탑',x:1662,y:450},
+ {id:'ei',team:'enemy',type:'inhib',name:'억제기',x:1893,y:450},
+ {id:'et1',team:'enemy',type:'tower',name:'쌍둥이 포탑',x:2029.5,y:376},
+ {id:'et2',team:'enemy',type:'tower',name:'쌍둥이 포탑',x:2029.5,y:524},
+ {id:'en1',team:'enemy',type:'nexus',name:'넥서스',x:2145,y:450}
+];
+class AramSeededRngV167{constructor(seed=167031){this.s=seed>>>0||1}next(){this.s=(Math.imul(this.s,1664525)+1013904223)>>>0;return this.s/4294967296}range(a,b){return a+(b-a)*this.next()}pick(a){return a&&a.length?a[Math.floor(this.next()*a.length)]:null}}
+class AramEntityIndexV167{
+ constructor(bs){this.bs=bs;this.refresh()}
+ refresh(){const a=this.bs.units||[];this.blueChamps=a.filter(u=>u.alive&&u.kind==='champ'&&u.team==='team');this.redChamps=a.filter(u=>u.alive&&u.kind==='champ'&&u.team==='enemy');this.blueMinions=a.filter(u=>u.alive&&u.kind==='minion'&&u.team==='team');this.redMinions=a.filter(u=>u.alive&&u.kind==='minion'&&u.team==='enemy')}
+ enemies(team,kind){if(kind==='champ')return team==='team'?this.redChamps:this.blueChamps;return team==='team'?this.redMinions:this.blueMinions}
+ allies(team,kind){if(kind==='champ')return team==='team'?this.blueChamps:this.redChamps;return team==='team'?this.blueMinions:this.redMinions}
+}
+function aramV167Role(u){const r=u?.champ?.roles||[];if(r.includes('Marksman'))return'MARKSMAN';if(r.includes('Assassin'))return'ASSASSIN';if(r.includes('Tank'))return'TANK';if(r.includes('Support'))return'SUPPORT';if(r.includes('Mage'))return'MAGE';return'FIGHTER'}
+function aramV167Dist(a,b){return Math.hypot((a?.x||0)-(b?.x||0),(a?.y||0)-(b?.y||0))}
+class AramMovementSystemV167{
+ constructor(engine){this.e=engine}
+ clampToLane(u){const g=this.e.geometry,w=Math.max(52,g.widthAt(u.x)-34),c=g.centerYAt(u.x);u.y=Math.max(c-w,Math.min(c+w,u.y))}
+ update(dt){const units=(this.e.bs.units||[]).filter(u=>u.alive);for(const u of units){const it=u.v2Intent||{},t=it.moveTarget;if(!u.v2Vel)u.v2Vel={x:0,y:0};let dx=0,dy=0;if(t){dx=t.x-u.x;dy=t.y-u.y}const d=Math.hypot(dx,dy)||1;const max=u.kind==='champ'?(u.v2MoveSpeed||55):(u.v2MoveSpeed||42);const want=t?1:0;const tx=want*dx/d*max,ty=want*dy/d*max;const accel=u.kind==='champ'?5.2:7.2;const k=1-Math.exp(-accel*dt);u.v2Vel.x+=(tx-u.v2Vel.x)*k;u.v2Vel.y+=(ty-u.v2Vel.y)*k;if(t&&Math.hypot(dx,dy)<8){u.v2Vel.x*=.55;u.v2Vel.y*=.55}u.x+=u.v2Vel.x*dt;u.y+=u.v2Vel.y*dt;u.x=Math.max(165,Math.min(2235,u.x));this.clampToLane(u)}this.separate(dt,units)}
+ separate(dt,units){for(let i=0;i<units.length;i++)for(let j=i+1;j<units.length;j++){const a=units[i],b=units[j];let dx=b.x-a.x,dy=b.y-a.y,d=Math.hypot(dx,dy);const min=(a.kind==='champ'||b.kind==='champ')?(a.team===b.team?38:34):18;if(d<=.001){dx=.01;dy=0;d=.01}if(d>=min)continue;const overlap=min-d,ux=dx/d,uy=dy/d,push=Math.min(7,overlap*.18);if(a.kind==='champ'||a.kind==='minion'){a.x-=ux*push;a.y-=uy*push;this.clampToLane(a)}if(b.kind==='champ'||b.kind==='minion'){b.x+=ux*push;b.y+=uy*push;this.clampToLane(b)}}}
+}
+class AramProjectileSystemV167{
+ constructor(engine){this.e=engine;this.items=[];this.seq=0}
+ spawn(src,target,damage,opt={}){if(!src||!target||!target.alive)return;this.items.push({id:++this.seq,source:src,target,team:src.team,x:src.x,y:src.y,damage,speed:opt.speed||520,radius:opt.radius||10,kind:opt.kind||'basic',structure:!!opt.structure,ttl:4})}
+ update(dt){const next=[];for(const p of this.items){const t=p.target;if(!t||!t.alive)continue;const dx=t.x-p.x,dy=t.y-p.y,d=Math.hypot(dx,dy)||1,step=p.speed*dt;p.ttl-=dt;if(d<=Math.max(p.radius,step)){this.e.combat.applyHit(p.source,t,p.damage,{kind:p.kind,structure:p.structure});continue}p.x+=dx/d*step;p.y+=dy/d*step;if(p.ttl>0)next.push(p)}this.items=next;this.e.bs.v2Projectiles=this.items}
+}
+class AramCombatSystemV167{
+ constructor(engine){this.e=engine}
+ applyHit(attacker,target,base,opt={}){if(!target||!target.alive)return;if(target.type){this.damageStructure(attacker,target,base);return}let dmg=base;if(attacker?.kind==='champ'){dmg*=combatPerformanceMultiplier(attacker)*roleDamageMultiplier(attacker)}if(target.kind==='champ')dmg/=Math.sqrt(Math.max(.20,combatPerformanceMultiplier(target)));if(attacker?.kind==='champ')attacker.damageDealt=(attacker.damageDealt||0)+dmg*12;if(target.kind==='champ')target.damageTaken=(target.damageTaken||0)+dmg*12;target.hp-=dmg;addFx(target.x,target.y,`-${Math.max(1,Math.round(dmg*12))}`,attacker?.team||'team');if(target.hp>0)return;target.hp=0;target.alive=false;target.v2Vel={x:0,y:0};if(target.kind==='minion'){if(attacker?.kind==='champ'){attacker.cs=(attacker.cs||0)+1}grantMinionXp(target)}else if(target.kind==='champ'){target.respawn=respawnSeconds(target);killLog(attacker,target)} }
+ damageStructure(attacker,st,base){if(!st?.alive||!this.e.structure.isTargetable(st,attacker.team))return;const allied=this.e.index.allies(attacker.team,'minion').some(m=>aramV167Dist(m,st)<175);if(st.type==='tower'&&this.e.bs.time<60)return;if(attacker.kind==='champ'&&!allied&&st.type==='tower')base*=.16;let dmg=base*(attacker.kind==='champ'?combatPerformanceMultiplier(attacker):1);if(st.type==='nexus')dmg*=.72;if((st.id==='t1'||st.id==='e1')&&this.e.bs.time<300)dmg*=.28;st.hp-=dmg;addFx(st.x,st.y,`-${Math.max(1,Math.round(dmg))}`,attacker.team);if(st.hp>0)return;st.hp=0;st.alive=false;addBattleLog(`[${formatBattleTime(this.e.bs.time)}] ${st.team==='enemy'?'적':'우리'} ${st.name} 파괴`);if(st.type==='inhib'){if(st.team==='team')this.e.bs.superEnemy=true;else this.e.bs.superTeam=true}if(st.type==='nexus'&&!this.e.bs.endPending){this.e.bs.endPending={winner:st.team==='enemy'?'team':'enemy',realAt:performance.now()+900};this.e.bs.status='넥서스 파괴';this.e.bs.engineStarted=false;if(this.e.bs.endTimer)clearTimeout(this.e.bs.endTimer);this.e.bs.endTimer=setTimeout(()=>finalizeBattleEnd(this.e.bs),900)}}
+}
+class AramStructureSystemV167{
+ constructor(engine){this.e=engine;this.state=new Map()}
+ targetGroups(team){return team==='team'?[['e1'],['e2'],['ei'],['et1','et2'],['en1']]:[['t1'],['t2'],['ti'],['tt1','tt2'],['tn1']]}
+ targetable(team){for(const ids of this.targetGroups(team)){const live=(this.e.bs.structures||[]).filter(s=>ids.includes(s.id)&&s.alive);if(live.length)return live}return[]}
+ isTargetable(st,team){return this.targetable(team).some(s=>s.id===st.id)}
+ nearestTarget(u){const ss=this.targetable(u.team);return ss.sort((a,b)=>aramV167Dist(u,a)-aramV167Dist(u,b))[0]||null}
+ update(dt){for(const st of this.e.bs.structures||[]){if(!st.alive||st.type!=='tower')continue;let s=this.state.get(st.id)||{mode:'IDLE',target:null,cd:0};s.cd=Math.max(0,s.cd-dt);let t=s.target;if(!t||!t.alive||aramV167Dist(st,t)>185)t=null;if(!t){const minions=this.e.index.enemies(st.team,'minion').filter(x=>aramV167Dist(st,x)<=185).sort((a,b)=>aramV167Dist(st,a)-aramV167Dist(st,b));const champs=this.e.index.enemies(st.team,'champ').filter(x=>aramV167Dist(st,x)<=185).sort((a,b)=>aramV167Dist(st,a)-aramV167Dist(st,b));t=minions[0]||champs[0]||null}s.target=t;if(t&&s.cd<=0){s.mode='FIRING';const dmg=t.kind==='minion'?12:17;this.e.projectiles.spawn({id:st.id,kind:'structure',team:st.team,x:st.x,y:st.y,nick:st.name},t,dmg,{speed:620,kind:'tower'});s.cd=1.15}else s.mode=t?'COOLDOWN':'IDLE';this.state.set(st.id,s)}}
+}
+class AramWaveSystemV167{
+ constructor(engine){this.e=engine;this.waves=[]}
+ interval(t){if(t>=35*60)return 10;if(t>=28*60)return 13;if(t>=20*60)return 17;if(t>=10*60)return 21;return 25}
+ makeMinion(team,type,slot){const cannon=type==='cannon',dir=team==='team'?1:-1,x=team==='team'?285:2115,base=450;const slots={m0:-48,m1:0,m2:48,r0:-62,r1:0,r2:62,c:0};const y=base+(slots[slot]||0);return{id:`v167-m-${team}-${++this.e.minionSeq}`,kind:'minion',minionType:type,team,nick:'미니언',xpValue:cannon?100:type==='ranged'?32:65,x,y,maxHp:cannon?62:type==='melee'?34:25,hp:cannon?62:type==='melee'?34:25,atk:cannon?4.0:type==='melee'?2.15:1.85,range:cannon?120:type==='ranged'?105:34,speed:1.45,v2MoveSpeed:cannon?38:42,attackCd:0,alive:true,formationSlot:slot,laneBiasWorld:y-base,v2Intent:{},v2Vel:{x:dir*10,y:0},phase:this.e.rng.range(0,6.28)}}
+ spawn(){const bs=this.e.bs;bs.waveCount=(bs.waveCount||0)+1;const cannon=bs.time>=15*60||bs.waveCount%2===1;for(const team of ['team','enemy']){['m0','m1','m2'].forEach(s=>bs.units.push(this.makeMinion(team,'melee',s)));['r0','r1','r2'].forEach(s=>bs.units.push(this.makeMinion(team,'ranged',s)));if(cannon||(team==='team'?bs.superTeam:bs.superEnemy))bs.units.push(this.makeMinion(team,'cannon','c'))}this.e.index.refresh()}
+ updateSchedule(){const bs=this.e.bs;while(bs.time>=bs.nextWaveAt){this.spawn();bs.nextWaveAt+=this.interval(bs.nextWaveAt)}}
+}
+class AramMinionAISystemV167{
+ constructor(engine){this.e=engine}
+ update(){for(const u of (this.e.bs.units||[])){if(!u.alive||u.kind!=='minion')continue;u.attackCd=Math.max(0,(u.attackCd||0)-ARAM_V167_SIM_DT);const enemies=this.e.index.enemies(u.team,'minion');let target=enemies.filter(e=>aramV167Dist(u,e)<155).sort((a,b)=>aramV167Dist(u,a)-aramV167Dist(u,b))[0];if(!target)target=this.e.index.enemies(u.team,'champ').filter(e=>aramV167Dist(u,e)<125).sort((a,b)=>aramV167Dist(u,a)-aramV167Dist(u,b))[0];const st=this.e.structure.nearestTarget(u);if(target){const d=aramV167Dist(u,target);if(d<=u.range&&u.attackCd<=0){if(u.minionType==='melee')this.e.combat.applyHit(u,target,u.atk);else this.e.projectiles.spawn(u,target,u.atk,{speed:420,kind:'minion'});u.attackCd=u.minionType==='cannon'?1.45:1.18}const dir=u.team==='team'?1:-1;u.v2Intent={moveTarget:{x:target.x-dir*Math.max(20,u.range*.72),y:target.y}}}else if(st){const d=aramV167Dist(u,st);if(d<=Math.max(38,u.range)&&u.attackCd<=0){this.e.combat.damageStructure(u,st,u.atk*.42);u.attackCd=1.25}else{const dir=u.team==='team'?1:-1;u.v2Intent={moveTarget:{x:st.x-dir*34,y:450+u.laneBiasWorld*.28}}}}}}
+}
+class AramChampionAISystemV167{
+ constructor(engine){this.e=engine}
+ perceive(u){const enemies=this.e.index.enemies(u.team,'champ'),allies=this.e.index.allies(u.team,'champ'),minions=this.e.index.allies(u.team,'minion');const sorted=enemies.slice().sort((a,b)=>aramV167Dist(u,a)-aramV167Dist(u,b));return{enemies,allies,minions,nearest:sorted[0]||null,low:enemies.filter(e=>e.hp/e.maxHp<.32).sort((a,b)=>aramV167Dist(u,a)-aramV167Dist(u,b))[0]||null,alliedAlive:allies.length,enemyAlive:enemies.length,structure:this.e.structure.nearestTarget(u)}}
+ chooseState(u,p){const role=u.v2Role,hr=u.hp/u.maxHp,s={LANE:18,POKE:0,ENGAGE:0,KITING:0,RETREAT:0,CHASE:0,SIEGE:0,DEFEND:0};if(hr<.25)s.RETREAT+=(p.nearest&&aramV167Dist(u,p.nearest)<230?95:24);else if(hr<.38)s.RETREAT+=(p.nearest&&aramV167Dist(u,p.nearest)<250?48:12);if(p.low&&aramV167Dist(u,p.low)<260&&hr>.42)s.CHASE+=50;if(p.alliedAlive>p.enemyAlive)s.ENGAGE+=18*(p.alliedAlive-p.enemyAlive);if(p.structure&&p.minions.some(m=>aramV167Dist(m,p.structure)<180)&&hr>.35)s.SIEGE+=42;if(p.structure&&!p.minions.some(m=>aramV167Dist(m,p.structure)<180))s.SIEGE-=65;if(role==='MARKSMAN'){s.KITING+=32;s.POKE+=24}else if(role==='MAGE'){s.POKE+=38;s.KITING+=16}else if(role==='ASSASSIN'){s.CHASE+=26;s.ENGAGE+=18}else if(role==='TANK'){s.ENGAGE+=30;s.DEFEND+=18}else if(role==='SUPPORT'){s.DEFEND+=34;s.POKE+=10}else{s.ENGAGE+=24}if(p.nearest){const d=aramV167Dist(u,p.nearest);if(d<95&&(role==='MARKSMAN'||role==='MAGE'||role==='SUPPORT'))s.KITING+=50;if(d<180)s.ENGAGE+=12}for(const k of Object.keys(s))s[k]+=this.e.rng.range(-2.5,2.5);return Object.entries(s).sort((a,b)=>b[1]-a[1])[0][0]}
+ update(dt){for(const u of this.e.index.blueChamps.concat(this.e.index.redChamps)){u.attackCd=Math.max(0,(u.attackCd||0)-dt);u.v2Role=u.v2Role||aramV167Role(u);const p=this.perceive(u),state=this.chooseState(u,p);u.v2State=state;let target=p.nearest;if(state==='CHASE'&&p.low)target=p.low;const dir=u.team==='team'?1:-1,front=u.team==='team'?Math.max(...p.allies.map(a=>a.x)):Math.min(...p.allies.map(a=>a.x));const role=u.v2Role;const range=u.v2AttackRange;let move=null,attack=null;if(state==='RETREAT'){move={x:u.x-dir*170,y:450+(u.v2LaneOffset||0)*.45}}else if(state==='SIEGE'&&p.structure){const d=aramV167Dist(u,p.structure);const siegeRange=(role==='MARKSMAN'||role==='MAGE')?range:46;if(d<=siegeRange)attack=p.structure;else move={x:p.structure.x-dir*(siegeRange*.78),y:450+(u.v2LaneOffset||0)*.18}}else if(target){const d=aramV167Dist(u,target);if(state==='KITING'){const desired=range*.84;if(d<desired*.8)move={x:u.x-dir*90,y:u.y+(u.v2LaneOffset||0)*.08};else if(d>desired*1.18)move={x:target.x-dir*desired,y:target.y};if(d<=range)attack=target}else if(state==='POKE'){const desired=range*.92;if(d<=range)attack=target;else move={x:target.x-dir*desired,y:target.y+(u.v2LaneOffset||0)*.12}}else{const desired=role==='TANK'||role==='FIGHTER'||role==='ASSASSIN'?Math.min(range*.62,48):range*.82;if(d<=range)attack=target;else move={x:target.x-dir*desired,y:target.y}}}else if(p.structure){move={x:p.structure.x-dir*180,y:450+(u.v2LaneOffset||0)*.35}}if((role==='MARKSMAN'||role==='MAGE'||role==='SUPPORT')&&Number.isFinite(front)){const safe=front-dir*95;if(dir===1&&move)move.x=Math.min(move.x,safe);if(dir===-1&&move)move.x=Math.max(move.x,safe)}u.v2Intent={state,moveTarget:move,attackTarget:attack,threat:p.nearest?Math.max(0,1-aramV167Dist(u,p.nearest)/260):0};if(attack&&u.attackCd<=0){const d=aramV167Dist(u,attack);if(d<=range){const dmg=u.atk*(.56+this.e.rng.range(0,.22));if(attack.type){this.e.combat.damageStructure(u,attack,dmg*.46)}else if(role==='TANK'||role==='FIGHTER'||role==='ASSASSIN'){this.e.combat.applyHit(u,attack,dmg)}else this.e.projectiles.spawn(u,attack,dmg,{speed:560,kind:'champ-basic'});u.attackCd=(role==='MARKSMAN'?1.25:role==='MAGE'?1.65:role==='ASSASSIN'?1.45:1.55)*(u.attackRateMod||1)}}}}
+}
+class AramRespawnSystemV167{
+ constructor(engine){this.e=engine}
+ update(dt){for(const u of (this.e.bs.units||[])){if(u.kind!=='champ'||u.alive)continue;u.respawn=Math.max(0,(u.respawn||0)-dt);if(u.respawn>0)continue;u.alive=true;u.hp=u.maxHp*.72;u.x=u.team==='team'?305:2095;u.y=450+(u.v2LaneOffset||0);u.v2Vel={x:0,y:0};u.v2State='LANE';u.spawnProtection=1.5}}
+}
+class AramEconomySystemV167{constructor(engine){this.e=engine}update(dt){for(const u of this.e.bs.team.concat(this.e.bs.enemy)){if(!u.alive)continue;u.gold+=6*dt;u.xp+=5*teamXpCatchup(u.team)*dt;u.level=levelFromXp(u.xp);u.spawnProtection=Math.max(0,(u.spawnProtection||0)-dt);autoBuyItems(u)}}}
+class AramSkillSystemV167{constructor(engine){this.e=engine;this.archetypes=['LINE_PROJECTILE','TARGET_PROJECTILE','AOE_CIRCLE','CONE','DASH','HEAL','SHIELD','CC','SELF_BUFF','EXECUTE']}update(dt){/* V167: 기반만 분리. 고유 챔피언 스킬은 V168+에서 데이터화 */}}
+class AramEventBridgeV167{constructor(engine){this.e=engine}pause(){this.e.bs.paused=true}resume(){this.e.bs.paused=false}}
+class AramMatchEngineV2{
+ constructor(bs){this.bs=bs;this.rng=new AramSeededRngV167((bs.v2Seed||167031)>>>0);this.geometry=new AramMapGeometryV164();this.index=new AramEntityIndexV167(bs);this.minionSeq=0;this.projectiles=new AramProjectileSystemV167(this);this.combat=new AramCombatSystemV167(this);this.structure=new AramStructureSystemV167(this);this.waves=new AramWaveSystemV167(this);this.minionAI=new AramMinionAISystemV167(this);this.championAI=new AramChampionAISystemV167(this);this.movement=new AramMovementSystemV167(this);this.respawn=new AramRespawnSystemV167(this);this.economy=new AramEconomySystemV167(this);this.skills=new AramSkillSystemV167(this);this.events=new AramEventBridgeV167(this);this.steps=0;this.totalUpdateMs=0;this.migrate();}
+ oldToWorld(x,y){return{x:150+Math.max(0,Math.min(100,Number(x)||50))/100*2100,y:450+(Number(y||50)-50)*10.6}}
+ migrate(){const bs=this.bs;if(bs.engineV2Active)return;for(const u of bs.units||[]){const q=this.oldToWorld(u.x,u.y);u.x=q.x;u.y=q.y;u.v2LaneOffset=(u.y-450);u.v2MoveSpeed=Math.max(42,(u.speed||2.1)*24);u.v2AttackRange=Math.max(42,(u.range||5)*21);u.v2Role=aramV167Role(u);u.v2Intent={};u.v2Vel={x:0,y:0};u.v2State='LANE'}const oldMap=new Map((bs.structures||[]).map(s=>[s.id,s]));bs.structures=ARAM_V167_STRUCTURE_LAYOUT.map(c=>{const o=oldMap.get(c.id)||{};return{...o,...c,hp:Number.isFinite(o.hp)?o.hp:100,alive:o.alive!==false}});bs.team=bs.units.filter(u=>u.kind==='champ'&&u.team==='team');bs.enemy=bs.units.filter(u=>u.kind==='champ'&&u.team==='enemy');bs.nextWaveAt=bs.time<1?45:Math.max(bs.time+1,bs.nextWaveAt||45);bs.v2Projectiles=[];bs.engineV2Active=true;bs.simulation={version:'V167',fixedDt:ARAM_V167_SIM_DT,accumulator:0,steps:0};bs.engineV2Telemetry={states:{},projectiles:0,steps:0,avgUpdateMs:0};this.index.refresh()}
+ update(dt){const t0=performance.now();this.bs.time+=dt;this.waves.updateSchedule();this.index.refresh();this.economy.update(dt);this.championAI.update(dt);this.minionAI.update();this.movement.update(dt);this.index.refresh();this.structure.update(dt);this.projectiles.update(dt);this.respawn.update(dt);this.skills.update(dt);if(this.bs.units.length>90)this.bs.units=this.bs.units.filter(u=>u.kind==='champ'||u.alive);this.steps++;this.totalUpdateMs+=performance.now()-t0;const tel=this.bs.engineV2Telemetry;tel.steps=this.steps;tel.projectiles=this.projectiles.items.length;tel.avgUpdateMs=this.totalUpdateMs/Math.max(1,this.steps);tel.states={};for(const u of this.bs.team.concat(this.bs.enemy))tel.states[u.id]={state:u.v2State,target:u.v2Intent?.attackTarget?.id||null,threat:u.v2Intent?.threat||0,vx:u.v2Vel?.x||0,vy:u.v2Vel?.y||0}}
+}
+function ensureAramMatchEngineV2(){const bs=battleState;if(!bs)return null;if(!bs.__engineV2||bs.__engineV2.bs!==bs)bs.__engineV2=new AramMatchEngineV2(bs);return bs.__engineV2}
+function processLegacyBattleEventsV167(){const bs=battleState;if(!bs)return false;
+ if(!bs.devForcedEventDone&&!bs.augmentOpen){if(triggerDeveloperForcedEvent())return true}
+ if(!bs.akaliChatDone&&party.some(c=>c.id==='nguyen')&&bs.enemy.some(u=>u.champ?.id==='akali')&&bs.time>=bs.akaliChatAt){bs.chat.push(`<span class="all-tag">[전체]</span> <span class="ally-chat">Nguyen Ngoc Tu:</span> 아칼리 사기 챔피언 하면 재미있음?`);bs.akaliChatDone=true}
+ if(bs.galioMessiMatch&&bs.galioMessiChatStage===0&&bs.time>=1){bs.chat.push(`<span class="all-tag">[전체]</span> <span class="ally-chat">갈리오:</span> 무슨 고트가 메시임?`);bs.galioMessiChatStage=1}if(bs.galioMessiMatch&&bs.galioMessiChatStage===1&&bs.time>=4){bs.chat.push(`<span class="all-tag">[전체]</span> <span class="ally-chat">갈리오:</span> 우리 날두횽이 고트지;`);bs.galioMessiChatStage=2}
+ if(bs.jogukMilteokMatch&&bs.jogukMilteokChatStage===0&&bs.time>=1){bs.chat.push(`<span class="all-tag">[전체]</span> <span class="ally-chat">조국:</span> ? 밀떡?`);bs.jogukMilteokChatStage=1}if(bs.jogukMilteokMatch&&bs.jogukMilteokChatStage===1&&bs.time>=4){bs.chat.push(`<span class="all-tag">[전체]</span> <span class="ally-chat">조국:</span> 개쳐맞을래?`);bs.jogukMilteokChatStage=2}
+ if(bs.siljeomEliseActive&&bs.time>=bs.siljeomSpiderNext){bs.siljeomSpiderCount++;bs.chat.push(`<span class="all-tag">[전체]</span> <span class="ally-chat">실점:</span> 스파이더맨~ 스파이더맨`);if(party.some(c=>c.id==='3patourwan'))bs.chat.push(`<span class="all-tag">[팀]</span> <span class="ally-chat">쓰리빠뚜르완:</span> ${bs.siljeomSpiderCount===1?'아 ㅈㄴ 시끄럽네':'스파이더맨~ 스파이더맨'}`);bs.siljeomSpiderNext+=300}
+ if(bs.jaebinRandomEventEnabled&&!bs.jaebinRandomEventDone&&!anyCharacterPopupOpen(bs)&&party.some(c=>c.id==='nguyen')&&bs.time>=bs.jaebinRandomEventAt){if(triggerJaebinRandomEvent())return true}
+ if(bs.molchoRandomEventEnabled&&!bs.molchoRandomEventDone&&!anyCharacterPopupOpen(bs)&&party.some(c=>c.id==='molcho')&&bs.time>=bs.molchoRandomEventAt){triggerMolchoRandomEvent();return true}
+ if(bs.galioSleepEnabled&&!bs.galioSleepDone&&!anyCharacterPopupOpen(bs)&&bs.time>=bs.galioSleepAt){if(triggerGalioSleepEvent())return true}
+ if(bs.siljeomPenaltyEnabled&&!bs.siljeomPenaltyDone&&!anyCharacterPopupOpen(bs)&&bs.time>=bs.siljeomPenaltyAt){if(triggerSiljeomPenaltyEvent())return true}
+ if(bs.munchulEnabled&&!bs.munchulDone&&!anyCharacterPopupOpen(bs)&&bs.time>=bs.munchulAt){if(triggerMunchulEvent())return true}
+ return false}
+// ===== END V167 ENGINE V2 =====
+
 function battleFrame(ts){
  if(mode!=='battle'||!battleState||!battleState.engineStarted)return;
  const bs=battleState;bs.lastEngineHeartbeat=performance.now();
  try{
-   if(bs.paused){bs.lastTs=ts;scheduleBattleFrame();return;}
-   if(bs.endPending){bs.lastTs=ts;syncBattleDom();if(checkEnd())return;scheduleBattleFrame();return;}
-   let raw=Math.min(.05,(ts-bs.lastTs)/1000);bs.lastTs=ts;let dt=Math.min(.8,raw*bs.speed);bs.time+=dt;
-   if(!bs.devForcedEventDone&&!bs.augmentOpen){if(triggerDeveloperForcedEvent()){scheduleBattleFrame();return;}}
-   if(!bs.akaliChatDone&&party.some(c=>c.id==='nguyen')&&bs.enemy.some(u=>u.champ?.id==='akali')&&bs.time>=bs.akaliChatAt){bs.chat.push(`<span class="all-tag">[전체]</span> <span class="ally-chat">Nguyen Ngoc Tu:</span> 아칼리 사기 챔피언 하면 재미있음?`);bs.akaliChatDone=true;}
-   if(bs.galioMessiMatch&&bs.galioMessiChatStage===0&&bs.time>=1){bs.chat.push(`<span class="all-tag">[전체]</span> <span class="ally-chat">갈리오:</span> 무슨 고트가 메시임?`);bs.galioMessiChatStage=1;}
-   if(bs.galioMessiMatch&&bs.galioMessiChatStage===1&&bs.time>=4){bs.chat.push(`<span class="all-tag">[전체]</span> <span class="ally-chat">갈리오:</span> 우리 날두횽이 고트지;`);bs.galioMessiChatStage=2;}
-   if(bs.jogukMilteokMatch&&bs.jogukMilteokChatStage===0&&bs.time>=1){bs.chat.push(`<span class="all-tag">[전체]</span> <span class="ally-chat">조국:</span> ? 밀떡?`);bs.jogukMilteokChatStage=1;}
-   if(bs.jogukMilteokMatch&&bs.jogukMilteokChatStage===1&&bs.time>=4){bs.chat.push(`<span class="all-tag">[전체]</span> <span class="ally-chat">조국:</span> 개쳐맞을래?`);bs.jogukMilteokChatStage=2;}
-   if(bs.siljeomEliseActive&&bs.time>=bs.siljeomSpiderNext){
-     bs.siljeomSpiderCount++;
-     bs.chat.push(`<span class="all-tag">[전체]</span> <span class="ally-chat">실점:</span> 스파이더맨~ 스파이더맨`);
-     if(party.some(c=>c.id==='3patourwan')){
-       if(bs.siljeomSpiderCount===1)bs.chat.push(`<span class="all-tag">[팀]</span> <span class="ally-chat">쓰리빠뚜르완:</span> 아 ㅈㄴ 시끄럽네`);
-       else if(bs.siljeomSpiderCount===2)bs.chat.push(`<span class="all-tag">[팀]</span> <span class="ally-chat">쓰리빠뚜르완:</span> 스파이더맨~ 스파이더맨`);
-     }
-     bs.siljeomSpiderNext+=300;
-   }
-   if(bs.jaebinRandomEventEnabled&&!bs.jaebinRandomEventDone&&!anyCharacterPopupOpen(bs)&&party.some(c=>c.id==='nguyen')&&bs.time>=bs.jaebinRandomEventAt){if(triggerJaebinRandomEvent()){scheduleBattleFrame();return;}}
-   if(bs.molchoRandomEventEnabled&&!bs.molchoRandomEventDone&&!anyCharacterPopupOpen(bs)&&party.some(c=>c.id==='molcho')&&bs.time>=bs.molchoRandomEventAt){triggerMolchoRandomEvent();scheduleBattleFrame();return;}
-   if(bs.galioSleepEnabled&&!bs.galioSleepDone&&!anyCharacterPopupOpen(bs)&&bs.time>=bs.galioSleepAt){if(triggerGalioSleepEvent()){scheduleBattleFrame();return;}}
-   if(bs.siljeomPenaltyEnabled&&!bs.siljeomPenaltyDone&&!anyCharacterPopupOpen(bs)&&bs.time>=bs.siljeomPenaltyAt){if(triggerSiljeomPenaltyEvent()){scheduleBattleFrame();return;}}
-   if(bs.munchulEnabled&&!bs.munchulDone&&!anyCharacterPopupOpen(bs)&&bs.time>=bs.munchulAt){if(triggerMunchulEvent()){scheduleBattleFrame();return;}}
-   while(bs.time>=bs.nextWaveAt){spawnWave();bs.nextWaveAt+=waveIntervalAt(bs.nextWaveAt)}
-   updateUnits(dt);updateStructures(dt);updateRelics(dt);applyOvercharge(dt);
-   if(bs.units.length>70)bs.units=bs.units.filter(u=>u.kind==='champ'||u.alive);
-   for(const f of bs.fx)f.ttl-=dt;bs.fx=bs.fx.filter(f=>f.ttl>0);
-   if(checkEnd()){render();return}
-   if(ts-bs.lastUiSync>=66){bs.lastUiSync=ts;syncBattleDom()}
- }catch(err){
-   console.error('[battle-engine]',err);
-   bs.status='경기 진행 중';
-   bs.lastTs=ts;
- }
+  if(bs.paused){bs.lastTs=ts;scheduleBattleFrame();return}
+  if(bs.endPending){bs.lastTs=ts;syncBattleDom();if(checkEnd())return;scheduleBattleFrame();return}
+  const engine=ensureAramMatchEngineV2();
+  const raw=Math.min(.10,Math.max(0,(ts-bs.lastTs)/1000));bs.lastTs=ts;
+  bs.simulation.accumulator=Math.min(4,bs.simulation.accumulator+raw*(bs.speed||1));
+  let steps=0;const maxSteps=120;
+  while(bs.simulation.accumulator>=ARAM_V167_SIM_DT&&steps<maxSteps&&!bs.paused&&!bs.endPending){engine.update(ARAM_V167_SIM_DT);bs.simulation.accumulator-=ARAM_V167_SIM_DT;bs.simulation.steps++;steps++}
+  if(steps===maxSteps)bs.simulation.accumulator=Math.min(bs.simulation.accumulator,ARAM_V167_SIM_DT*2);
+  if(processLegacyBattleEventsV167()){scheduleBattleFrame();return}
+  for(const f of bs.fx)f.ttl-=raw*Math.max(1,Math.min(4,bs.speed||1));bs.fx=bs.fx.filter(f=>f.ttl>0);
+  if(checkEnd()){render();return}
+  if(ts-bs.lastUiSync>=66){bs.lastUiSync=ts;syncBattleDom()}
+ }catch(err){console.error('[aram-v167-engine]',err);bs.status='경기 진행 중';bs.lastTs=ts}
  scheduleBattleFrame();
 }
 
-function screenPos(x,y){
- const centerY=78-x*.56; // blue bottom-left -> red top-right
- const lateral=((y||50)-50)*.58;
- return {left:Math.max(3,Math.min(97,x)),top:Math.max(8,Math.min(91,centerY+lateral))};
+
+const ARAM_WORLD_V164={WIDTH:2400,HEIGHT:900,BASE_Y:450};
+
+class AramCameraV164{
+ constructor(canvas){this.canvas=canvas;this.w=1;this.h=1;this.dpr=1;this.resize()}
+ resize(){const r=this.canvas.getBoundingClientRect();const w=Math.max(1,Math.round(r.width||innerWidth)),h=Math.max(1,Math.round(r.height||innerHeight)),d=Math.min(2,window.devicePixelRatio||1);const changed=w!==this.w||h!==this.h||d!==this.dpr;this.w=w;this.h=h;this.dpr=d;if(changed){this.canvas.width=Math.round(w*d);this.canvas.height=Math.round(h*d);this.canvas.getContext('2d').setTransform(d,0,0,d,0,0)}return changed}
+ worldToScreen(x,y){const t=Math.max(0,Math.min(1,x/ARAM_WORLD_V164.WIDTH));const ox=this.w*.115,oy=this.h*.79,ex=this.w*.885,ey=this.h*.205;const cx=ox+(ex-ox)*t,cy=oy+(ey-oy)*t-Math.sin(t*Math.PI)*this.h*.012;const dx=ex-ox,dy=ey-oy,len=Math.hypot(dx,dy)||1;const nx=-dy/len,ny=dx/len;const lateral=(y-ARAM_WORLD_V164.BASE_Y)*(Math.min(this.w,this.h)*.69/ARAM_WORLD_V164.HEIGHT);return{x:cx+nx*lateral,y:cy+ny*lateral}}
 }
-function syncStaticBattlePositions(){
- if(!battleState)return;
- for(const st of battleState.structures){const el=document.querySelector(`[data-structure="${st.id}"]`);if(el){const p=screenPos(st.x,st.y||50);el.style.left=p.left+'%';el.style.top=p.top+'%'}}
- const rs=[...document.querySelectorAll('.b2-relic')];battleState.relics.forEach((r,i)=>{if(rs[i]){const p=screenPos(r.x,50);rs[i].style.left=p.left+'%';rs[i].style.top=p.top+'%'}})
+
+class AramMapGeometryV164{
+ constructor(){this.W=ARAM_WORLD_V164.WIDTH;this.H=ARAM_WORLD_V164.HEIGHT}
+ centerYAt(x){return 450}
+ widthAt(x){
+  const t=Math.max(0,Math.min(1,x/this.W));
+  const edge=Math.min(t,1-t);
+  if(edge<.105){const q=edge/.105;return 390-58*q}
+  if(edge<.205){const q=(edge-.105)/.10;return 332-145*q}
+  const centerEase=Math.min(1,Math.max(0,(edge-.205)/.295));
+  return 187-10*centerEase;
+ }
+ engineToWorld(ex,ey){if((typeof battleState!=='undefined'&&battleState?.engineV2Active)||Number(ex)>120)return{x:Number(ex)||1200,y:Number(ey)||450};const x=150+Math.max(0,Math.min(100,Number(ex)||50))/100*2100;return{x,y:this.centerYAt(x)+(Number(ey||50)-50)*10.6}}
+ outline(extra=0,samples=96){const top=[],bot=[];for(let i=0;i<=samples;i++){const x=this.W*i/samples,c=this.centerYAt(x),w=this.widthAt(x)+extra;top.push({x,y:c-w});bot.push({x,y:c+w})}return top.concat(bot.reverse())}
+ edge(side,x,extra=0){const c=this.centerYAt(x),w=this.widthAt(x)+extra;return{x,y:c+(side>0?w:-w)}}
+ contains(x,y,pad=0){return Math.abs(y-this.centerYAt(x))<=this.widthAt(x)-pad}
 }
-function syncBattleDom(){const bs=battleState;try{syncBattleScoreboard()}catch(err){console.error('[battle-ui-score]',err)}const clock=document.querySelector('.b2-clock');if(clock)clock.textContent=formatBattleTime(bs.time);const right=document.querySelector('.b2-right');if(right)right.innerHTML=`<span>${bs.status}</span>`;
- for(const u of bs.team.concat(bs.enemy)){const el=document.querySelector(`[data-unit="${u.id}"]`);if(!el)continue;const p=screenPos(u.x,u.y);el.style.left=p.left+'%';el.style.top=p.top+'%';el.classList.toggle('dead',!u.alive);const hp=el.querySelector('.t-hp em');if(hp)hp.style.width=Math.max(0,u.hp/u.maxHp*100)+'%'}
- for(const u of bs.team.concat(bs.enemy)){const hud=document.querySelector(`[data-hud-unit="${u.id}"]`);if(!hud)continue;hud.classList.toggle('dead',!u.alive);const hp=hud.querySelector('.b2-hp i');if(hp)hp.style.width=Math.max(0,Math.min(100,u.hp/u.maxHp*100))+'%';const info=hud.querySelector('.unit-info small');if(info)info.textContent=`${u.champ.name} · Lv.${u.level}`;const gold=hud.querySelector('.b2-gold');if(gold)gold.textContent=Math.floor(u.gold).toLocaleString()+' G'}
- for(const st of bs.structures){const el=document.querySelector(`[data-structure="${st.id}"]`);if(el){el.classList.toggle('dead',!st.alive);const n=el.querySelector('.sname');if(n)n.textContent=`${st.name} · ${Math.max(0,Math.round(st.hp))}%`}}
- for(const r of bs.relics){const els=[...document.querySelectorAll('.b2-relic')];const idx=bs.relics.indexOf(r);if(els[idx])els[idx].classList.toggle('cool',r.cooldown>0)}
- if(bs.log.length>120)bs.log.splice(0,bs.log.length-120);
- const log=document.querySelector('.b2-log');
- if(log){
-   const logVersion=bs.logVersion||0;
-   if(Number(log.dataset.version||-1)!==logVersion){
-     log.innerHTML=bs.log.slice(-40).map(x=>`<div>${x}</div>`).join('');
-     log.dataset.version=String(logVersion);
-     requestAnimationFrame(()=>{const l=document.querySelector('.b2-log');if(l)l.scrollTop=l.scrollHeight});
-   }
+
+class AramWorldProjectionV164{
+ constructor(camera,geometry){this.camera=camera;this.geometry=geometry}
+ worldToScreen(x,y){return this.camera.worldToScreen(x,y)}
+ engineToWorld(x,y){return this.geometry.engineToWorld(x,y)}
+ engineToScreen(x,y){const w=this.engineToWorld(x,y);return this.worldToScreen(w.x,w.y)}
+}
+
+<!-- V166 CLEAN HOWLING-ABYSS-STYLE VISUAL PASS: cleaner silhouette, restrained detail -->
+class AramTerrainRendererV164{
+ constructor(camera,geometry,projection){this.camera=camera;this.g=geometry;this.p=projection;this.cache=document.createElement('canvas');this.seed=166;this.dirty=true}
+ rng(){this.seed=(this.seed*1664525+1013904223)>>>0;return this.seed/4294967296}
+ resize(){const d=this.camera.dpr;this.cache.width=Math.round(this.camera.w*d);this.cache.height=Math.round(this.camera.h*d);const c=this.cache.getContext('2d');c.setTransform(d,0,0,d,0,0);this.dirty=true}
+ pathWorld(ctx,pts){if(!pts.length)return;const q=this.p.worldToScreen(pts[0].x,pts[0].y);ctx.beginPath();ctx.moveTo(q.x,q.y);for(let i=1;i<pts.length;i++){const s=this.p.worldToScreen(pts[i].x,pts[i].y);ctx.lineTo(s.x,s.y)}ctx.closePath()}
+ lineWorld(ctx,pts){if(!pts.length)return;const q=this.p.worldToScreen(pts[0].x,pts[0].y);ctx.beginPath();ctx.moveTo(q.x,q.y);for(let i=1;i<pts.length;i++){const s=this.p.worldToScreen(pts[i].x,pts[i].y);ctx.lineTo(s.x,s.y)}}
+ drawMountainBand(ctx,y,amp,color,alpha,flip=1){const w=this.camera.w,h=this.camera.h;ctx.save();ctx.globalAlpha=alpha;ctx.beginPath();ctx.moveTo(0,flip>0?h:0);ctx.lineTo(0,y);const peaks=[.18,.44,.26,.62,.31,.50,.24,.68,.36,.52,.22,.57,.29];for(let i=0;i<peaks.length;i++){const x=w*i/(peaks.length-1),yy=y-flip*amp*peaks[i];ctx.lineTo(x,yy)}ctx.lineTo(w,flip>0?h:0);ctx.closePath();ctx.fillStyle=color;ctx.fill();ctx.restore()}
+ drawCliffShelf(ctx,x,y,scale,flip=1){ctx.save();ctx.translate(x,y);ctx.scale(scale*flip,scale);const g=ctx.createLinearGradient(-100,-90,100,120);g.addColorStop(0,'#24465d');g.addColorStop(.46,'#112c40');g.addColorStop(1,'#06131f');ctx.fillStyle=g;ctx.beginPath();ctx.moveTo(-130,-18);ctx.lineTo(-88,-88);ctx.lineTo(-25,-112);ctx.lineTo(42,-100);ctx.lineTo(112,-48);ctx.lineTo(132,16);ctx.lineTo(88,84);ctx.lineTo(15,116);ctx.lineTo(-62,98);ctx.lineTo(-120,52);ctx.closePath();ctx.fill();ctx.strokeStyle='rgba(92,137,162,.18)';ctx.lineWidth=1.5;ctx.stroke();ctx.fillStyle='rgba(221,238,247,.48)';ctx.beginPath();ctx.moveTo(-88,-88);ctx.lineTo(-25,-112);ctx.lineTo(41,-99);ctx.lineTo(92,-63);ctx.lineTo(45,-73);ctx.lineTo(-22,-83);ctx.lineTo(-72,-65);ctx.closePath();ctx.fill();ctx.fillStyle='rgba(107,190,222,.13)';ctx.beginPath();ctx.moveTo(15,-73);ctx.lineTo(53,-81);ctx.lineTo(73,-39);ctx.lineTo(48,21);ctx.lineTo(15,45);ctx.closePath();ctx.fill();ctx.restore()}
+ drawBaseTerrace(ctx,x,team){const c=this.g.centerYAt(x),half=this.g.widthAt(x)-58,blue=team==='team';const p=this.p.worldToScreen(x,c);ctx.save();ctx.translate(p.x,p.y);ctx.rotate(-.65);const glow=ctx.createRadialGradient(0,0,24,0,0,132);glow.addColorStop(0,blue?'rgba(59,185,255,.13)':'rgba(255,69,93,.12)');glow.addColorStop(1,'rgba(0,0,0,0)');ctx.fillStyle=glow;ctx.beginPath();ctx.ellipse(0,0,145,67,0,0,Math.PI*2);ctx.fill();ctx.restore();for(const mul of [.78,.56]){const pts=[{x:x-125*mul,y:c-half*mul},{x:x+125*mul,y:c-half*mul},{x:x+150*mul,y:c+half*mul},{x:x-150*mul,y:c+half*mul}];this.pathWorld(ctx,pts);ctx.fillStyle=blue?'rgba(38,72,91,.19)':'rgba(77,35,45,.18)';ctx.fill();ctx.strokeStyle='rgba(180,205,217,.12)';ctx.lineWidth=1;ctx.stroke()}}
+ drawStoneTiles(ctx){for(let x=165;x<2240;x+=132){const ww=this.g.widthAt(x)-62;for(let y=-ww;y<ww;y+=96){const c=this.g.centerYAt(x),shift=(Math.floor(x/132)%2)*42,y0=c+y+shift;if(!this.g.contains(x,y0,60))continue;const pts=[{x:x-58,y:y0-37},{x:x+58,y:y0-37},{x:x+61,y:y0+37},{x:x-61,y:y0+37}];this.pathWorld(ctx,pts);ctx.fillStyle='rgba(151,176,187,.035)';ctx.fill();ctx.strokeStyle='rgba(207,226,234,.075)';ctx.lineWidth=.85;ctx.stroke()}}}
+ drawSnowBank(ctx,x,y,rx,ry,a=.62){const p=this.p.worldToScreen(x,y);ctx.save();ctx.translate(p.x,p.y);ctx.rotate(-.65);const g=ctx.createLinearGradient(-rx,-ry,rx,ry);g.addColorStop(0,`rgba(239,248,252,${a})`);g.addColorStop(.58,`rgba(204,226,238,${a*.86})`);g.addColorStop(1,`rgba(137,173,194,${a*.38})`);ctx.fillStyle=g;ctx.beginPath();ctx.ellipse(0,0,rx,ry,0,0,Math.PI*2);ctx.fill();ctx.restore()}
+ drawIcePatch(ctx,x,y,rx,ry){const p=this.p.worldToScreen(x,y);ctx.save();ctx.translate(p.x,p.y);ctx.rotate(-.65);const g=ctx.createLinearGradient(-rx,0,rx,0);g.addColorStop(0,'rgba(107,190,221,.08)');g.addColorStop(.45,'rgba(117,215,239,.18)');g.addColorStop(1,'rgba(63,141,181,.09)');ctx.fillStyle=g;ctx.beginPath();ctx.ellipse(0,0,rx,ry,0,0,Math.PI*2);ctx.fill();ctx.strokeStyle='rgba(188,236,248,.22)';ctx.lineWidth=1;ctx.stroke();ctx.beginPath();ctx.moveTo(-rx*.22,0);ctx.lineTo(rx*.08,-ry*.32);ctx.lineTo(rx*.31,ry*.18);ctx.strokeStyle='rgba(206,244,252,.20)';ctx.stroke();ctx.restore()}
+ drawRailing(ctx,side){const gaps=side<0?[[760,840],[1640,1720]]:[[570,645],[1770,1840]];let seg=[];const inGap=x=>gaps.some(g=>x>=g[0]&&x<=g[1]);const flush=()=>{if(seg.length>1){this.lineWorld(ctx,seg);ctx.strokeStyle='#07131d';ctx.lineWidth=9;ctx.stroke();this.lineWorld(ctx,seg);ctx.strokeStyle='#567382';ctx.lineWidth=3.2;ctx.stroke();this.lineWorld(ctx,seg);ctx.strokeStyle='rgba(219,235,242,.48)';ctx.lineWidth=1.1;ctx.stroke()}seg=[]};for(let x=175;x<=2225;x+=42){if(inGap(x)){flush();continue}seg.push(this.g.edge(side,x,-12))}flush();for(let x=220;x<2200;x+=155){if(inGap(x))continue;const e=this.g.edge(side,x,-11),p=this.p.worldToScreen(e.x,e.y);ctx.fillStyle='#122633';ctx.strokeStyle='#5a7888';ctx.lineWidth=1;ctx.fillRect(p.x-4,p.y-8,8,16);ctx.strokeRect(p.x-4,p.y-8,8,16);ctx.fillStyle='rgba(224,239,246,.55)';ctx.beginPath();ctx.ellipse(p.x,p.y-8,6,2.2,0,0,Math.PI*2);ctx.fill()}}
+ draw(){if(!this.dirty)return;this.dirty=false;this.seed=166;const ctx=this.cache.getContext('2d'),w=this.camera.w,h=this.camera.h;ctx.clearRect(0,0,w,h);
+  const abyss=ctx.createLinearGradient(0,0,w,h);abyss.addColorStop(0,'#10283e');abyss.addColorStop(.42,'#061522');abyss.addColorStop(.63,'#030a12');abyss.addColorStop(1,'#0b2032');ctx.fillStyle=abyss;ctx.fillRect(0,0,w,h);
+  // restrained snowy mountain silhouettes: low detail, strong negative space
+  this.drawMountainBand(ctx,h*.29,h*.17,'#173149',.72,-1);this.drawMountainBand(ctx,h*.75,h*.15,'#0c2234',.70,1);this.drawMountainBand(ctx,h*.20,h*.08,'#315167',.32,-1);
+  // subtle abyss fog only
+  for(const [cx,cy,r] of [[w*.22,h*.48,w*.18],[w*.76,h*.42,w*.20],[w*.48,h*.64,w*.13]]){const fog=ctx.createRadialGradient(cx,cy,0,cx,cy,r);fog.addColorStop(0,'rgba(74,133,166,.065)');fog.addColorStop(1,'rgba(0,0,0,0)');ctx.fillStyle=fog;ctx.fillRect(cx-r,cy-r,r*2,r*2)}
+  // few large cliff shelves instead of dozens of random rocks
+  const shelves=[[w*.08,h*.18,.92,1],[w*.20,h*.83,.78,1],[w*.86,h*.18,.78,-1],[w*.94,h*.72,.92,-1],[w*.49,h*.04,.62,1],[w*.54,h*.96,.64,-1]];for(const a of shelves)this.drawCliffShelf(ctx,...a);
+  // bridge side mass and clean deck silhouette
+  const outer=this.g.outline(88);this.pathWorld(ctx,outer);ctx.save();ctx.translate(0,28);ctx.fillStyle='rgba(0,2,7,.70)';ctx.fill();ctx.restore();
+  this.pathWorld(ctx,outer);const rock=ctx.createLinearGradient(0,h*.16,0,h*.88);rock.addColorStop(0,'#2e5063');rock.addColorStop(.5,'#173143');rock.addColorStop(1,'#071621');ctx.fillStyle=rock;ctx.fill();ctx.strokeStyle='rgba(94,133,151,.48)';ctx.lineWidth=2;ctx.stroke();
+  const deck=this.g.outline(0);this.pathWorld(ctx,deck);const dg=ctx.createLinearGradient(w*.12,h*.82,w*.88,h*.18);dg.addColorStop(0,'#526f7d');dg.addColorStop(.48,'#405d6b');dg.addColorStop(1,'#4c6877');ctx.fillStyle=dg;ctx.fill();ctx.strokeStyle='rgba(200,220,229,.42)';ctx.lineWidth=2.2;ctx.stroke();
+  // single readable worn combat lane
+  const lane=this.g.outline(-66);this.pathWorld(ctx,lane);ctx.fillStyle='rgba(10,27,38,.18)';ctx.fill();ctx.strokeStyle='rgba(219,235,242,.045)';ctx.lineWidth=1;ctx.stroke();
+  this.drawStoneTiles(ctx);
+  // only a few cracks, placed as accents
+  for(let i=0;i<18;i++){const x=260+this.rng()*1880,half=this.g.widthAt(x)*.48,y=this.g.centerYAt(x)+(this.rng()*2-1)*half,p0=this.p.worldToScreen(x,y);ctx.beginPath();ctx.moveTo(p0.x,p0.y);let wx=x,wy=y;for(let k=0;k<2;k++){wx+=22+this.rng()*24;wy+=(this.rng()-.5)*28;const p=this.p.worldToScreen(wx,wy);ctx.lineTo(p.x,p.y)}ctx.strokeStyle='rgba(4,15,23,.28)';ctx.lineWidth=.9;ctx.stroke()}
+  // broad edge snow banks, deliberately sparse and clean
+  const snowXs=[230,360,520,690,860,1040,1320,1500,1680,1870,2040,2180];for(let i=0;i<snowXs.length;i++){const x=snowXs[i],side=i%2?-1:1,e=this.g.edge(side,x,-20),yy=e.y-side*18;this.drawSnowBank(ctx,x,yy,28+(i%3)*8,7+(i%2)*3,.58)}
+  // soft base snow fields
+  for(const [x,side] of [[215,-1],[290,1],[425,-1],[1975,1],[2110,-1],[2190,1]]){const e=this.g.edge(side,x,-55);this.drawSnowBank(ctx,x,e.y,42,12,.46)}
+  // only a handful of ice accents
+  for(const [x,o,rx,ry] of [[520,-45,36,10],[930,52,30,9],[1210,-55,44,11],[1520,42,34,9],[1880,-42,31,9],[340,65,27,8]])this.drawIcePatch(ctx,x,this.g.centerYAt(x)+o,rx,ry);
+  this.drawBaseTerrace(ctx,245,'team');this.drawBaseTerrace(ctx,2155,'enemy');
+  this.drawRailing(ctx,-1);this.drawRailing(ctx,1);
+  // fewer, evenly spaced braziers to frame the lane
+  const braziers=[300,555,820,1080,1320,1580,1840,2100];for(let i=0;i<braziers.length;i++){const x=braziers[i],side=i%2?-1:1,e=this.g.edge(side,x,-24),p=this.p.worldToScreen(e.x,e.y),R=28;const glow=ctx.createRadialGradient(p.x,p.y,1,p.x,p.y,R);glow.addColorStop(0,'rgba(255,189,74,.32)');glow.addColorStop(.38,'rgba(255,132,43,.15)');glow.addColorStop(1,'rgba(255,104,27,0)');ctx.fillStyle=glow;ctx.beginPath();ctx.arc(p.x,p.y,R,0,Math.PI*2);ctx.fill();ctx.fillStyle='#1a2932';ctx.strokeStyle='#607b88';ctx.fillRect(p.x-4,p.y-1,8,9);ctx.strokeRect(p.x-4,p.y-1,8,9);ctx.fillStyle='#ffd36a';ctx.beginPath();ctx.moveTo(p.x,p.y-13);ctx.quadraticCurveTo(p.x+6,p.y-6,p.x+2,p.y);ctx.quadraticCurveTo(p.x-4,p.y+1,p.x-4,p.y-2);ctx.quadraticCurveTo(p.x-7,p.y-7,p.x,p.y-13);ctx.fill()}
+  // simple central rune, intentionally low contrast
+  const cp=this.p.worldToScreen(1200,this.g.centerYAt(1200));ctx.save();ctx.translate(cp.x,cp.y);ctx.rotate(-.65);ctx.strokeStyle='rgba(105,202,225,.20)';ctx.lineWidth=1.5;ctx.beginPath();ctx.rect(-25,-25,50,50);ctx.moveTo(-34,0);ctx.lineTo(34,0);ctx.moveTo(0,-34);ctx.lineTo(0,34);ctx.stroke();ctx.restore();
+  // controlled team glows only around bases
+  for(const [x,color] of [[235,'59,190,255'],[2165,'255,72,96']]){const p=this.p.worldToScreen(x,this.g.centerYAt(x));const rg=ctx.createRadialGradient(p.x,p.y,0,p.x,p.y,145);rg.addColorStop(0,`rgba(${color},.14)`);rg.addColorStop(.52,`rgba(${color},.045)`);rg.addColorStop(1,`rgba(${color},0)`);ctx.fillStyle=rg;ctx.beginPath();ctx.arc(p.x,p.y,145,0,Math.PI*2);ctx.fill()}
+  const veil=ctx.createLinearGradient(0,0,0,h);veil.addColorStop(0,'rgba(111,157,183,.035)');veil.addColorStop(.48,'rgba(0,0,0,0)');veil.addColorStop(1,'rgba(18,51,71,.035)');ctx.fillStyle=veil;ctx.fillRect(0,0,w,h);
  }
- const chat=document.querySelector('.match-all-chat-body');
- if(chat){
-   const chatCount=(bs.chat||[]).length;
-   if(Number(chat.dataset.count||-1)!==chatCount){
-     chat.innerHTML=(bs.chat||[]).slice(-30).map(x=>`<div>${x}</div>`).join('');
-     chat.dataset.count=String(chatCount);
-     requestAnimationFrame(()=>{const c=document.querySelector('.match-all-chat-body');if(c)c.scrollTop=c.scrollHeight});
-   }
+ paintTo(ctx){this.draw();ctx.drawImage(this.cache,0,0,this.cache.width,this.cache.height,0,0,this.camera.w,this.camera.h)}
+}
+
+class AramStructureRendererV164{
+ constructor(projection){this.p=projection;this.flash=new Map()}
+ teamColor(team){return team==='enemy'?{core:'#ff5067',edge:'#ff9baa',dark:'#541521',glow:'rgba(255,65,91,.75)',hp:'#e9485d'}:{core:'#4ed4ff',edge:'#a9efff',dark:'#123f56',glow:'rgba(67,204,255,.75)',hp:'#3fc5f1'}}
+ drawBar(ctx,p,hp,w=54){ctx.fillStyle='rgba(0,0,0,.72)';ctx.fillRect(p.x-w/2,p.y+37,w,5);ctx.fillStyle='#263743';ctx.fillRect(p.x-w/2+1,p.y+38,w-2,3);ctx.fillStyle=hp>0?'#64d4ef':'#555';ctx.fillRect(p.x-w/2+1,p.y+38,(w-2)*Math.max(0,Math.min(100,hp))/100,3)}
+ polygon(ctx,pts,fill,stroke){ctx.beginPath();ctx.moveTo(pts[0][0],pts[0][1]);for(let i=1;i<pts.length;i++)ctx.lineTo(pts[i][0],pts[i][1]);ctx.closePath();ctx.fillStyle=fill;ctx.fill();if(stroke){ctx.strokeStyle=stroke;ctx.stroke()}}
+ drawTower(ctx,st,p,now){const c=this.teamColor(st.team);if(!st.alive)return this.drawRubble(ctx,p,c);ctx.save();ctx.translate(p.x,p.y);ctx.fillStyle='rgba(0,0,0,.5)';ctx.beginPath();ctx.ellipse(0,25,28,10,0,0,Math.PI*2);ctx.fill();let g=ctx.createLinearGradient(0,-25,0,26);g.addColorStop(0,'#456074');g.addColorStop(.55,'#263d4d');g.addColorStop(1,'#101f2a');this.polygon(ctx,[[-23,18],[-16,-8],[-10,-25],[10,-25],[16,-8],[23,18]],g,'#728b98');ctx.fillStyle='#1a2c38';ctx.fillRect(-17,8,34,10);ctx.strokeStyle='#66818e';ctx.strokeRect(-17,8,34,10);ctx.shadowColor=c.glow;ctx.shadowBlur=14+(this.flash.get(st.id)>now?14:0);this.polygon(ctx,[[0,-39],[12,-25],[0,-12],[-12,-25]],c.core,c.edge);ctx.shadowBlur=0;ctx.restore();this.drawBar(ctx,p,st.hp,52)}
+ drawInhib(ctx,st,p,now){const c=this.teamColor(st.team);if(!st.alive)return this.drawRubble(ctx,p,c);ctx.save();ctx.translate(p.x,p.y);ctx.fillStyle='rgba(0,0,0,.5)';ctx.beginPath();ctx.ellipse(0,21,31,10,0,0,Math.PI*2);ctx.fill();ctx.strokeStyle='#668493';ctx.lineWidth=3;ctx.fillStyle='#183142';ctx.beginPath();ctx.arc(0,6,25,0,Math.PI*2);ctx.fill();ctx.stroke();ctx.strokeStyle=c.edge;ctx.lineWidth=3;ctx.globalAlpha=.7;ctx.beginPath();ctx.arc(0,3,17,now*.001,now*.001+Math.PI*1.55);ctx.stroke();ctx.globalAlpha=1;ctx.shadowColor=c.glow;ctx.shadowBlur=18;this.polygon(ctx,[[0,-25],[11,-4],[0,9],[-11,-4]],c.core,c.edge);ctx.restore();this.drawBar(ctx,p,st.hp,54)}
+ drawNexus(ctx,st,p,now){const c=this.teamColor(st.team);if(!st.alive)return this.drawRubble(ctx,p,c,1.4);ctx.save();ctx.translate(p.x,p.y);ctx.fillStyle='rgba(0,0,0,.55)';ctx.beginPath();ctx.ellipse(0,31,48,16,0,0,Math.PI*2);ctx.fill();let bg=ctx.createRadialGradient(0,10,4,0,10,44);bg.addColorStop(0,'#38566a');bg.addColorStop(.55,'#172f40');bg.addColorStop(1,'#08151e');ctx.fillStyle=bg;ctx.strokeStyle='#7894a1';ctx.lineWidth=3;ctx.beginPath();ctx.arc(0,8,41,0,Math.PI*2);ctx.fill();ctx.stroke();ctx.save();ctx.rotate(now*.00038*(st.team==='enemy'?-1:1));ctx.strokeStyle=c.edge;ctx.globalAlpha=.75;ctx.lineWidth=3;for(let i=0;i<4;i++){ctx.rotate(Math.PI/2);ctx.beginPath();ctx.moveTo(25,0);ctx.lineTo(39,0);ctx.stroke()}ctx.restore();ctx.shadowColor=c.glow;ctx.shadowBlur=28;this.polygon(ctx,[[0,-49],[18,-9],[7,20],[-7,20],[-18,-9]],c.core,c.edge);ctx.shadowBlur=0;ctx.restore();this.drawBar(ctx,{x:p.x,y:p.y+5},st.hp,72)}
+ drawRubble(ctx,p,c,scale=1){ctx.save();ctx.translate(p.x,p.y);ctx.globalAlpha=.55;ctx.fillStyle='rgba(0,0,0,.45)';ctx.beginPath();ctx.ellipse(0,12,28*scale,9*scale,0,0,Math.PI*2);ctx.fill();ctx.fillStyle='#26343d';for(let i=0;i<6;i++){ctx.save();ctx.translate((i-2.5)*7*scale,((i%2)*6)*scale);ctx.rotate(i*.7);ctx.fillRect(-5*scale,-3*scale,10*scale,6*scale);ctx.restore()}ctx.restore()}
+ draw(ctx,st,now){const w=this.p.engineToWorld(st.x,st.y||50),p=this.p.worldToScreen(w.x,w.y);if(st.type==='nexus')this.drawNexus(ctx,st,p,now);else if(st.type==='inhib')this.drawInhib(ctx,st,p,now);else this.drawTower(ctx,st,p,now);return p}
+}
+
+class AramProjectileRendererV164{
+ constructor(){this.items=[]}
+ spawn(a,b,color='#9bdfff',wide=false){this.items.push({a,b,color,wide,born:performance.now(),life:wide?320:230})}
+ draw(ctx,now){this.items=this.items.filter(q=>now-q.born<q.life);for(const q of this.items){const t=Math.max(0,Math.min(1,(now-q.born)/q.life)),e=1-Math.pow(1-t,2),x=q.a.x+(q.b.x-q.a.x)*e,y=q.a.y+(q.b.y-q.a.y)*e;ctx.save();ctx.strokeStyle=q.color;ctx.shadowColor=q.color;ctx.shadowBlur=q.wide?14:8;ctx.lineWidth=q.wide?3:1.6;ctx.globalAlpha=.85*(1-t*.35);ctx.beginPath();ctx.moveTo(q.a.x+(x-q.a.x)*.55,q.a.y+(y-q.a.y)*.55);ctx.lineTo(x,y);ctx.stroke();ctx.fillStyle='#fff';ctx.beginPath();ctx.arc(x,y,q.wide?3.6:2.5,0,Math.PI*2);ctx.fill();ctx.restore()}}
+}
+
+class AramEffectRendererV164{
+ constructor(projection,projectiles,structures){this.p=projection;this.projectiles=projectiles;this.structures=structures;this.prev=new Map();this.prevAlive=new Map();this.bursts=[];this.texts=[];this.seenFx=new Set()}
+ posOf(o){return this.p.engineToScreen(o.x,o.y||50)}
+ findSource(target,bs){const foe=target.team==='team'?'enemy':'team';const towers=(bs.structures||[]).filter(s=>s.team===foe&&s.type==='tower'&&s.alive&&Math.abs(s.x-target.x)<(battleState?.engineV2Active?190:7.2)).sort((a,b)=>Math.abs(a.x-target.x)-Math.abs(b.x-target.x));if(towers[0])return{obj:towers[0],tower:true};const champs=(bs.units||[]).filter(u=>u.kind==='champ'&&u.team===foe&&u.alive&&Math.abs(u.x-target.x)<(battleState?.engineV2Active?260:11)).sort((a,b)=>Math.abs(a.x-target.x)-Math.abs(b.x-target.x));if(champs[0])return{obj:champs[0],tower:false};return null}
+ track(bs,now){const live=new Set();for(const o of [...(bs.units||[]),...(bs.structures||[])]){live.add(o.id);const hp=Number(o.hp||0),old=this.prev.get(o.id),alive=!!o.alive,oldAlive=this.prevAlive.get(o.id);if(old!==undefined&&hp<old-.25){const p=this.posOf(o);this.bursts.push({x:p.x,y:p.y,born:now,color:o.team==='enemy'?'#ff7483':'#71d7ff'});const source=this.findSource(o,bs);if(source){const a=this.posOf(source.obj),color=source.obj.team==='enemy'?'#ff6479':'#64d7ff';this.projectiles.spawn(a,p,color,source.tower);if(source.tower)this.structures.flash.set(source.obj.id,now+180)}}if(oldAlive===true&&!alive){const p=this.posOf(o);for(let i=0;i<8;i++)this.bursts.push({x:p.x,y:p.y,born:now-i*8,color:'#e8f7ff',death:true,angle:i/8*Math.PI*2})}this.prev.set(o.id,hp);this.prevAlive.set(o.id,alive)}
+  for(const f of bs.fx||[]){if(this.seenFx.has(f.id))continue;this.seenFx.add(f.id);const p=this.p.engineToScreen(f.x,f.y);this.texts.push({x:p.x,y:p.y,text:f.text,color:f.team==='enemy'?'#ff9cab':'#9fe4ff',born:now})}if(this.seenFx.size>300)this.seenFx.clear()
  }
- syncBattleScoreboard();
- const fxWrap=document.querySelector('.b2-stage');if(fxWrap){document.querySelectorAll('[data-fx]').forEach(el=>el.remove());for(const f of bs.fx){const d=document.createElement('div');d.className='b2-fx '+(f.team==='enemy'?'red':'blue');d.dataset.fx=f.id;const p=screenPos(f.x,f.y);d.style.left=p.left+'%';d.style.top=p.top+'%';d.textContent=f.text;fxWrap.appendChild(d)}}}
+ draw(ctx,now){this.bursts=this.bursts.filter(b=>now-b.born<520);for(const b of this.bursts){const t=(now-b.born)/520;ctx.save();ctx.globalAlpha=Math.max(0,1-t);ctx.strokeStyle=b.color;ctx.shadowColor=b.color;ctx.shadowBlur=10;ctx.lineWidth=2;if(b.death){const r=5+t*26,a=b.angle;ctx.beginPath();ctx.moveTo(b.x+Math.cos(a)*r*.35,b.y+Math.sin(a)*r*.35);ctx.lineTo(b.x+Math.cos(a)*r,b.y+Math.sin(a)*r);ctx.stroke()}else{ctx.beginPath();ctx.arc(b.x,b.y,4+t*15,0,Math.PI*2);ctx.stroke()}ctx.restore()}this.texts=this.texts.filter(t=>now-t.born<800);for(const t of this.texts){const q=(now-t.born)/800;ctx.save();ctx.globalAlpha=1-q;ctx.fillStyle=t.color;ctx.font='900 12px Arial';ctx.textAlign='center';ctx.shadowColor='#000';ctx.shadowBlur=4;ctx.fillText(t.text,t.x,t.y-12-q*20);ctx.restore()}}
+}
+
+class AramParticleSystemV164{
+ constructor(camera){this.camera=camera;this.snow=[];this.fog=[];this.reset()}
+ reset(){this.snow=[];this.fog=[];for(let i=0;i<42;i++)this.snow.push({x:Math.random(),y:Math.random(),s:.45+Math.random()*2.15,v:.010+Math.random()*.030,dr:(Math.random()-.5)*.026,a:.12+Math.random()*.42,near:Math.random()<.10});for(let i=0;i<3;i++)this.fog.push({x:Math.random(),y:.2+Math.random()*.65,w:.18+Math.random()*.24,a:.025+Math.random()*.035,v:(Math.random()-.5)*.0025})}
+ draw(ctx,dt){const w=this.camera.w,h=this.camera.h;ctx.save();for(const f of this.fog){f.x+=f.v*dt;if(f.x<-.3)f.x=1.2;if(f.x>1.2)f.x=-.3;const g=ctx.createRadialGradient(f.x*w,f.y*h,0,f.x*w,f.y*h,w*f.w);g.addColorStop(0,`rgba(132,190,220,${f.a})`);g.addColorStop(1,'rgba(95,155,190,0)');ctx.fillStyle=g;ctx.fillRect(0,0,w,h)}for(const p of this.snow){p.y+=p.v*dt;p.x+=p.dr*dt;if(p.y>1.04){p.y=-.04;p.x=Math.random()}if(p.x<-.04)p.x=1.04;if(p.x>1.04)p.x=-.04;ctx.globalAlpha=p.a;ctx.fillStyle=p.near?'#f3fbff':'#d7eff9';ctx.beginPath();ctx.arc(p.x*w,p.y*h,p.near?p.s*1.8:p.s,0,Math.PI*2);ctx.fill()}ctx.restore()}
+}
+class AramUnitRendererV164{
+ constructor(projection){this.p=projection;this.visual=new Map();this.images=new Map()}
+ imageFor(u){const id=u?.champ?.id;if(!id)return null;const src=`assets/champions/${championImageId(id)}_0.jpg`;let im=this.images.get(src);if(!im){im=new Image();im.src=src;this.images.set(src,im)}return im}
+ visualPos(u,dt){const target=this.p.engineToWorld(u.x,u.y);let v=this.visual.get(u.id);if(!v||Math.hypot(v.x-target.x,v.y-target.y)>520){v={x:target.x,y:target.y};this.visual.set(u.id,v)}const a=1-Math.pow(.002,Math.min(.06,dt));v.x+=(target.x-v.x)*a;v.y+=(target.y-v.y)*a;return this.p.worldToScreen(v.x,v.y)}
+ drawMinion(ctx,u,p){if(!u.alive)return;const enemy=u.team==='enemy',c=enemy?'#e95b6d':'#5ebef0',edge=enemy?'#ffc2ca':'#cef1ff';ctx.save();ctx.translate(p.x,p.y);ctx.fillStyle='rgba(0,0,0,.45)';ctx.beginPath();ctx.ellipse(0,5,8,3,0,0,Math.PI*2);ctx.fill();ctx.fillStyle=c;ctx.strokeStyle=edge;ctx.lineWidth=1;if(u.minionType==='cannon'){ctx.fillRect(-7,-6,14,11);ctx.strokeRect(-7,-6,14,11);ctx.fillStyle='#d5b45c';ctx.fillRect(-3,-10,6,7)}else if(u.minionType==='ranged'){ctx.rotate(Math.PI/4);ctx.fillRect(-5,-5,10,10);ctx.strokeRect(-5,-5,10,10)}else{ctx.beginPath();ctx.moveTo(0,-8);ctx.lineTo(7,6);ctx.lineTo(-7,6);ctx.closePath();ctx.fill();ctx.stroke()}ctx.restore()}
+ drawChamp(ctx,u,p){if(!u.alive)return;const enemy=u.team==='enemy',edge=enemy?'#ef6172':'#51c6ff',im=this.imageFor(u);ctx.save();ctx.fillStyle='rgba(0,0,0,.55)';ctx.beginPath();ctx.ellipse(p.x,p.y+13,18,6,0,0,Math.PI*2);ctx.fill();ctx.beginPath();ctx.arc(p.x,p.y,17,0,Math.PI*2);ctx.clip();if(im&&im.complete&&im.naturalWidth)ctx.drawImage(im,p.x-18,p.y-18,36,36);else{ctx.fillStyle=enemy?'#5a1722':'#123f58';ctx.fill();ctx.fillStyle='#fff';ctx.font='900 11px Arial';ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText((u.champ?.name||u.nick||'?').slice(0,1),p.x,p.y)}ctx.restore();ctx.save();ctx.strokeStyle=edge;ctx.lineWidth=2.4;ctx.shadowColor=edge;ctx.shadowBlur=5;ctx.beginPath();ctx.arc(p.x,p.y,18,0,Math.PI*2);ctx.stroke();ctx.restore();const hp=Math.max(0,Math.min(1,u.hp/u.maxHp));ctx.fillStyle='rgba(0,0,0,.8)';ctx.fillRect(p.x-22,p.y-27,44,5);ctx.fillStyle=enemy?'#dc4255':'#2bc978';ctx.fillRect(p.x-21,p.y-26,42*hp,3);ctx.fillStyle='#02080d';ctx.beginPath();ctx.arc(p.x-19,p.y-19,7,0,Math.PI*2);ctx.fill();ctx.strokeStyle='#aabdc6';ctx.lineWidth=1;ctx.stroke();ctx.fillStyle='#fff';ctx.font='900 7px Arial';ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText(String(u.level||3),p.x-19,p.y-19);ctx.font='900 8px Arial';ctx.textBaseline='alphabetic';ctx.fillStyle='#fff';ctx.shadowColor='#000';ctx.shadowBlur=4;ctx.fillText(u.nick||'',p.x,p.y-33);ctx.shadowBlur=0}
+ draw(ctx,u,dt){const p=this.visualPos(u,dt);if(u.kind==='champ')this.drawChamp(ctx,u,p);else this.drawMinion(ctx,u,p);return p}
+ cleanup(bs){const ids=new Set((bs.units||[]).map(u=>u.id));for(const k of this.visual.keys())if(!ids.has(k))this.visual.delete(k)}
+}
+
+class AramRendererV164{
+ constructor(canvas){this.canvas=canvas;this.ctx=canvas.getContext('2d');this.camera=new AramCameraV164(canvas);this.geometry=new AramMapGeometryV164();this.projection=new AramWorldProjectionV164(this.camera,this.geometry);this.terrain=new AramTerrainRendererV164(this.camera,this.geometry,this.projection);this.structures=new AramStructureRendererV164(this.projection);this.projectiles=new AramProjectileRendererV164();this.effects=new AramEffectRendererV164(this.projection,this.projectiles,this.structures);this.particles=new AramParticleSystemV164(this.camera);this.units=new AramUnitRendererV164(this.projection);this.running=true;this.frames=0;this.last=performance.now();this.terrain.resize();this.raf=requestAnimationFrame(t=>this.frame(t))}
+ destroy(){this.running=false;cancelAnimationFrame(this.raf)}
+ frame(now){if(!this.running)return;this.frames++;if(mode!=='battle'||!battleState||!document.body.contains(this.canvas)){this.destroy();if(window.__aramRendererV164===this)window.__aramRendererV164=null;return}const resized=this.camera.resize();if(resized){this.terrain.resize();this.particles.reset()}const dt=Math.min(.06,Math.max(.001,(now-this.last)/1000));this.last=now;const ctx=this.ctx,w=this.camera.w,h=this.camera.h;ctx.clearRect(0,0,w,h);this.terrain.paintTo(ctx);const bs=battleState;this.effects.track(bs,now);
+  const actors=[];for(const st of bs.structures||[]){const q=this.projection.engineToScreen(st.x,st.y||50);actors.push({y:q.y,kind:'structure',o:st})}for(const u of bs.units||[]){if(!u.alive)continue;const q=this.projection.engineToScreen(u.x,u.y);actors.push({y:q.y,kind:'unit',o:u})}actors.sort((a,b)=>a.y-b.y);for(const a of actors){if(a.kind==='structure')this.structures.draw(ctx,a.o,now);else this.units.draw(ctx,a.o,dt)}
+  // relics remain part of the engine state and are rendered on the same world projection
+  for(const r of bs.relics||[]){const p=this.projection.engineToScreen(r.x,battleState?.engineV2Active?(r.y||450):50);ctx.save();ctx.globalAlpha=r.cooldown>0?.25:1;const g=ctx.createRadialGradient(p.x,p.y,1,p.x,p.y,18);g.addColorStop(0,'rgba(144,255,224,.95)');g.addColorStop(1,'rgba(55,183,157,0)');ctx.fillStyle=g;ctx.beginPath();ctx.arc(p.x,p.y,18,0,Math.PI*2);ctx.fill();ctx.strokeStyle='#baffec';ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(p.x-5,p.y);ctx.lineTo(p.x+5,p.y);ctx.moveTo(p.x,p.y-5);ctx.lineTo(p.x,p.y+5);ctx.stroke();ctx.restore()}
+  if(bs.v2Projectiles?.length){for(const pr of bs.v2Projectiles){const pp=this.projection.engineToScreen(pr.x,pr.y);ctx.save();ctx.fillStyle=pr.team==='enemy'?'#ff8b98':'#8cddff';ctx.shadowColor=ctx.fillStyle;ctx.shadowBlur=10;ctx.beginPath();ctx.arc(pp.x,pp.y,pr.kind==='tower'?4:2.8,0,Math.PI*2);ctx.fill();ctx.restore()}}this.projectiles.draw(ctx,now);this.effects.draw(ctx,now);this.particles.draw(ctx,dt);this.units.cleanup(bs);this.raf=requestAnimationFrame(t=>this.frame(t))}
+}
+
+function ensureAramRendererV164(){if(mode!=='battle'||!battleState)return null;const canvas=document.getElementById('aramCanvasV164');if(!canvas)return null;const current=window.__aramRendererV164;if(current&&current.canvas===canvas&&current.running)return current;if(current)current.destroy();window.__aramRendererV164=new AramRendererV164(canvas);return window.__aramRendererV164}
+function syncStaticBattlePositions(){ensureAramRendererV164()}
+function syncBattleDom(){
+ const bs=battleState;if(!bs||mode!=='battle')return;
+ try{syncBattleScoreboard()}catch(err){console.error('[battle-ui-score]',err)}
+ const clock=document.querySelector('.aram-canvas-clock');if(clock)clock.textContent=formatBattleTime(bs.time||0);
+ for(const u of bs.team.concat(bs.enemy)){const hud=document.querySelector(`[data-aram-hud-unit="${u.id}"]`);if(!hud)continue;hud.classList.toggle('dead',!u.alive);const hp=hud.querySelector('.aram-canvas-hp-fill');if(hp)hp.style.width=Math.max(0,Math.min(100,u.hp/u.maxHp*100))+'%';const lv=hud.querySelector('.aram-canvas-level');if(lv)lv.textContent=u.level}
+ const speed=document.querySelectorAll('.aram-canvas-speed button');speed.forEach(btn=>btn.classList.toggle('active',btn.textContent===`${bs.speed}×`));
+ ensureAramRendererV164();
+}
 
 function startDeveloperBattle(){
  const allyIds=[0,1,2,3,4].map(i=>document.getElementById('devAllyChar'+i)?.value).filter(Boolean);
@@ -12184,272 +12394,157 @@ requestAnimationFrame(after);
 
 
 
-<!-- V160 SPECTATOR HUD PATCH START -->
-<style id="v160-spectator-hud-style">
-/* V160: spectator-style HUD only. Match engine untouched. */
-.battle-v2{background:#03080d!important}
-.b2-head{
-  position:relative!important;
-  height:76px!important;
-  flex:0 0 76px!important;
-  display:grid!important;
-  grid-template-columns:1fr 240px 1fr!important;
-  align-items:start!important;
-  padding:0 16px!important;
-  background:linear-gradient(180deg,rgba(2,7,12,.98),rgba(4,12,19,.96))!important;
-  border-bottom:1px solid #284051!important;
-  box-shadow:0 5px 18px #0009!important;
-  z-index:70!important;
+
+
+
+
+
+
+<!-- V166 CLEAN MAP PASS -->
+<script>window.__AUGMENT_VERSION__='V166';</script>
+<!-- V167 MATCH ENGINE V2: fixed-step, FSM AI, wave formation, projectile towers -->
+
+<!-- V168 AUGMENT COMPLETE PATCH START -->
+<script id="v168-augment-complete-patch">
+(function(){
+'use strict';
+const V168_DESCRIPTIONS={"감시의 장막":"30초마다 적의 다음 스킬을 막아 주는 주문 방어막을 생성합니다.","강타자":"기본 공격 시 최대 체력의 2.5%에 해당하는 추가 물리 피해를 입힙니다.","광신자":"공격 속도 35% + 주문력에 비례한 추가 공격 속도 5%, 치명타 확률 25% + 주문력에 비례한 추가 치명타 확률 5%를 얻습니다.","궁극의 저지 불가":"궁극기 사용 후 3초 동안 군중 제어 효과에 면역이 됩니다. (재사용 대기시간 8초)","그림자 질주":"돌진, 도약, 점멸, 순간이동 스킬을 사용하거나 투명 상태에서 벗어난 후 2초 동안 이동 속도가 300 증가합니다.","능력치!":"능력치 모루 2개를 획득합니다.","능수능란":"공격 속도가 60% 증가합니다.","대지의 영혼":"전투에서 벗어나면 잠시 동안 보호막을 획득하는 대지의 영혼을 얻습니다.","도주 계획":"체력이 35%가 되면 최대 체력의 65% 보호막, 150% 추가 이동 속도, 축소 효과를 얻습니다. 5.5초에 걸쳐 점차 사라집니다. (재사용 대기시간 75초)","도취":"적중 시 마나를 최대 마나의 2.5% 소모해 최대 마나의 3.5%에 해당하는 마법 피해를 입힙니다. 이 피해에는 치명타가 적용될 수 있습니다.","마법공학의 영혼":"주기적으로 스킬 또는 기본 공격으로 피해를 입히면 번개를 발사해 적에게 연쇄 피해와 둔화를 입히는 영혼을 얻습니다.","마법사 (물리)":"주문력을 추가 공격력으로 전환하고 공격력이 15% 증가합니다.","민병대":"이동 속도가 100% 상승합니다. 피해를 받으면 6초 동안 비활성화됩니다.","바다의 영혼":"적에게 피해를 입힌 후 높은 체력 및 마나 재생 효과를 얻는 바다의 영혼을 획득합니다.","부식":"적에게 피해를 입히면 4초 동안 방어력 및 마법 저항력 감소 중첩을 얻습니다. 중첩당 1.5% 감소, 최대 20중첩으로 30% 감소합니다.","불을 밝혀":"매 4번째 공격마다 폭죽 4개를 발사해 추가 마법 피해를 입힙니다. 피해량은 15~105(레벨) + 0.45 추가 공격력 + 0.19 주문력입니다.","사악한 정신":"주문력이 20~80(레벨) 증가합니다.","선혈포식":"모든 피해 흡혈 15%를 얻습니다.","속전속결":"적보다 빠를수록 입히는 피해량이 증가합니다. 이동 속도 10당 피해량이 1% 증가합니다.","순수주의자 - 마법사":"재사용 대기시간 감소 10%를 얻고 모든 공격 속도를 스킬 가속으로 전환합니다. 공격 속도 1%당 스킬 가속 0.65입니다.","승리를 위한 회전":"회전 스킬의 피해량이 30%, 스킬 가속이 30 증가합니다.","쌍둥이 불꽃":"스킬 피해를 입히면 폭죽을 발사해 마법 피해를 입힙니다. 치명타 확률이 25% 증가합니다.","우당탕탕":"적을 이동 불가 상태로 만들 때마다 적응형 능력치를 얻습니다. 아수라장에서는 사망 시 중첩의 50%를 잃으며 중첩당 추가 공격력 6 또는 주문력 10을 얻습니다.","육중한 힘":"공격력이 20% 증가합니다.","음속 폭발":"아군에게 이로운 효과, 회복, 보호막을 부여하면 주변 적에게 30~150(레벨)의 고정 피해를 입히고 2초 동안 30% 둔화시킵니다. 재사용 대기시간 2초, 사거리 450입니다.","응급 처치 키트":"체력 회복 및 보호막 효과가 20% 증가합니다.","적응형 능력치":"추가 공격력을 주문력으로 전환하고 주문력이 15% 증가합니다.","전환: 골드":"무작위 골드 증강을 획득합니다.","점멸탄":"점멸 사용 시 주변에 폭발을 일으켜 마법 피해를 입히고 1.25초간 35% 둔화시킵니다. 아수라장에서는 사망 시 초기화됩니다.","정신 변환":"최대 체력이 마나의 절반만큼 증가합니다.","조준경 부착":"공격 사거리가 75 증가합니다. 원거리 챔피언은 50만 증가합니다.","지옥불 영혼":"기본 스킬 또는 기본 공격으로 적을 공격할 때마다 추가 피해를 입히는 지옥불 영혼을 얻습니다.","징수의 총 업그레이드":"징수의 총 기본 지속 효과로 적을 처형하면 처형 기준치가 높아지고 추가 골드를 얻습니다. 250골드를 획득합니다.","차가운 냉기":"둔화 효과가 이동 속도를 추가로 75 감소시킵니다.","태풍":"기본 공격 시 추가 대상에게 폭죽을 발사해 30%의 피해를 입히고 적중 시 효과를 적용합니다.","폴터가이스트":"폴터가이스트 소환사 주문을 얻습니다. 방어막과 유체화를 동시에 사용해 110~440(레벨)의 보호막과 30% 추가 이동 속도를 5초간 얻습니다. 재사용 대기시간 40초.","하체 운동의 날":"이동 속도 50과 둔화 저항 40%를 얻습니다.","확보된 킬":"체력이 40% 이하인 적에게 접근하면 이동 속도가 100% 증가합니다.","확률적 방어":"치명타 확률(최대 50%)만큼 공격을 방어해 받는 피해를 20% 감소시킬 수 있습니다. 치명타 확률이 25% 증가합니다.","다단 중첩":"스킬의 영구적 중첩을 얻을 때 100% 더 얻습니다.","감쇠 광선":"기본 공격 시 3초 동안 적의 피해량이 15% 감소합니다.","극악무도":"적을 스킬로 맞히면 영구적으로 주문력 1을 얻습니다. 재사용 대기시간 1초. 첫 번째 증강이 아니면 주문력 40으로 시작합니다.","급속 성장":"급속 성장 소환사 주문을 얻습니다. 사용 시 크기가 커지고 주변 적을 공중에 띄우며 7초 동안 최대 체력의 20% + 300만큼 최대 체력을 얻습니다.","너만을 위해":"동료에게 사용하는 체력 회복 및 보호막 효과가 30% 강해집니다.","넘을 수 없는 벽":"여진 및 빙결 강화 핵심 룬의 효과를 얻습니다.","노련한 저격수":"600 이상 떨어진 적을 기본 스킬로 맞히면 재사용 대기시간이 80% 감소합니다. 지속 피해는 65% 감소합니다.","능력치 더하기 능력치!":"능력치 모루 3개를 획득합니다.","되풀이":"스킬 가속 60을 얻습니다.","마법 명사수":"기본 공격 시 주문력의 75%만큼 추가 물리 피해를 입힙니다.","마법 미사일":"스킬로 피해를 입히면 대상에게 마법 미사일 3발을 날립니다. 각 미사일은 이동 거리에 비례해 최대 체력의 1%에 해당하는 고정 피해를 입힙니다.","무법자의 투지":"이동 스킬 사용 시 방어력과 마법 저항력 12를 얻습니다. 최대 5회 중첩됩니다.","바늘에 실 끼우기":"방어구 관통력 및 마법 관통력이 18% 증가합니다.","범람":"마나 소모량이 2배가 됩니다. 스킬의 체력 회복량, 보호막 흡수량 및 피해량이 최대 마나에 비례해 증가합니다.","부메랑 투척":"10초마다 자동으로 근처 적에게 부메랑을 던집니다. 40~200 + 0.22 추가 공격력 + 0.15 주문력의 적응형 피해를 입힙니다.","빛의 인도자 결의":"체력이 50% 아래로 떨어지면 3초 동안 최대 체력의 30%를 회복합니다. 사망 시 또는 45초마다 초기화됩니다.","빵과 버터":"Q 스킬 가속 100을 얻습니다.","빵과 잼":"W 스킬 가속 100을 얻습니다.","빵과 치즈":"E 스킬 가속 100을 얻습니다.","상급 조준경 부착":"공격 사거리가 200 증가합니다. 원거리 챔피언은 100만 증가합니다.","소환술사":"소환물의 크기, 체력, 피해량이 40% 증가합니다.","속행":"스킬 가속의 70%만큼 이동 속도가 증가합니다.","시작부터 끝까지":"선제공격과 어둠의 수확 핵심 룬을 얻습니다.","신난다!":"처치 관여 시 4초 동안 이동 속도 100%와 공격 속도 15%를 얻습니다.","신성한 중재":"전투 시작 15초 후 보호의 별이 내려옵니다. 착지하면 자신과 주변 아군이 2.5초 동안 무적 상태가 됩니다. 이후 35초마다 자동 사용됩니다.","영혼 흡수":"치명타 확률 25% 증가 및 치명타 적중 시 생명력 흡수 12%를 얻습니다.","전술적 대비":"부활 시 또는 70초마다 주문력 1당 3의 피해를 흡수하는 보호막을 얻습니다.","전환: 프리즘":"무작위 프리즘 증강을 획득합니다.","점멸 난사":"점멸 사용 가능 횟수가 3번이 되고 재사용 대기시간이 2초가 됩니다. 아수라장에서는 120초마다 모두 충전됩니다.","처형 시간":"궁극기 사용 시 모든 적 챔피언에게 죽음의 표식을 남깁니다. 표식은 자신이 대상에게 입히는 피해의 40%를 저장하고 5초 후 폭발해 저장된 만큼의 고정 피해를 입힙니다. 재사용 대기시간 8초.","천상의 신체":"체력이 1500 증가하지만 입히는 피해가 10% 감소합니다.","최첨단 발명가":"아이템 가속이 100 증가합니다. 아이템 재사용 대기시간 50% 감소 효과와 동일하며 모든 아이템 스킬의 재사용 대기시간을 감소시킵니다.","치명적 미사일":"치명타 발동 시 폭죽을 발사해 각각 15~65(레벨)의 마법 피해를 입힙니다. 치명타 확률 25%도 얻습니다.","치명적 치유":"체력 회복 및 보호막 효과에 치명타가 적용될 수 있습니다. 치명타 확률 25% 증가. 효과 발동 시 체력 회복 및 보호막 효과가 50% 추가 증가합니다.","치명적인 공격":"치명타 확률이 50% 증가합니다.","취약":"아이템 및 지속 피해 효과에 145% 피해를 입히는 치명타가 적용될 수 있습니다. 치명타 확률 25% 증가.","퀘스트: 강철 같은 심장":"강철심장 300중첩 이상을 보유해야 합니다. 보상으로 강철심장 중첩이 3배가 됩니다.","타오르는 새벽":"스킬이 적에게 표식을 남기며, 적은 아군의 다음 공격으로부터 추가 마법 피해를 입습니다. 추가 피해량 40~130, 대상당 재사용 대기시간 0.5초.","핀볼":"눈덩이의 스킬 가속이 50 증가하고 100~500의 고정 피해를 추가합니다. 눈덩이가 벽에 튕길 때마다 크기 25%, 재사용 대기시간 감소 30%, 피해량 25%가 증가합니다.","화염 낙인":"기본 공격 시 무한히 중첩되는 화상 효과를 적용해 지속적으로 피해를 입힙니다.","환영 무기":"스킬이 적중 시 효과를 적용합니다. 대상마다 1초의 재사용 대기시간이 적용됩니다.","후원":"1750골드를 획득합니다.","거석상의 용기":"적 챔피언을 이동 불가 상태로 만들면 최대 체력에 비례한 보호막을 얻습니다. 보호막은 100~300 + 최대 체력의 5%입니다.","거인":"크기가 커지고 체력이 35%, 적응형 능력치가 15% 증가합니다.","거인 학살자":"크기가 작아져 이동 속도가 25% 증가하며, 자신보다 큰 상대의 크기에 비례해 챔피언에게 10~30% 추가 피해를 입힙니다.","검무":"검무 소환사 주문을 얻습니다. 사용하면 적에게 돌진해 8회 공격하는 동안 대상으로 지정되지 않습니다. 1회 피해량은 30~150(레벨) + 0.1 추가 공격력 + 0.06 주문력 + 적중 시 피해량의 50%입니다.","검을 뽑아라":"근접 챔피언으로 간주되며 공격력 24%, 체력 24%, 공격 속도 20%, 생명력 흡수 20%, 이동 속도 20%를 얻습니다. 원래 공격 사거리에 따라 추가 능력치가 증가합니다.","결투의 대가":"기본 공격 시 중첩되는 주문력을 얻고 스킬 사용 시 공격력을 얻습니다. 주문력 6~18, 공격력 3~9를 얻습니다.","광대 대학":"속임수 소환사 주문과 암습 효과를 얻습니다. 사망 시 폭발하는 상자를 생성해 고정 피해와 공포를 입힙니다.","궁극기 대변혁":"궁극기를 사용한 다음 초기화됩니다. 재사용 대기시간 75초 또는 사망 시 초기화됩니다.","기본으로 돌아가기":"스킬 피해량, 체력 회복량, 보호막이 35% 증가하고 스킬 가속 70을 얻지만 궁극기를 사용할 수 없습니다.","난공불락":"궁극기를 사용하면 2초 동안 무적 상태가 됩니다. 재사용 대기시간 8초.","능력치 더하기 능력치 더하기 능력치!":"능력치 모루 4개를 획득합니다.","대지의 각성":"돌진, 도약, 점멸, 순간이동 스킬이 1초 후 폭발하는 흔적을 남겨 물리 피해를 입힙니다. 피해량 90~250(레벨) + 1.25 추가 공격력 + 0.6 주문력입니다.","도망갈 수 없어":"궁극기를 사용하면 주변 적을 도발하고 몇 초 동안 피해량 감소를 얻습니다.","돌진":"이동 스킬의 스킬 가속이 175 증가합니다.","미친 과학자":"라운드 시작 시 크기가 커져 적응형 능력치와 체력이 증가하거나, 작아져 스킬 가속과 이동 속도가 증가합니다.","보석 건틀릿":"스킬에 치명타가 적용될 수 있습니다. 치명타 확률이 25% + 주문력의 4.5% 증가하며, 치명타 발동 시 스킬이 145%의 피해를 입힙니다.","불길한 서약":"잃은 체력에 비례해 최대 주문력 150, 이동 속도 50%, 모든 피해 흡혈 20%를 얻지만 스킬 사용 시 현재 체력의 5% 피해를 입습니다.","신비한 주먹":"적중 시 스킬의 재사용 대기시간이 1.25초 감소합니다.","양손잡이":"기본 공격 시 40% 피해를 입히고 적중 시 효과를 40% 적용하는 2차 투사체를 발사합니다. 총 공격 속도가 10% 증가합니다.","요정 마법":"궁극기로 피해를 입히면 대상을 2초간 변이시킵니다. 재사용 대기시간 8초. 변이된 대상은 이동 속도가 60 감소합니다.","유레카":"주문력의 30%에 해당하는 스킬 가속을 얻습니다.","유리 대포":"최대 체력이 30% 감소합니다. 원거리 챔피언은 피해량의 15%, 근거리 챔피언은 25%만큼 추가 고정 피해를 입힙니다.","전능의 영혼":"무작위 드래곤 영혼 3개를 획득합니다.","전장의 교향곡":"치명적 속도와 정복자 핵심 룬을 얻습니다.","전환: 혼돈":"무작위 증강 2개를 획득합니다.","죽음의 순환":"체력을 회복하거나 재생하면 가장 가까운 적 챔피언에게 일정 비율만큼 마법 피해를 입힙니다. 피해 비율 70%.","지옥의 전도체":"스킬 피해를 입힐 때마다 무한히 중첩되는 화상 효과를 적용해 3초 동안 매초 1~12(레벨) + 0.012 주문력 + 0.28 추가 공격력의 마법 피해를 입힙니다. 화상 효과가 피해를 입힐 때마다 기본 스킬 재사용 대기시간을 0.08초 감소시킵니다.","최상급 조준경 부착":"공격 사거리가 250 증가합니다. 원거리 챔피언은 150만 증가합니다.","최종 형태":"궁극기 사용 시 10초 동안 최대 체력의 50%에 해당하는 보호막, 모든 피해 흡혈 20%, 이동 속도 30%를 얻습니다.","퀘스트: 우글렛의 마녀 모자":"라바돈의 죽음모자와 존야의 모래시계를 보유하면 우글렛의 마녀 모자를 얻습니다.","퀘스트: 이케시아의 몰락":"태양불꽃 방패와 공허한 광휘를 보유하면 두 아이템이 공허의 불길로 합쳐집니다.","탄환 세례":"기본 공격 시 추가 탄환 5개를 발사해 각각 물리 피해를 입힙니다. 이동한 거리에 따라 피해량이 최대 50% 증가하며, 각 탄환은 치명타와 적중 시 효과를 적용할 수 있습니다. 방향별 재사용 대기시간 8초.","탭 댄서":"기본 공격 시 이동 속도 10을 얻고, 이동 속도에 비례해 공격 속도가 증가합니다. 효과는 5초 동안 지속되며 무한히 초기화 및 중첩됩니다.","판도라의 상자":"모든 증강을 무작위 프리즘 증강으로 전환합니다.","프로틴 음료":"추가 방어력 및 마법 저항력에 비례해 체력 회복 및 보호막 효과가 증가합니다. 증가량은 25% + 추가 방어력의 35% + 추가 마법 저항력의 35%입니다."};
+const V168_REQUIRED={"silver":["감시의 장막","강타자","광신자","궁극의 저지 불가","그림자 질주","능력치!","능수능란","대지의 영혼","도주 계획","도취","마법공학의 영혼","마법사 (물리)","민병대","바다의 영혼","부식","불을 밝혀","사악한 정신","선혈포식","속전속결","순수주의자 - 마법사","승리를 위한 회전","쌍둥이 불꽃","우당탕탕","육중한 힘","음속 폭발","응급 처치 키트","적응형 능력치","전환: 골드","점멸탄","정신 변환","조준경 부착","지옥불 영혼","징수의 총 업그레이드","차가운 냉기","태풍","폴터가이스트","하체 운동의 날","확보된 킬","확률적 방어","다단 중첩"],"gold":["감쇠 광선","극악무도","급속 성장","너만을 위해","넘을 수 없는 벽","노련한 저격수","능력치 더하기 능력치!","되풀이","마법 명사수","마법 미사일","무법자의 투지","바늘에 실 끼우기","범람","부메랑 투척","빛의 인도자 결의","빵과 버터","빵과 잼","빵과 치즈","상급 조준경 부착","소환술사","속행","시작부터 끝까지","신난다!","신성한 중재","영혼 흡수","전술적 대비","전환: 프리즘","점멸 난사","처형 시간","천상의 신체","최첨단 발명가","치명적 미사일","치명적 치유","치명적인 공격","취약","퀘스트: 강철 같은 심장","타오르는 새벽","핀볼","화염 낙인","환영 무기","후원"],"prismatic":["거석상의 용기","거인","거인 학살자","검무","검을 뽑아라","결투의 대가","광대 대학","궁극기 대변혁","기본으로 돌아가기","난공불락","능력치 더하기 능력치 더하기 능력치!","대지의 각성","도망갈 수 없어","돌진","미친 과학자","보석 건틀릿","불길한 서약","신비한 주먹","양손잡이","요정 마법","유레카","유리 대포","전능의 영혼","전장의 교향곡","전환: 혼돈","죽음의 순환","지옥의 전도체","최상급 조준경 부착","최종 형태","퀘스트: 우글렛의 마녀 모자","퀘스트: 이케시아의 몰락","탄환 세례","탭 댄서","판도라의 상자","프로틴 음료"]};
+Object.assign(AUGMENT_DESCRIPTIONS,V168_DESCRIPTIONS);
+for(const [tier,names] of Object.entries(V168_REQUIRED)){
+  for(const name of names) if(!augmentNames[tier].includes(name)) augmentNames[tier].push(name);
 }
-.b2-head>div:first-child,.b2-right{visibility:hidden!important}
-.b2-head>div:nth-child(2){padding-top:5px!important;text-align:center!important}
-.b2-score{
-  display:flex!important;align-items:center!important;justify-content:center!important;gap:18px!important;
-  height:38px!important;line-height:38px!important;margin:0!important;
-  font-size:30px!important;font-weight:1000!important;letter-spacing:0!important;
-  color:#dceaf2!important;text-shadow:0 2px 8px #000!important;
-  background:linear-gradient(180deg,#142a36,#09151d)!important;
-  border:1px solid #466270!important;border-top:0!important;
-  clip-path:polygon(8% 0,92% 0,100% 72%,88% 100%,12% 100%,0 72%)!important;
+function v168Owned(u,name){return allOwnedAugments(u).some(a=>a&&a.name===name)}
+function v168Init(u){
+ if(!u)return; u.ap=Number(u.ap||0);u.maxMana=Number(u.maxMana||100);u.mana=Number.isFinite(u.mana)?u.mana:u.maxMana;
+ u.critChance=Number(u.critChance||0);u.haste=Number(u.haste||0);u.lifesteal=Number(u.lifesteal||0);u.healPower=Number(u.healPower||1);
+ u.sizeScale=Number(u.sizeScale||1);u.armor=Number(u.armor||0);u.mr=Number(u.mr||0);u.slowResist=Number(u.slowResist||0);u.__v168Ops=u.__v168Ops||{};
 }
-.b2-score .blue{color:#5aaeff!important}.b2-score .red{color:#ff6470!important}
-.b2-clock{
-  margin-top:3px!important;padding:0!important;border:0!important;background:transparent!important;
-  color:#b9c8d0!important;font-size:13px!important;font-weight:900!important;line-height:18px!important;
+function v168Op(u,name){v168Init(u);return u.__v168Ops[name]||(u.__v168Ops[name]={mult:[],add:[],flags:[]})}
+function v168Mult(u,name,key,val){const r=v168Op(u,name);u[key]=Number(u[key]??1)*val;r.mult.push([key,val]);}
+function v168Add(u,name,key,val){const r=v168Op(u,name);u[key]=Number(u[key]||0)+val;r.add.push([key,val]);}
+function v168Flag(u,name,key,val=true){const r=v168Op(u,name);u[key]=val;r.flags.push(key)}
+function v168RangeAdd(u,name,worldAdd){v168Add(u,name,'range',worldAdd/21);if(Number.isFinite(u.v2AttackRange))v168Add(u,name,'v2AttackRange',worldAdd)}
+function v168MoveMult(u,name,m){v168Mult(u,name,'speed',m);if(Number.isFinite(u.v2MoveSpeed))v168Mult(u,name,'v2MoveSpeed',m);if(Number.isFinite(u.__v168BaseMoveSpeed))u.__v168BaseMoveSpeed*=m}
+function v168HpMult(u,name,m){const ratio=u.maxHp?u.hp/u.maxHp:1;v168Mult(u,name,'maxHp',m);u.hp=u.maxHp*ratio;const r=v168Op(u,name);r.hpRatio=true}
+function v168Anvils(u,name,count){for(let i=0;i<count;i++){const k=(name.charCodeAt(i%name.length)+i)%3;if(k===0)v168Mult(u,name,'atk',1.06);else if(k===1)v168HpMult(u,name,1.06);else v168MoveMult(u,name,1.04)}v168Flag(u,name,'statAnvils',(u.statAnvils||0)+count)}
+function v168Apply(u,tier,name){
+ v168Init(u);if(u.__v168Ops[name])return;v168Op(u,name);
+ switch(name){
+  case '광신자': v168Mult(u,name,'attackRateMod',1/1.35);v168Add(u,name,'critChance',.25+Math.min(.05,u.ap/1600));break;
+  case '능수능란':v168Mult(u,name,'attackRateMod',1/1.60);break;
+  case '능력치!':v168Anvils(u,name,2);break; case '능력치 더하기 능력치!':v168Anvils(u,name,3);break; case '능력치 더하기 능력치 더하기 능력치!':v168Anvils(u,name,4);break;
+  case '사악한 정신':v168Add(u,name,'ap',20+Math.max(0,(u.level||3)-3)*4);break;
+  case '선혈포식':v168Add(u,name,'lifesteal',.15);break; case '육중한 힘':v168Mult(u,name,'atk',1.20);break;
+  case '응급 처치 키트':v168Mult(u,name,'healPower',1.20);break; case '너만을 위해':v168Flag(u,name,'allyHealShieldMult',1.30);break;
+  case '정신 변환':v168HpMult(u,name,1+Math.min(.40,u.maxMana/1000*.5));break;
+  case '조준경 부착':v168RangeAdd(u,name,(u.v2Role==='MARKSMAN'||u.champ?.roles?.includes('Marksman'))?50:75);break;
+  case '상급 조준경 부착':v168RangeAdd(u,name,(u.v2Role==='MARKSMAN'||u.champ?.roles?.includes('Marksman'))?100:200);break;
+  case '최상급 조준경 부착':v168RangeAdd(u,name,(u.v2Role==='MARKSMAN'||u.champ?.roles?.includes('Marksman'))?150:250);break;
+  case '하체 운동의 날':v168MoveMult(u,name,1.15);v168Add(u,name,'slowResist',.40);break;
+  case '확률적 방어':v168Add(u,name,'critChance',.25);break;
+  case '마법사 (물리)':v168Add(u,name,'atk',u.ap*.75);v168Mult(u,name,'atk',1.15);v168Flag(u,name,'apToAd',true);break;
+  case '적응형 능력치':v168Add(u,name,'ap',Math.max(0,(u.atk||0)-8)*1.2);v168Mult(u,name,'ap',1.15);break;
+  case '쌍둥이 불꽃':v168Add(u,name,'critChance',.25);break;
+  case '되풀이':v168Add(u,name,'haste',60);break; case '빵과 버터':v168Add(u,name,'qHaste',100);break; case '빵과 잼':v168Add(u,name,'wHaste',100);break; case '빵과 치즈':v168Add(u,name,'eHaste',100);break;
+  case '바늘에 실 끼우기':v168Add(u,name,'penetration',.18);break;
+  case '영혼 흡수':v168Add(u,name,'critChance',.25);v168Flag(u,name,'critLifesteal',.12);break;
+  case '치명적 미사일':v168Add(u,name,'critChance',.25);break;case '치명적 치유':v168Add(u,name,'critChance',.25);v168Flag(u,name,'healCrit',true);break;
+  case '치명적인 공격':v168Add(u,name,'critChance',.50);break;case '취약':v168Add(u,name,'critChance',.25);v168Flag(u,name,'dotCrit',true);break;
+  case '천상의 신체':v168HpMult(u,name,1.55);v168Flag(u,name,'damageDealtMult',.90);break;
+  case '후원':v168Add(u,name,'gold',1750);break; case '징수의 총 업그레이드':v168Add(u,name,'gold',250);v168Flag(u,name,'collectorThreshold',.05);break;
+  case '거인':v168HpMult(u,name,1.35);v168Mult(u,name,'atk',1.15);v168Mult(u,name,'ap',1.15);v168Mult(u,name,'sizeScale',1.22);break;
+  case '거인 학살자':v168MoveMult(u,name,1.25);v168Mult(u,name,'sizeScale',.78);break;
+  case '검을 뽑아라':v168Mult(u,name,'atk',1.24);v168HpMult(u,name,1.24);v168Mult(u,name,'attackRateMod',1/1.20);v168Add(u,name,'lifesteal',.20);v168MoveMult(u,name,1.20);v168Flag(u,name,'meleeOverride',true);break;
+  case '기본으로 돌아가기':v168Add(u,name,'haste',70);v168Flag(u,name,'abilityPowerMult',1.35);v168Flag(u,name,'healShieldMult',1.35);v168Flag(u,name,'ultDisabled',true);break;
+  case '돌진':v168Add(u,name,'dashHaste',175);break;
+  case '보석 건틀릿':v168Add(u,name,'critChance',.25+Math.min(.20,u.ap*.00045));v168Flag(u,name,'skillCrit',true);break;
+  case '불길한 서약':v168Add(u,name,'lifesteal',.20);v168Flag(u,name,'missingHpPower',true);break;
+  case '양손잡이':v168Mult(u,name,'attackRateMod',1/1.10);v168Flag(u,name,'dualWield',true);break;
+  case '유레카':v168Add(u,name,'haste',u.ap*.30);break;
+  case '유리 대포':v168HpMult(u,name,.70);v168Flag(u,name,'glassCannon',true);break;
+  case '최종 형태':v168Flag(u,name,'finalForm',true);break;
+  case '프로틴 음료':v168Flag(u,name,'proteinHealing',true);break;
+  case '순수주의자 - 마법사':v168Add(u,name,'haste',10);v168Flag(u,name,'attackSpeedToHaste',true);break;
+  default:v168Flag(u,name,'augment_'+name,true);break;
+ }
 }
-.b2-main{position:relative!important;display:block!important;min-height:0!important;overflow:hidden!important}
-.b2-stage{position:absolute!important;inset:0!important;z-index:1!important}
-/* Top team HUD strips */
-.b2-side{
-  position:absolute!important;top:4px!important;bottom:auto!important;z-index:60!important;
-  width:calc(50% - 142px)!important;height:66px!important;
-  padding:4px 6px!important;box-sizing:border-box!important;overflow:visible!important;
-  background:linear-gradient(180deg,rgba(6,18,29,.94),rgba(4,12,19,.88))!important;
-  border:1px solid #27465b!important;border-radius:3px!important;
-  display:grid!important;grid-template-columns:repeat(5,minmax(0,1fr))!important;gap:4px!important;
-  pointer-events:none!important;
+function v168Undo(u,pick){if(!u||!pick)return;v168Init(u);const r=u.__v168Ops[pick.name];if(!r)return;for(const [k,v] of [...r.add].reverse())u[k]=Number(u[k]||0)-v;for(const [k,v] of [...r.mult].reverse())u[k]=Number(u[k]||0)/v;for(const k of r.flags)delete u[k];delete u.__v168Ops[pick.name];u.hp=Math.min(u.hp,u.maxHp)}
+applyAugmentStatEffect=v168Apply;undoAugmentStatEffect=v168Undo;augmentDescription=function(name){return AUGMENT_DESCRIPTIONS[name]||'고유 효과를 지닌 증강체입니다.'};
+for(const tier of ['silver','gold','prismatic']){augmentTemplates[tier].splice(0,augmentTemplates[tier].length,...augmentNames[tier].map(n=>({name:n,desc:augmentDescription(n),icon:tier==='silver'?'◇':tier==='gold'?'✦':'◆',apply:u=>v168Apply(u,tier,n)})))}
+
+class AramAugmentRuntimeV168{
+ constructor(engine){this.e=engine}
+ nearestEnemy(u){return this.e.index.enemies(u.team,'champ').slice().sort((a,b)=>aramV167Dist(u,a)-aramV167Dist(u,b))[0]||null}
+ update(dt){const bs=this.e.bs,t=bs.time;for(const u of bs.team.concat(bs.enemy)){v168Init(u);if(!u.alive)continue;u.mana=Math.min(u.maxMana,u.mana+u.maxMana*.008*dt);u.v2Shield=Math.max(0,u.v2Shield||0);const target=this.nearestEnemy(u);
+   if(!Number.isFinite(u.__v168BaseMoveSpeed))u.__v168BaseMoveSpeed=u.v2MoveSpeed||55;let mm=1;
+   if(v168Owned(u,'민병대')&&t-(u.lastDamagedAt||-999)>=6)mm*=2;
+   if(v168Owned(u,'확보된 킬')&&target&&target.hp/target.maxHp<=.40)mm*=2;
+   if((u.escapeSpeedUntil||0)>t)mm*=2.5;if((u.polterSpeedUntil||0)>t)mm*=1.30;if((u.jinxUntil||0)>t)mm*=2;
+   if(v168Owned(u,'속행'))mm*=1+Math.min(.45,(u.haste||0)*.007);
+   u.v2MoveSpeed=u.__v168BaseMoveSpeed*mm;
+   if(v168Owned(u,'감시의 장막')&&t>=(u.spellShieldNext||0)){u.spellShieldReady=true;u.spellShieldNext=t+30}
+   if(v168Owned(u,'대지의 영혼')&&t-(u.lastDamagedAt||-999)>5&&t>=(u.earthShieldNext||0)){u.v2Shield=Math.max(u.v2Shield,u.maxHp*.12*(u.healPower||1));u.earthShieldNext=t+12}
+   if(v168Owned(u,'도주 계획')&&u.hp/u.maxHp<=.35&&t>=(u.escapePlanNext||0)){u.v2Shield+=u.maxHp*.65*(u.healPower||1);u.escapeSpeedUntil=t+5.5;u.escapePlanNext=t+75}
+   if(v168Owned(u,'바다의 영혼')&&(u.seaRegenUntil||0)>t){u.hp=Math.min(u.maxHp,u.hp+u.maxHp*.018*dt*(u.healPower||1));u.mana=Math.min(u.maxMana,u.mana+u.maxMana*.02*dt)}
+   if(v168Owned(u,'빛의 인도자 결의')&&u.hp/u.maxHp<.5&&t>=(u.dawnResolveNext||0)){u.hp=Math.min(u.maxHp,u.hp+u.maxHp*.30*(u.healPower||1));u.dawnResolveNext=t+45}
+   if(v168Owned(u,'전술적 대비')&&t>=(u.tacticalPrepNext||0)){u.v2Shield=Math.max(u.v2Shield,Math.max(u.maxHp*.10,(u.ap||0)*.25)*(u.healPower||1));u.tacticalPrepNext=t+70}
+   if(v168Owned(u,'신성한 중재')&&t>=15&&t>=(u.divineNext||15)){u.invulnerableUntil=t+2.5;u.divineNext=t+35}
+   if(v168Owned(u,'폴터가이스트')&&u.hp/u.maxHp<.55&&t>=(u.polterNext||0)){u.v2Shield+=u.maxHp*(.12+.015*(u.level||3))*(u.healPower||1);u.polterSpeedUntil=t+5;u.polterNext=t+40}
+   if(v168Owned(u,'부메랑 투척')&&target&&t>=(u.boomerangNext||0)){const dmg=(4+(u.level||3)*.7)+(u.atk||0)*.22+(u.ap||0)*.15;this.e.projectiles.spawn(u,target,dmg,{speed:480,kind:'augment-boomerang'});u.boomerangNext=t+10}
+   if(v168Owned(u,'급속 성장')&&u.hp/u.maxHp<.45&&t>=(u.growthNext||0)){u.v2Shield+=u.maxHp*.20+25;u.growthUntil=t+7;u.growthNext=t+45}
+   if(v168Owned(u,'불길한 서약')){const missing=1-u.hp/u.maxHp;u.v168OathPower=missing}
+   if(v168Owned(u,'프로틴 음료'))u.v168ProteinMult=1.25+Math.min(.7,((u.armor||0)+(u.mr||0))*.0035);
+   if((u.burnStacks||0)>0&&t>=(u.burnTickAt||0)){u.burnTickAt=t+1;u.hp-=Math.min(u.maxHp*.025,(u.burnStacks||0)*.35);if(u.hp<=0){u.hp=1}}
+  } }
 }
-.b2-side:not(.right){left:10px!important;border-color:#285f8c!important;box-shadow:inset 3px 0 #3597ee,0 5px 16px #0007!important}
-.b2-side.right{right:10px!important;left:auto!important;border-color:#713744!important;box-shadow:inset -3px 0 #dc4c59,0 5px 16px #0007!important}
-.b2-side-title{display:none!important}
-.b2-unit,.b2-side.right .b2-unit{
-  min-width:0!important;width:auto!important;height:56px!important;margin:0!important;padding:3px!important;
-  display:grid!important;grid-template-columns:32px minmax(0,1fr)!important;gap:4px!important;align-items:center!important;
-  background:rgba(7,19,29,.88)!important;border:1px solid rgba(58,105,137,.42)!important;
-  box-shadow:none!important;text-align:left!important;box-sizing:border-box!important;
-}
-.b2-side.right .b2-unit{grid-template-columns:minmax(0,1fr) 32px!important;background:rgba(31,12,18,.80)!important;border-color:rgba(137,60,71,.45)!important;text-align:right!important}
-.b2-side.right .b2-unit .portrait{order:2!important}.b2-side.right .b2-unit .unit-info{order:1!important}
-.portrait,.b2-orb{
-  width:30px!important;height:42px!important;min-width:30px!important;flex:0 0 30px!important;margin:0!important;
-  border-radius:2px!important;border:1px solid #3d8fd3!important;background:#07111a!important;overflow:hidden!important;
-}
-.b2-side.right .portrait,.b2-side.right .b2-orb{border-color:#c64e5b!important}
-.unit-info{min-width:0!important;width:100%!important}
-.b2-unit strong{display:block!important;font-size:8px!important;line-height:11px!important;white-space:nowrap!important;overflow:hidden!important;text-overflow:ellipsis!important;color:#e6f0f5!important}
-.b2-unit small{display:block!important;font-size:7px!important;line-height:10px!important;white-space:nowrap!important;overflow:hidden!important;text-overflow:ellipsis!important;color:#8198a6!important;margin:0!important}
-.b2-hp{height:4px!important;margin:3px 0 0!important;background:#08141c!important;border:1px solid #1b3442!important}
-.b2-side:not(.right) .b2-hp i{background:#42a6ff!important}.b2-side.right .b2-hp i{background:#ef5964!important}
-.b2-gold{display:none!important}.unit-augments{display:none!important}
-/* keep map unobstructed under top roster */
-.b2-map{top:0!important}
-/* speed dock below team strips, centered */
-.b2-speed-dock{
-  top:72px!important;left:50%!important;right:auto!important;bottom:auto!important;transform:translateX(-50%)!important;
-  width:auto!important;max-width:none!important;padding:4px 6px!important;gap:3px!important;
-  background:rgba(3,12,18,.82)!important;border:1px solid #304d5c!important;z-index:58!important;
-}
-.b2-speed-dock button{min-width:34px!important;padding:4px 7px!important;font-size:8px!important}
-/* Bottom spectator scoreboard */
-.battle-scoreboard{
-  display:block!important;position:absolute!important;left:50%!important;right:auto!important;bottom:14px!important;
-  transform:translateX(-50%)!important;width:min(920px,72%)!important;height:218px!important;z-index:65!important;
-  background:linear-gradient(180deg,rgba(6,18,29,.97),rgba(2,9,15,.98))!important;
-  border:1px solid #49616d!important;box-shadow:0 15px 44px #000c,inset 0 1px rgba(211,184,111,.18)!important;
-  overflow:hidden!important;border-radius:2px!important;
-}
-.battle-scoreboard-head{
-  height:30px!important;display:flex!important;align-items:center!important;justify-content:center!important;
-  padding:0 10px!important;border-bottom:1px solid #3b5360!important;
-  background:linear-gradient(180deg,#10232e,#08151d)!important;color:#d5e2e8!important;font-size:10px!important;font-weight:1000!important;letter-spacing:2px!important
-}
-.score-close{display:none!important}.scoreboard-body{height:calc(100% - 30px)!important;display:grid!important;grid-template-rows:repeat(5,1fr)!important;gap:1px!important;padding:3px!important;box-sizing:border-box!important;background:#02080d!important}
-.score-pair{display:grid!important;grid-template-columns:minmax(0,1fr) 24px minmax(0,1fr)!important;align-items:center!important;background:linear-gradient(90deg,rgba(15,50,74,.72),rgba(7,18,26,.95) 47%,rgba(7,18,26,.95) 53%,rgba(68,20,29,.68))!important;border:1px solid #17303e!important}
-.score-half{display:grid!important;align-items:center!important;min-width:0!important;padding:2px 5px!important;gap:5px!important}
-.ally-half{grid-template-columns:minmax(150px,1fr) 50px 30px 34px!important}.enemy-half{grid-template-columns:34px 30px 50px minmax(150px,1fr)!important}
-.score-items{display:grid!important;grid-template-columns:repeat(6,22px)!important;gap:3px!important;justify-content:start!important}
-.enemy-items{justify-content:end!important}
-.score-item{width:22px!important;height:22px!important;border:1px solid #47515a!important;background:#0a1117!important;font-size:8px!important}
-.score-item.filled{border-color:#9b7c37!important;background:#17160f!important;box-shadow:inset 0 0 5px #c79a3440!important}.score-item img{width:100%!important;height:100%!important;object-fit:cover!important}
-.score-champ{width:30px!important;height:30px!important;border:1px solid #4f9bda!important;overflow:hidden!important}.score-champ.enemy{border-color:#cf5864!important}.score-champ img{width:100%!important;height:100%!important;object-fit:cover!important}
-.score-kda{font-size:10px!important;font-weight:1000!important;color:#dce8ee!important;text-align:center!important}.score-cs{font-size:9px!important;color:#a7b6be!important;text-align:center!important}.score-mid{font-size:8px!important;color:#617986!important;text-align:center!important}
-.mobile-score-toggle{display:none!important}
-/* Match log/chat remain but move away from the main scoreboard */
-.b2-panel{left:12px!important;right:auto!important;bottom:14px!important;transform:none!important;width:min(280px,20%)!important;height:218px!important;box-sizing:border-box!important;z-index:57!important;opacity:.92!important}
-.b2-panel-head{font-size:8px!important;padding:5px 7px!important}.b2-log{height:150px!important;font-size:8px!important;line-height:1.45!important;padding:5px 7px!important}.b2-controls{display:none!important}
-.match-all-chat{left:auto!important;right:12px!important;bottom:14px!important;transform:none!important;width:min(280px,20%)!important;height:118px!important;z-index:57!important}
-.match-all-chat-head{font-size:8px!important}.match-all-chat-body{font-size:8px!important;line-height:1.45!important}
-@media(max-width:1100px){
-  .b2-side{width:calc(50% - 118px)!important}.b2-head{grid-template-columns:1fr 200px 1fr!important}.b2-score{font-size:24px!important;gap:12px!important}
-  .battle-scoreboard{width:min(780px,76%)!important}.score-items{grid-template-columns:repeat(6,18px)!important}.score-item{width:18px!important;height:18px!important}.ally-half{grid-template-columns:minmax(120px,1fr) 44px 26px 30px!important}.enemy-half{grid-template-columns:30px 26px 44px minmax(120px,1fr)!important}
-  .b2-panel,.match-all-chat{width:18%!important}
-}
-@media(max-width:800px){
-  .b2-head{height:62px!important;flex-basis:62px!important;grid-template-columns:1fr 150px 1fr!important;padding:0 6px!important}.b2-score{height:31px!important;line-height:31px!important;font-size:20px!important}.b2-clock{font-size:10px!important}
-  .b2-side{top:2px!important;width:calc(50% - 82px)!important;height:52px!important;padding:2px!important;gap:2px!important}.b2-side:not(.right){left:2px!important}.b2-side.right{right:2px!important}.b2-unit,.b2-side.right .b2-unit{height:46px!important;grid-template-columns:22px minmax(0,1fr)!important;padding:2px!important;gap:2px!important}.b2-side.right .b2-unit{grid-template-columns:minmax(0,1fr) 22px!important}.portrait,.b2-orb{width:21px!important;height:30px!important;min-width:21px!important}.b2-unit strong{font-size:6px!important}.b2-unit small{display:none!important}.b2-hp{height:3px!important}
-  .b2-speed-dock{top:56px!important;max-width:88%!important;overflow-x:auto!important}.b2-speed-dock button{min-width:28px!important;padding:3px 5px!important;font-size:7px!important}
-  .battle-scoreboard{display:none!important;left:5%!important;right:5%!important;bottom:8px!important;transform:none!important;width:90%!important;height:min(58dvh,390px)!important;z-index:96!important}.battle-scoreboard.open{display:block!important}.score-close{display:block!important;position:absolute!important;right:6px!important;top:2px!important;border:0!important;background:transparent!important;color:#fff!important;font-size:20px!important}.scoreboard-body{overflow-y:auto!important}.score-pair{grid-template-columns:minmax(0,1fr) 14px minmax(0,1fr)!important}.score-half{gap:2px!important;padding:2px!important}.ally-half{grid-template-columns:minmax(60px,1fr) 32px 18px 22px!important}.enemy-half{grid-template-columns:22px 18px 32px minmax(60px,1fr)!important}.score-items{grid-template-columns:repeat(3,14px)!important;gap:1px!important}.score-item{width:14px!important;height:14px!important}.score-champ{width:20px!important;height:20px!important}.score-kda,.score-cs{font-size:6px!important}.mobile-score-toggle{display:block!important;position:absolute!important;right:8px!important;top:58px!important;z-index:95!important;border:1px solid #536f7d!important;background:#081721e8!important;color:#dceaf2!important;padding:5px 8px!important;font-size:7px!important;font-weight:900!important}
-  .b2-panel{left:5px!important;bottom:5px!important;width:42%!important;height:88px!important}.b2-panel-head{display:none!important}.b2-log{height:84px!important;font-size:6.5px!important}.match-all-chat{right:5px!important;bottom:5px!important;width:42%!important;height:88px!important}.match-all-chat-head{display:none!important}.match-all-chat-body{height:84px!important;font-size:6.5px!important;overflow:auto!important}
-}
-</style>
-<script id="v160-spectator-hud-script">
-(()=>{
-  const VERSION=160;
-  const oldRender=window.render;
-  if(typeof oldRender==='function'){
-    window.render=function(){
-      const r=oldRender.apply(this,arguments);
-      try{
-        if(window.mode==='battle') requestAnimationFrame(()=>{
-          try{
-            const score=document.querySelector('.b2-score');
-            if(score){
-              const b=score.querySelector('[data-team-kills]');
-              const e=score.querySelector('[data-enemy-kills]');
-              if(b&&e) score.innerHTML=`<span class="blue" data-team-kills>${b.textContent}</span><span style="color:#68808d;font-size:.72em">:</span><span class="red" data-enemy-kills>${e.textContent}</span>`;
-            }
-            const head=document.querySelector('.battle-scoreboard-head span');
-            if(head) head.textContent='MATCH STATUS';
-          }catch(err){}
-        });
-      }catch(e){}
-      return r;
-    }
-  }
+
+const _v168CombatApply=AramCombatSystemV167.prototype.applyHit;
+AramCombatSystemV167.prototype.applyHit=function(attacker,target,base,opt={}){
+ if(!attacker||!target||!target.alive)return;v168Init(attacker);v168Init(target);const t=this.e.bs.time,kind=opt.kind||((attacker.kind==='champ')?'basic':'other'),basic=attacker.kind==='champ'&&(kind==='basic'||kind==='champ-basic'||!opt.kind),skill=/skill|ability|ult/.test(kind);
+ if((target.invulnerableUntil||0)>t)return;if(skill&&target.spellShieldReady){target.spellShieldReady=false;addFx(target.x,target.y,'SPELL BLOCK',target.team);return}
+ let dmg=Number(base||0);if(attacker.damageDealtDebuffUntil>t)dmg*=.85;if(attacker.damageDealtMult)dmg*=attacker.damageDealtMult;
+ if(v168Owned(attacker,'강타자')&&basic)dmg+=attacker.maxHp*.025;if(v168Owned(attacker,'마법 명사수')&&basic)dmg+=(attacker.ap||0)*.75;if(v168Owned(attacker,'지옥불 영혼')&&(basic||skill))dmg+=Math.max(1,(attacker.atk||0)*.12+(attacker.ap||0)*.05);
+ if(v168Owned(attacker,'도취')&&basic&&attacker.mana>=attacker.maxMana*.025){attacker.mana-=attacker.maxMana*.025;dmg+=attacker.maxMana*.035}
+ if(v168Owned(attacker,'속전속결')){const diff=Math.max(0,(attacker.v2MoveSpeed||0)-(target.v2MoveSpeed||0));dmg*=1+Math.min(.35,diff/10*.01)}
+ if(v168Owned(attacker,'거인 학살자')){const ratio=(target.sizeScale||1)/(attacker.sizeScale||1);if(ratio>1)dmg*=1+Math.min(.30,.10+(ratio-1)*.20)}
+ if(v168Owned(attacker,'유리 대포'))dmg*=attacker.v2Role==='MARKSMAN'||attacker.v2Role==='MAGE'?1.15:1.25;
+ if(v168Owned(attacker,'불길한 서약'))dmg*=1+Math.min(.22,(attacker.v168OathPower||0)*.30);
+ if(v168Owned(target,'부식')===false&&target.corrosionUntil>t)dmg*=1+Math.min(.30,(target.corrosionStacks||0)*.015);
+ let critChance=Math.min(.95,attacker.critChance||0),crit=false;if(critChance>0&&this.e.rng.next()<critChance){crit=true;dmg*=skill&&v168Owned(attacker,'보석 건틀릿')?1.45:1.75}
+ if(v168Owned(target,'확률적 방어')&&this.e.rng.next()<Math.min(.50,target.critChance||0))dmg*=.80;
+ if(target.v2Shield>0){const absorb=Math.min(target.v2Shield,dmg);target.v2Shield-=absorb;dmg-=absorb;if(dmg<=0){addFx(target.x,target.y,'SHIELD',target.team);return}}
+ target.lastDamagedAt=t;attacker.lastCombatAt=t;target.lastCombatAt=t;
+ _v168CombatApply.call(this,attacker,target,dmg,{...opt,kind});
+ if(!target.alive&&v168Owned(attacker,'신난다!'))attacker.jinxUntil=t+4;
+ if(attacker.kind==='champ'&&dmg>0){if(v168Owned(attacker,'바다의 영혼'))attacker.seaRegenUntil=t+5;const ls=(attacker.lifesteal||0)+(crit&&attacker.critLifesteal?attacker.critLifesteal:0);if(ls>0)attacker.hp=Math.min(attacker.maxHp,attacker.hp+dmg*ls*(attacker.healPower||1));}
+ if(v168Owned(attacker,'감쇠 광선')&&basic)target.damageDealtDebuffUntil=t+3;
+ if(v168Owned(attacker,'부식')){target.corrosionStacks=Math.min(20,(target.corrosionUntil>t?target.corrosionStacks||0:0)+1);target.corrosionUntil=t+4}
+ if(v168Owned(attacker,'화염 낙인')&&basic){target.burnStacks=(target.burnStacks||0)+1;target.burnTickAt=Math.min(target.burnTickAt||t,t+1)}
+ if(v168Owned(attacker,'불을 밝혀')&&basic){attacker.v168BasicCount=(attacker.v168BasicCount||0)+1;if(attacker.v168BasicCount%4===0){const bonus=(15+(u=>Math.min(90,(u.level||3)*5))(attacker))/12+(attacker.atk||0)*.45+(attacker.ap||0)*.19;for(let i=0;i<4;i++)this.e.projectiles.spawn(attacker,target,bonus/4,{speed:620,kind:'augment-firework'})}}
+ if(v168Owned(attacker,'태풍')&&basic){const alt=this.e.index.enemies(attacker.team,'champ').filter(x=>x.alive&&x!==target).sort((a,b)=>aramV167Dist(attacker,a)-aramV167Dist(attacker,b))[0];if(alt&&aramV167Dist(attacker,alt)<360)this.e.projectiles.spawn(attacker,alt,dmg*.30,{speed:600,kind:'augment-typhoon'})}
+ if(v168Owned(attacker,'양손잡이')&&basic&&kind!=='augment-dual')this.e.projectiles.spawn(attacker,target,dmg*.40,{speed:640,kind:'augment-dual'});
+ if(v168Owned(attacker,'탄환 세례')&&basic&&t>=(attacker.bulletBarrageNext||0)){attacker.bulletBarrageNext=t+8;for(let i=0;i<5;i++)this.e.projectiles.spawn(attacker,target,dmg*.18,{speed:650+i*18,kind:'augment-barrage'})}
+ if(v168Owned(attacker,'마법공학의 영혼')&&(basic||skill)&&t>=(attacker.hexSoulNext||0)){attacker.hexSoulNext=t+5;const chain=this.e.index.enemies(attacker.team,'champ').filter(x=>x.alive).sort((a,b)=>aramV167Dist(target,a)-aramV167Dist(target,b)).slice(0,3);for(const e of chain)this.e.projectiles.spawn(attacker,e,Math.max(1,dmg*.22),{speed:700,kind:'augment-chain'})}
+ if(v168Owned(attacker,'탭 댄서')&&basic){attacker.tapStacks=Math.min(12,(attacker.tapStacks||0)+1);attacker.tapUntil=t+5}
+ if(v168Owned(attacker,'결투의 대가')&&basic)attacker.ap+=(6+Math.min(12,(attacker.level||3)-3));
+ if(v168Owned(attacker,'극악무도')&&skill&&t>=(attacker.vileNext||0)){attacker.ap+=1;attacker.vileNext=t+1}
+ return;
+};
+
+const _v168ChampionUpdate=AramChampionAISystemV167.prototype.update;
+AramChampionAISystemV167.prototype.update=function(dt){for(const u of this.e.index.blueChamps.concat(this.e.index.redChamps)){if(v168Owned(u,'탭 댄서')&&(u.tapUntil||0)>this.e.bs.time)u.attackRateMod=Math.max(.42,(u.attackRateMod||1)/(1+Math.min(.75,(u.tapStacks||0)*.035)));if(v168Owned(u,'광신자')&&u.ap>0)u.attackRateMod=Math.max(.40,(u.attackRateMod||1)/(1+Math.min(.05,u.ap/2000)))}return _v168ChampionUpdate.call(this,dt)};
+
+const _v168Respawn=AramRespawnSystemV167.prototype.update;AramRespawnSystemV167.prototype.update=function(dt){const was=new Map(this.e.bs.units.filter(u=>u.kind==='champ').map(u=>[u.id,u.alive]));_v168Respawn.call(this,dt);for(const u of this.e.bs.units)if(u.kind==='champ'&&u.alive&&!was.get(u.id)){if(v168Owned(u,'전술적 대비'))u.tacticalPrepNext=0;if(v168Owned(u,'화염 낙인'))u.burnStacks=0;if(v168Owned(u,'미친 과학자')){if(this.e.rng.next()<.5){u.sizeScale*=1.18;u.maxHp*=1.16;u.hp*=1.16;u.atk*=1.10}else{u.sizeScale*=.86;u.haste=(u.haste||0)+45;u.__v168BaseMoveSpeed=(u.__v168BaseMoveSpeed||u.v2MoveSpeed)*1.15}}}};
+
+const _v168EngineCtorUpdate=AramMatchEngineV2.prototype.update;AramMatchEngineV2.prototype.update=function(dt){if(!this.augmentRuntimeV168)this.augmentRuntimeV168=new AramAugmentRuntimeV168(this);this.augmentRuntimeV168.update(dt);return _v168EngineCtorUpdate.call(this,dt)};
+
+// ensure V2 migration preserves static augment-derived combat stats and creates runtime baselines.
+const _v168Migrate=AramMatchEngineV2.prototype.migrate;AramMatchEngineV2.prototype.migrate=function(){const r=_v168Migrate.call(this);for(const u of this.bs.team.concat(this.bs.enemy)){v168Init(u);u.__v168BaseMoveSpeed=u.v2MoveSpeed}return r};
+
+window.V168_AUGMENT_QA={required:V168_REQUIRED,descriptions:V168_DESCRIPTIONS,count:Object.values(V168_REQUIRED).reduce((a,b)=>a+b.length,0)};
 })();
 </script>
-<!-- V160 SPECTATOR HUD PATCH END -->
-
-
-<!-- V161 PROCEDURAL ABYSS PATCH START -->
-<style id="v161-procedural-abyss-style">
-/* V161: no battle-map image. The arena is built from CSS/DOM geometry. */
-.b2-stage{background:#06101a!important;isolation:isolate!important}
-.b2-map{position:absolute!important;inset:0!important;background:
- radial-gradient(circle at 14% 84%,rgba(39,111,164,.22) 0 5%,transparent 20%),
- radial-gradient(circle at 86% 16%,rgba(126,30,46,.17) 0 5%,transparent 20%),
- linear-gradient(135deg,#07131f 0%,#0a1c2b 43%,#0a1723 57%,#100c18 100%)!important;
- filter:none!important;transform:none!important;overflow:hidden!important;z-index:0!important}
-.b2-map:before,.b2-map:after{display:none!important}.clean-bridge{display:none!important}
-.v161-world{position:absolute;inset:0;overflow:hidden;pointer-events:none}
-.v161-void{position:absolute;inset:0;background:
- radial-gradient(ellipse at 25% 28%,rgba(32,77,117,.34),transparent 23%),
- radial-gradient(ellipse at 76% 72%,rgba(27,65,101,.31),transparent 26%),
- repeating-linear-gradient(135deg,rgba(118,181,219,.025) 0 2px,transparent 2px 42px),
- linear-gradient(180deg,#071522 0%,#06101a 58%,#07131f 100%)}
-.v161-cliff{position:absolute;background:
- repeating-linear-gradient(90deg,#20394b 0 14px,#142b3a 14px 29px,#0e2230 29px 43px);
- border:2px solid #365368;box-shadow:0 12px 28px #000b,inset 0 0 0 3px rgba(173,218,240,.025)}
-.v161-cliff.c1{left:-8%;top:-8%;width:44%;height:31%;transform:rotate(-7deg);clip-path:polygon(0 0,100% 0,84% 40%,92% 58%,68% 100%,0 91%)}
-.v161-cliff.c2{right:-9%;bottom:-9%;width:44%;height:34%;transform:rotate(-7deg);clip-path:polygon(25% 0,100% 8%,100% 100%,0 100%,13% 55%,5% 36%)}
-.v161-cliff.c3{right:-7%;top:-4%;width:28%;height:34%;clip-path:polygon(16% 0,100% 0,100% 100%,38% 84%,48% 55%,0 35%)}
-.v161-cliff.c4{left:-7%;bottom:-5%;width:29%;height:35%;clip-path:polygon(0 0,66% 11%,100% 48%,61% 67%,75% 100%,0 100%)}
-.v161-snow{position:absolute;background:rgba(154,210,238,.12);border-radius:50%;filter:blur(.4px)}
-.v161-snow.s1{left:6%;top:69%;width:22%;height:7%;transform:rotate(-39deg)}
-.v161-snow.s2{right:7%;top:22%;width:23%;height:7%;transform:rotate(-39deg)}
-.v161-snow.s3{left:38%;top:44%;width:25%;height:6%;transform:rotate(-39deg)}
-.v161-bridge-shadow,.v161-bridge-wall-a,.v161-bridge-wall-b,.v161-bridge,.v161-road{position:absolute;inset:0}
-.v161-bridge-shadow{clip-path:polygon(0 81%,7% 97%,100% 26%,93% 8%);background:#02080e;filter:drop-shadow(0 18px 20px #000d)}
-.v161-bridge{clip-path:polygon(0 79%,8% 94%,100% 23%,92% 9%);background:
- repeating-linear-gradient(135deg,rgba(174,210,225,.08) 0 2px,transparent 2px 52px),
- linear-gradient(135deg,#243f50,#1a3241 48%,#203b4c);box-shadow:inset 0 0 50px rgba(126,190,220,.10)}
-.v161-road{clip-path:polygon(2.8% 80.7%,8.5% 90.3%,97.3% 22%,91.5% 12.2%);background:
- repeating-linear-gradient(45deg,transparent 0 35px,rgba(167,205,221,.08) 36px 38px),
- repeating-linear-gradient(135deg,#2b4655 0 34px,#243d4c 35px 70px);box-shadow:inset 0 0 30px rgba(133,203,233,.08)}
-.v161-road:before{content:"";position:absolute;inset:0;background:linear-gradient(135deg,rgba(75,169,226,.12),transparent 43%,transparent 57%,rgba(211,67,86,.10));clip-path:inherit}
-.v161-bridge-wall-a{clip-path:polygon(0 78.5%,7.5% 82.5%,99.2% 12.7%,91.7% 8.6%);background:repeating-linear-gradient(135deg,#456777 0 22px,#203947 23px 33px);filter:drop-shadow(0 4px 5px #000b)}
-.v161-bridge-wall-b{clip-path:polygon(.8% 92%,8% 95.7%,100% 25.2%,92.7% 21.2%);background:repeating-linear-gradient(135deg,#456777 0 22px,#203947 23px 33px);filter:drop-shadow(0 5px 6px #000b)}
-.v161-base{position:absolute;width:25%;height:29%;background:
- repeating-linear-gradient(45deg,rgba(186,219,232,.07) 0 2px,transparent 2px 38px),
- linear-gradient(145deg,#274554,#1a3140);border:3px solid #446878;box-shadow:0 18px 30px #000a,inset 0 0 35px rgba(132,202,230,.08)}
-.v161-base.blue{left:-3%;bottom:-5%;clip-path:polygon(0 20%,47% 0,100% 44%,82% 100%,0 100%)}
-.v161-base.red{right:-3%;top:-5%;clip-path:polygon(18% 0,100% 0,100% 80%,53% 100%,0 56%);background:
- repeating-linear-gradient(45deg,rgba(225,194,203,.055) 0 2px,transparent 2px 38px),
- linear-gradient(145deg,#4a2631,#2b1821)}
-.v161-center-rune{position:absolute;left:50%;top:48%;width:72px;height:72px;transform:translate(-50%,-50%) rotate(45deg);border:2px solid rgba(116,190,221,.35);box-shadow:0 0 0 6px rgba(10,26,37,.65),0 0 18px rgba(67,170,216,.20);background:#17354566}
-.v161-center-rune:before,.v161-center-rune:after{content:"";position:absolute;inset:15px;border:1px solid rgba(149,214,237,.28)}
-.v161-center-rune:after{inset:28px;background:#7edcff33;box-shadow:0 0 12px #64cfff55}
-.v161-torch{position:absolute;width:8px;height:8px;border-radius:2px;background:#ffb449;box-shadow:0 0 5px #ff942c,0 0 13px #ff6b1f,0 0 24px #ff4e1c88;transform:translate(-50%,-50%)}
-.v161-torch:after{content:"";position:absolute;left:2px;top:7px;width:4px;height:8px;background:#6a4d3e;border:1px solid #1d2429}
-.v161-ice{position:absolute;width:5px;height:32px;background:linear-gradient(#bcf2ff,#4eb6e5 55%,#195c8b);clip-path:polygon(50% 0,100% 85%,66% 100%,0 86%);opacity:.7;filter:drop-shadow(0 0 5px #4dcfff55)}
-.v161-ice.i1{left:19%;top:73%;transform:rotate(-18deg)}.v161-ice.i2{left:25%;top:68%;height:22px}.v161-ice.i3{right:20%;top:24%;transform:rotate(12deg)}.v161-ice.i4{right:25%;top:31%;height:24px}
-.v161-crack{position:absolute;height:2px;width:8%;background:#7acdf266;box-shadow:0 0 6px #62c8f077;transform-origin:left center}.v161-crack:after{content:"";position:absolute;left:52%;top:0;width:58%;height:2px;background:inherit;transform:rotate(31deg);transform-origin:left}.v161-crack.k1{left:31%;top:62%;transform:rotate(-37deg)}.v161-crack.k2{left:58%;top:36%;transform:rotate(-37deg)}
-/* Structure track no longer rotates the objects; screenPos supplies actual map coordinates. */
-.structure-track{position:absolute!important;inset:0!important;left:0!important;top:0!important;width:100%!important;height:100%!important;transform:none!important;z-index:9!important;pointer-events:none!important}
-.structure-track .b2-structure{position:absolute!important;top:0;transform:translate(-50%,-50%)!important}
-.structure-track .b2-structure .sicon,.structure-track .b2-structure .sname{transform:none!important}
-/* Procedural structures */
-.b2-structure .sicon{font-size:0!important;color:transparent!important;position:relative!important;display:block!important;background:none!important;border:0!important;box-shadow:none!important;overflow:visible!important}
-.b2-structure.tower .sicon{width:30px!important;height:45px!important;border-radius:0!important;background:linear-gradient(90deg,#0b1d29,#31536a 35%,#41697f 50%,#263f50 68%,#081821)!important;border:2px solid #67b2db!important;box-shadow:0 0 12px #47a9dc66,0 6px 10px #0008!important;clip-path:polygon(22% 0,78% 0,100% 22%,82% 100%,18% 100%,0 22%)!important}
-.b2-structure.tower .sicon:before{content:"";position:absolute;left:50%;top:6px;transform:translateX(-50%) rotate(45deg);width:9px;height:9px;background:#66d2ff;box-shadow:0 0 10px #5bd2ff}
-.b2-structure.red.tower .sicon{background:linear-gradient(90deg,#241016,#5a2833 35%,#70404a 50%,#44222b 68%,#1c0b10)!important;border-color:#e46c78!important;box-shadow:0 0 12px #e54e6266,0 6px 10px #0008!important}.b2-structure.red.tower .sicon:before{background:#ff6d79;box-shadow:0 0 10px #ff5264}
-.b2-structure.inhib .sicon{width:38px!important;height:38px!important;border-radius:50%!important;background:radial-gradient(circle,#72ddff 0 18%,#1a5572 19% 36%,#0b2432 38% 58%,#4c839b 60% 65%,#0a1821 66%)!important;border:2px solid #6fc8e8!important;box-shadow:0 0 14px #55c8ff66!important}.b2-structure.red.inhib .sicon{background:radial-gradient(circle,#ff7684 0 18%,#7b2836 19% 36%,#2f1218 38% 58%,#97515a 60% 65%,#1c0b10 66%)!important;border-color:#f0818b!important;box-shadow:0 0 14px #ef566866!important}
-.b2-structure.nexus .sicon{width:58px!important;height:58px!important;border-radius:50%!important;background:radial-gradient(circle at 50% 42%,#adf0ff 0 11%,#55cfff 12% 24%,#174a6b 25% 42%,#0a2231 44% 63%,#5a93ad 64% 68%,#091820 69%)!important;border:2px solid #7ed9f4!important;box-shadow:0 0 20px #4ccaff77,0 7px 16px #0009!important}.b2-structure.red.nexus .sicon{background:radial-gradient(circle at 50% 42%,#ffd0d4 0 11%,#ff6a79 12% 24%,#6d2635 25% 42%,#2b1017 44% 63%,#a64c59 64% 68%,#1b0a0e 69%)!important;border-color:#f28d97!important;box-shadow:0 0 20px #f2526577,0 7px 16px #0009!important}
-.b2-structure .sname{display:block!important;position:absolute!important;left:50%!important;top:calc(100% + 7px)!important;transform:translateX(-50%)!important;min-width:max-content!important;margin:0!important;padding:2px 6px!important;border-radius:999px!important;background:rgba(3,11,18,.82)!important;border:1px solid rgba(100,159,188,.36)!important;color:#dcebf2!important;font-size:8px!important;font-weight:900!important;white-space:nowrap!important}.b2-structure.red .sname{border-color:rgba(189,83,99,.42)!important}
-.b2-structure.dead{opacity:.18!important;filter:grayscale(1)!important}
-@media(max-width:800px){.b2-structure .sname{display:none!important}.b2-structure.tower .sicon{width:20px!important;height:31px!important}.b2-structure.inhib .sicon{width:26px!important;height:26px!important}.b2-structure.nexus .sicon{width:38px!important;height:38px!important}.v161-center-rune{width:45px;height:45px}.v161-torch{width:5px;height:5px}}
-</style>
-<script id="v161-procedural-abyss-script">
-(()=>{
- const VERSION=161;
- const PATH=[
-  {p:5,x:8.5,y:84.5},{p:11,x:13.3,y:80.6},{p:17,x:18.7,y:76.0},{p:28,x:28.6,y:67.5},
-  {p:40,x:39.8,y:58.3},{p:50,x:49.5,y:50.2},{p:60,x:59.7,y:42.1},{p:72,x:70.8,y:32.8},
-  {p:83,x:80.8,y:24.4},{p:89,x:86.0,y:20.1},{p:95,x:91.1,y:15.8}
- ];
- const VISUAL={
-  tn1:{p:5,o:0},tt1:{p:11,o:-7},tt2:{p:11,o:7},ti:{p:17,o:0},t2:{p:28,o:0},t1:{p:40,o:0},
-  e1:{p:60,o:0},e2:{p:72,o:0},ei:{p:83,o:0},et1:{p:89,o:-7},et2:{p:89,o:7},en1:{p:95,o:0}
- };
- function pathPoint(progress,offset=0){
-  const p=Math.max(PATH[0].p,Math.min(PATH[PATH.length-1].p,Number(progress)||0));
-  let a=PATH[0],b=PATH[1];
-  for(let i=1;i<PATH.length;i++){if(p<=PATH[i].p){a=PATH[i-1];b=PATH[i];break}a=PATH[i-1];b=PATH[i]}
-  const t=(p-a.p)/(b.p-a.p||1),x=a.x+(b.x-a.x)*t,y=a.y+(b.y-a.y)*t;
-  const dx=b.x-a.x,dy=b.y-a.y,len=Math.hypot(dx,dy)||1,px=-dy/len,py=dx/len;
-  return {left:x+px*offset*.42,top:y+py*offset*.42};
- }
- const proceduralScreenPos=(x,y)=>{
-   const off=(Number(y??50)-50)*.46;
-   const q=pathPoint(Number(x)||0,off);
-   return {left:Math.max(3,Math.min(97,q.left)),top:Math.max(5,Math.min(95,q.top))};
- };
- window.screenPos=proceduralScreenPos;try{screenPos=proceduralScreenPos}catch(e){}
- function worldMarkup(){
-  const torches=[[8,85],[13,78],[19,73],[25,68],[33,62],[42,55],[58,43],[67,36],[75,29],[82,24],[88,19],[93,14]];
-  return `<div class="v161-world"><div class="v161-void"></div><div class="v161-cliff c1"></div><div class="v161-cliff c2"></div><div class="v161-cliff c3"></div><div class="v161-cliff c4"></div><div class="v161-snow s1"></div><div class="v161-snow s2"></div><div class="v161-snow s3"></div><div class="v161-bridge-shadow"></div><div class="v161-bridge"></div><div class="v161-road"></div><div class="v161-bridge-wall-a"></div><div class="v161-bridge-wall-b"></div><div class="v161-base blue"></div><div class="v161-base red"></div><div class="v161-center-rune"></div><div class="v161-ice i1"></div><div class="v161-ice i2"></div><div class="v161-ice i3"></div><div class="v161-ice i4"></div><div class="v161-crack k1"></div><div class="v161-crack k2"></div>${torches.map(([l,t])=>`<i class="v161-torch" style="left:${l}%;top:${t}%"></i>`).join('')}</div>`;
- }
- function ensureWorld(){const map=document.querySelector('.b2-map');if(map&&!map.querySelector('.v161-world')){map.innerHTML=worldMarkup();}}
- const staticFn=function(){
-  const bs=battleState;if(!bs)return;
-  for(const st of bs.structures||[]){const el=document.querySelector(`[data-structure="${st.id}"]`);if(!el)continue;const v=VISUAL[st.id];const q=v?pathPoint(v.p,v.o):proceduralScreenPos(st.x,st.y||50);el.style.left=q.left+'%';el.style.top=q.top+'%';}
-  const rs=[...document.querySelectorAll('.b2-relic')];(bs.relics||[]).forEach((r,i)=>{if(rs[i]){const q=proceduralScreenPos(r.x,50);rs[i].style.left=q.left+'%';rs[i].style.top=q.top+'%'}});
- };
- window.syncStaticBattlePositions=staticFn;try{syncStaticBattlePositions=staticFn}catch(e){}
- function verifyStructureOrder(){
-  const bs=battleState;if(!bs?.structures)return;
-  const required=['tn1','tt1','tt2','ti','t2','t1','e1','e2','ei','et1','et2','en1'];
-  const ids=new Set(bs.structures.map(s=>s.id));
-  bs.v161StructureLayoutOk=required.every(id=>ids.has(id));
- }
- const baseRender=window.render;
- if(typeof baseRender==='function')window.render=function(){const r=baseRender.apply(this,arguments);if(mode==='battle')requestAnimationFrame(()=>{try{ensureWorld();verifyStructureOrder();staticFn();if(typeof syncBattleDom==='function')syncBattleDom()}catch(e){console.error('[V161 MAP]',e)}});return r};
- const baseStart=window.startBattle;
- if(typeof baseStart==='function')window.startBattle=function(){const r=baseStart.apply(this,arguments);try{verifyStructureOrder()}catch(e){}return r};
- window.V161_PROCEDURAL_ABYSS={version:VERSION,path:PATH,visualStructures:VISUAL,screenPos:proceduralScreenPos,verify:verifyStructureOrder};
-})();
-</script>
-<!-- V161 PROCEDURAL ABYSS PATCH END -->
-
+<!-- V168 AUGMENT COMPLETE PATCH END -->
 </body>
 </html>
