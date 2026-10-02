@@ -3286,9 +3286,22 @@ function compositionMultiplier(champs,opponents){
  if(front===0)return .72;if(marksman===0&&mage===0)return .78;if(support===0)return .92;if(front===1)return .95;
  return 1;
 }
+
+const GALAXY_TOURNAMENT_STORE_V173='gokseon-galaxy-pcbang-tournament-v2';
+function isGalaxyTournamentBattle(){
+ if(window.__galaxyV158?.activeMatch)return true;
+ try{const t=JSON.parse(localStorage.getItem(GALAXY_TOURNAMENT_STORE_V173)||'null');return !!t?.activeMatch}catch(e){return false}
+}
+function disableTournamentScriptedEventsV173(bs){
+ if(!bs)return;bs.tournamentBattle=true;bs.devForcedEventDone=true;bs.akaliChatDone=true;
+ const off=['jaebinRandomEventEnabled','molchoRandomEventEnabled','galioSleepEnabled','siljeomPenaltyEnabled','munchulEnabled','galioMessiMatch','jogukMilteokMatch','siljeomEliseActive'];
+ off.forEach(k=>bs[k]=false);
+ const done=['jaebinRandomEventDone','molchoRandomEventDone','galioSleepDone','siljeomPenaltyDone','munchulDone'];done.forEach(k=>bs[k]=true);
+ bs.jaebinBadAugmentActive=false;bs.jaebinHealpackDebuffActive=false;bs.playerHealpackBoostActive=false;bs.molchoDrunkActive=false;bs.molchoPhoneUntil=0;bs.molchoAugmentScamActive=false;bs.galioSleepActive=false;bs.siljeomPenaltyOutcome=null;bs.munchulTargetRealName=null;bs.munchulMultiplier=1;['jaebinEventOpen','jaebinHealOpen','jaebinBadAugmentOpen','molchoPhoneOpen','molchoDrunkOpen','molchoAugmentScamOpen','galioSleepOpen','siljeomPenaltyOpen','munchulOpen'].forEach(k=>bs[k]=false);
+}
 function molchoEventMultiplier(u){
  const bs=battleState;
- if(!bs||!u||u.team!=='team'||u.realName!=='김병욱')return 1;
+ if(!bs||bs.tournamentBattle||!u||u.team!=='team'||u.realName!=='김병욱')return 1;
  let mult=1;
  if((bs.molchoPhoneUntil||0)>bs.time)mult*=.8;
  if(bs.molchoDrunkActive)mult*=.5;
@@ -3296,7 +3309,7 @@ function molchoEventMultiplier(u){
  return mult;
 }
 function jaebinEventMultiplier(u){
- const bs=battleState;if(!bs||!u||u.team!=='team')return 1;
+ const bs=battleState;if(!bs||bs.tournamentBattle||!u||u.team!=='team')return 1;
  let mult=1;
  if(u.realName==='이재빈'){
    if(bs.jaebinBadAugmentActive)mult*=.8;
@@ -3306,7 +3319,7 @@ function jaebinEventMultiplier(u){
  return mult;
 }
 function personalPopupMultiplier(u){
- const bs=battleState;if(!bs||!u||u.team!=='team')return 1;
+ const bs=battleState;if(!bs||bs.tournamentBattle||!u||u.team!=='team')return 1;
  let mult=1;
  if(u.realName==='김정운'&&bs.galioSleepActive)mult*=.5;
  if(u.realName==='박성진'){
@@ -3351,7 +3364,7 @@ function startBattle(){
  const structures=[
  {id:'tn1',team:'team',type:'nexus',name:'넥서스',x:5,y:50,hp:100,alive:true},{id:'tt1',team:'team',type:'tower',name:'쌍둥이 포탑',x:10.5,y:43,hp:100,alive:true},{id:'tt2',team:'team',type:'tower',name:'쌍둥이 포탑',x:10.5,y:57,hp:100,alive:true},{id:'ti',team:'team',type:'inhib',name:'억제기',x:17,y:50,hp:100,alive:true},{id:'t2',team:'team',type:'tower',name:'2차 포탑',x:28,y:50,hp:100,alive:true},{id:'t1',team:'team',type:'tower',name:'1차 포탑',x:40,y:50,hp:100,alive:true},
  {id:'e1',team:'enemy',type:'tower',name:'1차 포탑',x:60,y:50,hp:100,alive:true},{id:'e2',team:'enemy',type:'tower',name:'2차 포탑',x:72,y:50,hp:100,alive:true},{id:'ei',team:'enemy',type:'inhib',name:'억제기',x:83,y:50,hp:100,alive:true},{id:'et1',team:'enemy',type:'tower',name:'쌍둥이 포탑',x:89.5,y:43,hp:100,alive:true},{id:'et2',team:'enemy',type:'tower',name:'쌍둥이 포탑',x:89.5,y:57,hp:100,alive:true},{id:'en1',team:'enemy',type:'nexus',name:'넥서스',x:95,y:50,hp:100,alive:true}];
- battleState={time:0,lastTs:performance.now(),lastUiSync:0,status:'시작 증강체 선택 중',speed:1,team,enemy,units:[...team,...enemy],structures,relics:[],fx:[],fxSeq:0,log:[],logVersion:0,chat:[],teamKills:0,enemyKills:0,nextWaveAt:60,pushMomentumUntil:{team:0,enemy:0},waveCount:0,superTeam:false,superEnemy:false,paused:true,engineStarted:false,jaebinRandomEventEnabled:(Math.random()<.80),jaebinRandomEventType:(me?.id!=='nguyen'&&Math.random()<.5?'healpack':'taunt'),jaebinRandomEventAt:180+Math.random()*300,jaebinRandomEventDone:false,jaebinEventOpen:false,jaebinHealOpen:false,jaebinEventResult:null,jaebinChatAttempted:false,jaebinBadAugmentOpen:false,jaebinBadAugmentDone:false,jaebinBadAugmentActive:false,playerHealpackBoostActive:false,jaebinHealpackDebuffActive:false,
+ battleState={time:0,lastTs:performance.now(),lastUiSync:0,status:'시작 증강체 선택 중',speed:1,team,enemy,units:[...team,...enemy],structures,relics:[],fx:[],fxSeq:0,log:[],logVersion:0,chat:[],teamKills:0,enemyKills:0,nextWaveAt:45,pushMomentumUntil:{team:0,enemy:0},waveCount:0,superTeam:false,superEnemy:false,paused:true,engineStarted:false,jaebinRandomEventEnabled:(Math.random()<.80),jaebinRandomEventType:(me?.id!=='nguyen'&&Math.random()<.5?'healpack':'taunt'),jaebinRandomEventAt:180+Math.random()*300,jaebinRandomEventDone:false,jaebinEventOpen:false,jaebinHealOpen:false,jaebinEventResult:null,jaebinChatAttempted:false,jaebinBadAugmentOpen:false,jaebinBadAugmentDone:false,jaebinBadAugmentActive:false,playerHealpackBoostActive:false,jaebinHealpackDebuffActive:false,
 molchoRandomEventEnabled:(Math.random()<.80),molchoRandomEventType:(Math.random()<.5?'phone':'drunk'),
 molchoRandomEventAt:0,molchoRandomEventDone:false,molchoPhoneOpen:false,molchoPhoneUntil:0,molchoDrunkOpen:false,molchoDrunkActive:false,
 molchoAugmentScamOpen:false,molchoAugmentScamDone:false,molchoAugmentScamActive:false,
@@ -3362,14 +3375,15 @@ jogukMilteokMatch:(party.some(c=>c.id==='joguk')&&enemyTeam.some(e=>e.nick==='�
 siljeomEliseActive:(party.some(c=>c.id==='siljeom')&&teamPicks[party.findIndex(c=>c.id==='siljeom')]?.id==='elise'),siljeomSpiderNext:300,siljeomSpiderCount:0,
 munchulEnabled:((((me?.id==='dage'||me?.id==='dakestan')&&party.some(c=>c.id==='molcho'))||(me?.id==='molcho'&&party.some(c=>c.id==='dage'||c.id==='dakestan')))&&Math.random()<.82),
 munchulAt:180+Math.random()*420,munchulOpen:false,munchulDone:false,munchulResult:null,munchulTargetRealName:null,munchulMultiplier:1,munchulScenario:(me?.id==='molcho'?'molcho':'dage'),
-augmentOpen:true,augmentStage:'start',augmentChoices:[],augments:[],augmentDone:{start:false,7:false,11:false,15:false},augmentTierByStage:{},endPending:null,endTimer:null,endFinalized:false,akaliChatAt:420+Math.random()*60,akaliChatDone:false,teamCompMultiplier:teamComp,enemyCompMultiplier:enemyComp};
+augmentOpen:true,augmentStage:'start',augmentChoices:[],augments:[],augmentDone:{start:false,7:false,11:false,15:false},augmentTierByStage:{},endPending:null,endTimer:null,endFinalized:false,akaliChatAt:420+Math.random()*60,akaliChatDone:false,teamCompMultiplier:teamComp,enemyCompMultiplier:enemyComp,tournamentBattle:isGalaxyTournamentBattle()};
  // 시작 증강은 전투 루프를 돌리기 전에 먼저 확정한다.
  // 이전처럼 RAF를 먼저 시작한 뒤 0.7초 후 paused=true를 거는 순서를 없애서 00:00 정지 상태를 방지한다.
  battleState.molchoRandomEventAt=battleState.molchoRandomEventType==='drunk'?(50+Math.random()*25):(300+Math.random()*600);
  battleState.augmentTier=getAugmentTierForStage('start');
  battleState.augmentChoices=makeAugmentChoices(battleState.augmentTier,battleState.team?.[0]);
  applyDeveloperBattleConfig(battleState);
- if(party.some(c=>c.id==='siljeom')) battleState.chat.push(`<span class="all-tag">[전체]</span> <span class="ally-chat">실점:</span> 안녕하세요~ 매너게임이요 ^^`);
+ if(battleState.tournamentBattle)disableTournamentScriptedEventsV173(battleState);
+ if(!battleState.tournamentBattle&&party.some(c=>c.id==='siljeom')) battleState.chat.push(`<span class="all-tag">[전체]</span> <span class="ally-chat">실점:</span> 안녕하세요~ 매너게임이요 ^^`);
  mode='battle';
  render();
  armBattleUiSync();
@@ -3759,10 +3773,208 @@ function aramV167Role(u){const r=u?.champ?.roles||[];if(r.includes('Marksman'))r
 function aramV167Dist(a,b){return Math.hypot((a?.x||0)-(b?.x||0),(a?.y||0)-(b?.y||0))}
 function aramV170SegDist(px,py,ax,ay,bx,by){const vx=bx-ax,vy=by-ay,wx=px-ax,wy=py-ay,c1=vx*wx+vy*wy;if(c1<=0)return Math.hypot(px-ax,py-ay);const c2=vx*vx+vy*vy;if(c2<=c1)return Math.hypot(px-bx,py-by);const t=c1/c2;return Math.hypot(px-(ax+t*vx),py-(ay+t*vy))}
 function aramV170RolePriority(role){return{MARKSMAN:1.35,MAGE:1.28,SUPPORT:1.12,ASSASSIN:1.08,FIGHTER:.94,TANK:.72}[role]||1}
-const ARAM_V171_MELEE_BASIC=new Set(['garen','galio','gangplank','gragas','gwen','nasus','naafiri','nautilus','nocturne','nunu','nilah','darius','diana','rakan','rell','rammus','rumble','renekton','rengar','leona','reksai','leesin','masteryi','mordekaiser','monkeyking','vi','viego','volibear','briar','blitzcrank','shaco','sett','shen','shyvana','skarner','sylas','singed','xinzhhao','xinzhao','akali','yasuo','yone','ornn','warwick','udyr','irelia','illaoi','jarvaniv','jax','zac','ksante','katarina','kassadin','kayne','kayn','khazix','fizz','pantheon','pyke','poppy','tahmkench','talon','trundle']);
-const ARAM_V171_RANGED_BASIC=new Set(['graves','gnar','nidalee','jayce','kennen','kayle','teemo','twistedfate','urgot']);
-function aramV171AttackType(u){const id=(u?.champ?.id||'').toLowerCase(),roles=u?.champ?.roles||[];if(ARAM_V171_MELEE_BASIC.has(id))return'MELEE';if(ARAM_V171_RANGED_BASIC.has(id)||roles.includes('Marksman'))return'RANGED';if(roles.includes('Mage')&&!roles.includes('Fighter')&&!roles.includes('Tank'))return'RANGED';if(roles.includes('Support')&&!roles.includes('Tank')&&!roles.includes('Fighter'))return'RANGED';return'MELEE'}
-function aramV171BasicRange(u){return aramV171AttackType(u)==='RANGED'?Math.max(155,u.v2AttackRange||0):Math.min(72,u.v2AttackRange||72)}
+const CHAMPION_ATTACK_PROFILE=Object.freeze({
+  "garen":{attackType:'MELEE',source:'cdragon-riot-client'},
+  "galio":{attackType:'MELEE',source:'cdragon-riot-client'},
+  "gangplank":{attackType:'MELEE',source:'cdragon-riot-client'},
+  "gragas":{attackType:'MELEE',source:'cdragon-riot-client'},
+  "graves":{attackType:'RANGED',source:'cdragon-riot-client'},
+  "gwen":{attackType:'MELEE',source:'cdragon-riot-client'},
+  "gnar":{attackType:'RANGED',source:'cdragon-riot-client',dynamic:'GNAR_FORM'},
+  "nami":{attackType:'RANGED',source:'cdragon-riot-client'},
+  "nasus":{attackType:'MELEE',source:'cdragon-riot-client'},
+  "naafiri":{attackType:'MELEE',source:'cdragon-riot-client'},
+  "nautilus":{attackType:'MELEE',source:'cdragon-riot-client'},
+  "nocturne":{attackType:'MELEE',source:'cdragon-riot-client'},
+  "nunu":{attackType:'MELEE',source:'cdragon-riot-client'},
+  "nidalee":{attackType:'RANGED',source:'cdragon-riot-client',dynamic:'NIDALEE_FORM'},
+  "neeko":{attackType:'RANGED',source:'cdragon-riot-client'},
+  "nilah":{attackType:'MELEE',source:'cdragon-riot-client'},
+  "darius":{attackType:'MELEE',source:'cdragon-riot-client'},
+  "diana":{attackType:'MELEE',source:'cdragon-riot-client'},
+  "draven":{attackType:'MELEE',source:'cdragon-riot-client'},
+  "ryze":{attackType:'RANGED',source:'cdragon-riot-client'},
+  "rakan":{attackType:'MELEE',source:'cdragon-riot-client'},
+  "rell":{attackType:'MELEE',source:'cdragon-riot-client'},
+  "rammus":{attackType:'MELEE',source:'cdragon-riot-client'},
+  "lux":{attackType:'RANGED',source:'cdragon-riot-client'},
+  "rumble":{attackType:'MELEE',source:'cdragon-riot-client'},
+  "renata":{attackType:'RANGED',source:'cdragon-riot-client'},
+  "renekton":{attackType:'MELEE',source:'cdragon-riot-client'},
+  "reksai":{attackType:'MELEE',source:'cdragon-riot-client'},
+  "rengar":{attackType:'MELEE',source:'cdragon-riot-client'},
+  "lucian":{attackType:'RANGED',source:'cdragon-riot-client'},
+  "lulu":{attackType:'RANGED',source:'cdragon-riot-client'},
+  "leblanc":{attackType:'RANGED',source:'cdragon-riot-client'},
+  "leesin":{attackType:'MELEE',source:'cdragon-riot-client'},
+  "riven":{attackType:'MELEE',source:'cdragon-riot-client'},
+  "lissandra":{attackType:'RANGED',source:'cdragon-riot-client'},
+  "lillia":{attackType:'MELEE',source:'cdragon-riot-client'},
+  "masteryi":{attackType:'MELEE',source:'cdragon-riot-client'},
+  "maokai":{attackType:'MELEE',source:'cdragon-riot-client'},
+  "malzahar":{attackType:'RANGED',source:'cdragon-riot-client'},
+  "malphite":{attackType:'MELEE',source:'cdragon-riot-client'},
+  "mel":{attackType:'RANGED',source:'cdragon-riot-client'},
+  "mordekaiser":{attackType:'MELEE',source:'cdragon-riot-client'},
+  "morgana":{attackType:'RANGED',source:'cdragon-riot-client'},
+  "drmundo":{attackType:'MELEE',source:'cdragon-riot-client'},
+  "missfortune":{attackType:'RANGED',source:'cdragon-riot-client'},
+  "milio":{attackType:'RANGED',source:'cdragon-riot-client'},
+  "bard":{attackType:'RANGED',source:'cdragon-riot-client'},
+  "varus":{attackType:'RANGED',source:'cdragon-riot-client'},
+  "vi":{attackType:'MELEE',source:'cdragon-riot-client'},
+  "veigar":{attackType:'RANGED',source:'cdragon-riot-client'},
+  "vayne":{attackType:'RANGED',source:'cdragon-riot-client'},
+  "vex":{attackType:'RANGED',source:'cdragon-riot-client'},
+  "belveth":{attackType:'MELEE',source:'cdragon-riot-client'},
+  "velkoz":{attackType:'RANGED',source:'cdragon-riot-client'},
+  "volibear":{attackType:'MELEE',source:'cdragon-riot-client'},
+  "braum":{attackType:'MELEE',source:'cdragon-riot-client'},
+  "briar":{attackType:'MELEE',source:'cdragon-riot-client'},
+  "brand":{attackType:'RANGED',source:'cdragon-riot-client'},
+  "vladimir":{attackType:'RANGED',source:'cdragon-riot-client'},
+  "blitzcrank":{attackType:'MELEE',source:'cdragon-riot-client'},
+  "viego":{attackType:'MELEE',source:'cdragon-riot-client'},
+  "viktor":{attackType:'RANGED',source:'cdragon-riot-client'},
+  "poppy":{attackType:'MELEE',source:'cdragon-riot-client'},
+  "samira":{attackType:'RANGED',source:'cdragon-riot-client'},
+  "sion":{attackType:'MELEE',source:'cdragon-riot-client'},
+  "sylas":{attackType:'MELEE',source:'cdragon-riot-client'},
+  "shaco":{attackType:'MELEE',source:'cdragon-riot-client'},
+  "senna":{attackType:'RANGED',source:'cdragon-riot-client'},
+  "seraphine":{attackType:'RANGED',source:'cdragon-riot-client'},
+  "sejuani":{attackType:'MELEE',source:'cdragon-riot-client'},
+  "sett":{attackType:'MELEE',source:'cdragon-riot-client'},
+  "sona":{attackType:'RANGED',source:'cdragon-riot-client'},
+  "soraka":{attackType:'RANGED',source:'cdragon-riot-client'},
+  "shen":{attackType:'MELEE',source:'cdragon-riot-client'},
+  "shyvana":{attackType:'MELEE',source:'cdragon-riot-client'},
+  "smolder":{attackType:'RANGED',source:'cdragon-riot-client'},
+  "swain":{attackType:'RANGED',source:'cdragon-riot-client'},
+  "skarner":{attackType:'MELEE',source:'cdragon-riot-client'},
+  "sivir":{attackType:'RANGED',source:'cdragon-riot-client'},
+  "xinzhao":{attackType:'MELEE',source:'cdragon-riot-client'},
+  "syndra":{attackType:'RANGED',source:'cdragon-riot-client'},
+  "singed":{attackType:'MELEE',source:'cdragon-riot-client'},
+  "thresh":{attackType:'RANGED',source:'cdragon-riot-client'},
+  "ahri":{attackType:'RANGED',source:'cdragon-riot-client'},
+  "amumu":{attackType:'MELEE',source:'cdragon-riot-client'},
+  "aurelionsol":{attackType:'RANGED',source:'cdragon-riot-client'},
+  "ivern":{attackType:'RANGED',source:'cdragon-riot-client'},
+  "azir":{attackType:'RANGED',source:'cdragon-riot-client'},
+  "akali":{attackType:'MELEE',source:'cdragon-riot-client'},
+  "akshan":{attackType:'RANGED',source:'cdragon-riot-client'},
+  "aatrox":{attackType:'MELEE',source:'cdragon-riot-client'},
+  "aphelios":{attackType:'RANGED',source:'cdragon-riot-client'},
+  "alistar":{attackType:'MELEE',source:'cdragon-riot-client'},
+  "ambessa":{attackType:'MELEE',source:'cdragon-riot-client'},
+  "annie":{attackType:'RANGED',source:'cdragon-riot-client'},
+  "anivia":{attackType:'RANGED',source:'cdragon-riot-client'},
+  "ashe":{attackType:'RANGED',source:'cdragon-riot-client'},
+  "yasuo":{attackType:'MELEE',source:'cdragon-riot-client'},
+  "ekko":{attackType:'MELEE',source:'cdragon-riot-client'},
+  "elise":{attackType:'RANGED',source:'cdragon-riot-client',dynamic:'ELISE_FORM'},
+  "wukong":{attackType:'MELEE',source:'cdragon-riot-client'},
+  "aurora":{attackType:'RANGED',source:'cdragon-riot-client'},
+  "ornn":{attackType:'MELEE',source:'cdragon-riot-client'},
+  "orianna":{attackType:'RANGED',source:'cdragon-riot-client'},
+  "olaf":{attackType:'MELEE',source:'cdragon-riot-client'},
+  "yone":{attackType:'MELEE',source:'cdragon-riot-client'},
+  "yorick":{attackType:'MELEE',source:'cdragon-riot-client'},
+  "udyr":{attackType:'MELEE',source:'cdragon-riot-client'},
+  "urgot":{attackType:'RANGED',source:'cdragon-riot-client'},
+  "warwick":{attackType:'MELEE',source:'cdragon-riot-client'},
+  "yunara":{attackType:'RANGED',source:'cdragon-riot-client'},
+  "yuumi":{attackType:'RANGED',source:'cdragon-riot-client'},
+  "irelia":{attackType:'MELEE',source:'cdragon-riot-client'},
+  "evelynn":{attackType:'MELEE',source:'cdragon-riot-client'},
+  "ezreal":{attackType:'RANGED',source:'cdragon-riot-client'},
+  "illaoi":{attackType:'MELEE',source:'cdragon-riot-client'},
+  "jarvaniv":{attackType:'MELEE',source:'cdragon-riot-client'},
+  "xayah":{attackType:'RANGED',source:'cdragon-riot-client'},
+  "zyra":{attackType:'RANGED',source:'cdragon-riot-client'},
+  "zac":{attackType:'MELEE',source:'cdragon-riot-client'},
+  "zaahen":{attackType:'MELEE',source:'cdragon-riot-client'},
+  "janna":{attackType:'RANGED',source:'cdragon-riot-client'},
+  "jax":{attackType:'MELEE',source:'cdragon-riot-client'},
+  "zed":{attackType:'MELEE',source:'cdragon-riot-client'},
+  "xerath":{attackType:'RANGED',source:'cdragon-riot-client'},
+  "zeri":{attackType:'RANGED',source:'cdragon-riot-client'},
+  "jayce":{attackType:'RANGED',source:'cdragon-riot-client',dynamic:'JAYCE_FORM'},
+  "zoe":{attackType:'RANGED',source:'cdragon-riot-client'},
+  "ziggs":{attackType:'RANGED',source:'cdragon-riot-client'},
+  "jhin":{attackType:'RANGED',source:'cdragon-riot-client'},
+  "zilean":{attackType:'RANGED',source:'cdragon-riot-client'},
+  "jinx":{attackType:'RANGED',source:'cdragon-riot-client'},
+  "chogath":{attackType:'MELEE',source:'cdragon-riot-client'},
+  "karma":{attackType:'RANGED',source:'cdragon-riot-client'},
+  "camille":{attackType:'MELEE',source:'cdragon-riot-client'},
+  "kassadin":{attackType:'MELEE',source:'cdragon-riot-client'},
+  "karthus":{attackType:'RANGED',source:'cdragon-riot-client'},
+  "cassiopeia":{attackType:'RANGED',source:'cdragon-riot-client'},
+  "kaisa":{attackType:'RANGED',source:'cdragon-riot-client'},
+  "khazix":{attackType:'MELEE',source:'cdragon-riot-client'},
+  "katarina":{attackType:'MELEE',source:'cdragon-riot-client'},
+  "kalista":{attackType:'RANGED',source:'cdragon-riot-client'},
+  "kennen":{attackType:'RANGED',source:'cdragon-riot-client'},
+  "caitlyn":{attackType:'RANGED',source:'cdragon-riot-client'},
+  "kayn":{attackType:'MELEE',source:'cdragon-riot-client'},
+  "kayle":{attackType:'MELEE',source:'cdragon-riot-client',dynamic:'KAYLE_LEVEL'},
+  "kogmaw":{attackType:'RANGED',source:'cdragon-riot-client'},
+  "corki":{attackType:'RANGED',source:'cdragon-riot-client'},
+  "quinn":{attackType:'RANGED',source:'cdragon-riot-client'},
+  "ksante":{attackType:'MELEE',source:'cdragon-riot-client'},
+  "kled":{attackType:'MELEE',source:'cdragon-riot-client'},
+  "qiyana":{attackType:'MELEE',source:'cdragon-riot-client'},
+  "kindred":{attackType:'RANGED',source:'cdragon-riot-client'},
+  "taric":{attackType:'MELEE',source:'cdragon-riot-client'},
+  "talon":{attackType:'MELEE',source:'cdragon-riot-client'},
+  "taliyah":{attackType:'RANGED',source:'cdragon-riot-client'},
+  "tahmkench":{attackType:'MELEE',source:'cdragon-riot-client'},
+  "trundle":{attackType:'MELEE',source:'cdragon-riot-client'},
+  "tristana":{attackType:'RANGED',source:'cdragon-riot-client'},
+  "tryndamere":{attackType:'MELEE',source:'cdragon-riot-client'},
+  "twistedfate":{attackType:'RANGED',source:'cdragon-riot-client'},
+  "twitch":{attackType:'RANGED',source:'cdragon-riot-client'},
+  "teemo":{attackType:'RANGED',source:'cdragon-riot-client'},
+  "pyke":{attackType:'MELEE',source:'cdragon-riot-client'},
+  "pantheon":{attackType:'MELEE',source:'cdragon-riot-client'},
+  "fiddlesticks":{attackType:'RANGED',source:'cdragon-riot-client'},
+  "fiora":{attackType:'MELEE',source:'cdragon-riot-client'},
+  "fizz":{attackType:'MELEE',source:'cdragon-riot-client'},
+  "heimerdinger":{attackType:'RANGED',source:'cdragon-riot-client'},
+  "hecarim":{attackType:'MELEE',source:'cdragon-riot-client'},
+  "hwei":{attackType:'RANGED',source:'cdragon-riot-client'},
+  "leona":{attackType:'MELEE',source:'cdragon-riot-client'},
+  "locke":{attackType:'MELEE',source:'local-custom'}
+});
+
+function resolveAttackProfile(u){
+ const id=(u?.champ?.id||'').toLowerCase(),base=CHAMPION_ATTACK_PROFILE[id];
+ if(!base){console.error('[V173] missing attack profile',id);return{attackType:'MELEE',source:'MISSING_PROFILE'}}
+ let attackType=base.attackType,form=u?.v173Form||null;
+ if(id==='jayce')attackType=form==='HAMMER'?'MELEE':'RANGED';
+ else if(id==='nidalee')attackType=form==='COUGAR'?'MELEE':'RANGED';
+ else if(id==='elise')attackType=form==='SPIDER'?'MELEE':'RANGED';
+ else if(id==='gnar')attackType=form==='MEGA'?'MELEE':'RANGED';
+ else if(id==='kayle')attackType=(u?.level||3)>=6?'RANGED':'MELEE';
+ return{...base,attackType,form};
+}
+function aramV171AttackType(u){return resolveAttackProfile(u).attackType}
+function aramV171BasicRange(u){return resolveAttackProfile(u).attackType==='RANGED'?168:68}
+function syncAttackProfileV173(u){if(!u||u.kind!=='champ')return;const p=resolveAttackProfile(u);u.v2AttackType=p.attackType;u.v2AttackRange=aramV171BasicRange(u);u.v173AttackProfile=p;return p}
+function updateAdaptiveFormV173(u,p,state,dt){
+ const id=(u?.champ?.id||'').toLowerCase(),now=battleState?.time||0,d=p?.nearest?aramV167Dist(u,p.nearest):999;
+ if(id==='jayce')u.v173Form=(['ENGAGE','CHASE','SCRAMBLE'].includes(state)&&d<125)?'HAMMER':'CANNON';
+ else if(id==='nidalee')u.v173Form=(['ENGAGE','CHASE'].includes(state)&&p?.low&&d<125)?'COUGAR':'HUMAN';
+ else if(id==='elise')u.v173Form=(['ENGAGE','CHASE','SCRAMBLE'].includes(state)&&d<115)?'SPIDER':'HUMAN';
+ else if(id==='gnar'){
+   if((u.v173MegaUntil||0)>now)u.v173Form='MEGA';
+   else{u.v173GnarRage=Math.max(0,(u.v173GnarRage||0)+(p?.nearest&&d<270?dt*10:dt*2));if(u.v173GnarRage>=100){u.v173Form='MEGA';u.v173MegaUntil=now+12;u.v173GnarRage=0}else u.v173Form='MINI'}
+ }else if(id==='kayle')u.v173Form=(u.level||3)>=6?'ASCENDED_RANGED':'PRE6_MELEE';
+ syncAttackProfileV173(u);
+}
+window.V173_ATTACK_PROFILE_QA={count:Object.keys(CHAMPION_ATTACK_PROFILE).length,missing:champions.filter(c=>!CHAMPION_ATTACK_PROFILE[c.id]).map(c=>c.id)};
 function aramV170Subtype(u){if(u.v2Subtype)return u.v2Subtype;const r=u.v2Role||aramV167Role(u),n=(u.champ?.name||u.champ?.id||'').toLowerCase();let st={TANK:'ENGAGER',FIGHTER:'SKIRMISHER',ASSASSIN:'FLANKER',MAGE:'POKE',MARKSMAN:'HYPERCARRY',SUPPORT:'ENCHANTER'}[r]||'SKIRMISHER';if(r==='TANK'&&/braum|shen|tahm|taric/.test(n))st='PEELER';if(r==='MAGE'&&/annie|syndra|veigar|leblanc/.test(n))st='BURST';if(r==='MAGE'&&/anivia|orianna|viktor|zyra/.test(n))st='CONTROL';if(r==='FIGHTER'&&/darius|garen|illaoi|sett/.test(n))st='JUGGERNAUT';if(r==='ASSASSIN'&&/katarina|pyke|viego/.test(n))st='RESET';if(r==='MARKSMAN'&&/ezreal|jayce|varus|caitlyn/.test(n))st='POKE';if(r==='MARKSMAN'&&/lucian|zeri|kalista/.test(n))st='MOBILE';if(r==='SUPPORT'&&/blitz|nautilus|thresh|rakan/.test(n))st='CATCHER';if(r==='SUPPORT'&&/braum|taric|leona/.test(n))st='WARDEN';return u.v2Subtype=st}
 class AramMovementSystemV167{
  constructor(engine){this.e=engine}
@@ -3781,16 +3993,19 @@ class AramProjectileSystemV167{
 class AramCombatSystemV167{
  constructor(engine){this.e=engine}
  applyHit(attacker,target,base,opt={}){if(!target||!target.alive)return;if(target.type){this.damageStructure(attacker,target,base);return}let dmg=base;if(attacker?.kind==='champ'){dmg*=combatPerformanceMultiplier(attacker)*roleDamageMultiplier(attacker)}if(target.kind==='champ')dmg/=Math.sqrt(Math.max(.20,combatPerformanceMultiplier(target)));if((target.invulnerableUntil||0)>this.e.bs.time)dmg=0;if((target.v2Shield||0)>0&&dmg>0){const absorbed=Math.min(target.v2Shield,dmg);target.v2Shield-=absorbed;dmg-=absorbed}if(attacker?.kind==='champ')attacker.damageDealt=(attacker.damageDealt||0)+dmg*12;if(target.kind==='champ')target.damageTaken=(target.damageTaken||0)+dmg*12;if(attacker?.kind==='champ'&&target.kind==='champ'&&attacker.team!==target.team)this.e.structure?.onChampionDamaged?.(attacker,target);target.hp-=dmg;if(target.hp>0)return;target.hp=0;target.alive=false;target.v2Vel={x:0,y:0};target.v2State='RESPAWN';if(target.kind==='minion'){if(attacker?.kind==='champ'){attacker.cs=(attacker.cs||0)+1}grantMinionXp(target)}else if(target.kind==='champ'){target.respawn=respawnSeconds(target);killLog(attacker,target)} }
- damageStructure(attacker,st,base){if(!st?.alive||!this.e.structure.isTargetable(st,attacker.team))return;const allied=this.e.index.allies(attacker.team,'minion').some(m=>aramV167Dist(m,st)<175);if(st.type==='tower'&&this.e.bs.time<60)return;if(attacker.kind==='champ'&&!allied&&st.type==='tower')base*=.12;let dmg=base*(attacker.kind==='champ'?combatPerformanceMultiplier(attacker):1);if(st.type==='nexus')dmg*=.72;if((st.id==='t1'||st.id==='e1')&&this.e.bs.time<300)dmg*=.28;st.hp-=dmg;if(st.hp>0)return;st.hp=0;st.alive=false;addBattleLog(`[${formatBattleTime(this.e.bs.time)}] ${st.team==='enemy'?'적':'우리'} ${st.name} 파괴`);if(st.type==='inhib'){if(st.team==='team')this.e.bs.superEnemy=true;else this.e.bs.superTeam=true}if(st.type==='nexus'&&!this.e.bs.endPending){this.e.bs.endPending={winner:st.team==='enemy'?'team':'enemy',realAt:performance.now()+900};this.e.bs.status='넥서스 파괴';this.e.bs.engineStarted=false;if(this.e.bs.endTimer)clearTimeout(this.e.bs.endTimer);this.e.bs.endTimer=setTimeout(()=>finalizeBattleEnd(this.e.bs),900)}}
+ damageStructure(attacker,st,base){if(!st?.alive||!this.e.structure.isTargetable(st,attacker.team))return;if(st.type==='tower'&&this.e.bs.time<45)return;if(attacker.kind==='champ'&&!this.e.structure.canSiege(attacker.team,st)){this.e.bs.engineV2Telemetry&&(this.e.bs.engineV2Telemetry.champStructureBlocked=(this.e.bs.engineV2Telemetry.champStructureBlocked||0)+1);return}let dmg=base*(attacker.kind==='champ'?combatPerformanceMultiplier(attacker):1);if(st.type==='nexus')dmg*=.72;if((st.id==='t1'||st.id==='e1')&&this.e.bs.time<300)dmg*=.28;st.hp-=dmg;if(st.hp>0)return;st.hp=0;st.alive=false;addBattleLog(`[${formatBattleTime(this.e.bs.time)}] ${st.team==='enemy'?'적':'우리'} ${st.name} 파괴`);if(st.type==='inhib'){if(st.team==='team')this.e.bs.superEnemy=true;else this.e.bs.superTeam=true}if(st.type==='nexus'&&!this.e.bs.endPending){this.e.bs.endPending={winner:st.team==='enemy'?'team':'enemy',realAt:performance.now()+900};this.e.bs.status='넥서스 파괴';this.e.bs.engineStarted=false;if(this.e.bs.endTimer)clearTimeout(this.e.bs.endTimer);this.e.bs.endTimer=setTimeout(()=>finalizeBattleEnd(this.e.bs),900)}}
 }
 class AramStructureSystemV167{
  constructor(engine){this.e=engine;this.state=new Map()}
  targetGroups(team){return team==='team'?[['e1'],['e2'],['ei'],['et1','et2'],['en1']]:[['t1'],['t2'],['ti'],['tt1','tt2'],['tn1']]}
  targetable(team){for(const ids of this.targetGroups(team)){const live=(this.e.bs.structures||[]).filter(s=>ids.includes(s.id)&&s.alive);if(live.length)return live}return[]}
  isTargetable(st,team){return this.targetable(team).some(s=>s.id===st.id)}
- nearestTarget(u){const ss=this.targetable(u.team);return ss.sort((a,b)=>aramV167Dist(u,a)-aramV167Dist(u,b))[0]||null}
+ canSiege(team,st){if(!st||!st.alive||!this.isTargetable(st,team))return false;const minions=this.e.index.allies(team,'minion').filter(m=>m.alive);if(!minions.length)return false;const dir=team==='team'?1:-1;return minions.some(m=>aramV167Dist(m,st)<=215&&((st.x-m.x)*dir>=-35))}
+ nearestTarget(u,requireSiege=false){const ss=this.targetable(u.team).filter(st=>!requireSiege||this.canSiege(u.team,st));return ss.sort((a,b)=>aramV167Dist(u,a)-aramV167Dist(u,b))[0]||null}
+ towerThreatAt(team,x,y){return (this.e.bs.structures||[]).some(st=>st.alive&&st.type==='tower'&&st.team!==team&&Math.hypot(st.x-x,st.y-y)<198)}
+ clampChampionOutOfTower(u,move){if(!move||u.kind!=='champ')return move;for(const st of this.e.bs.structures||[]){if(!st.alive||st.type!=='tower'||st.team===u.team||this.canSiege(u.team,st))continue;if(Math.hypot(move.x-st.x,move.y-st.y)<202){const dir=u.team==='team'?1:-1;move.x=st.x-dir*205;move.y=450+(move.y-450)*.75;this.e.bs.engineV2Telemetry&&(this.e.bs.engineV2Telemetry.towerEntryBlocked=(this.e.bs.engineV2Telemetry.towerEntryBlocked||0)+1)}}return move}
  onChampionDamaged(attacker,target){for(const st of this.e.bs.structures||[]){if(!st.alive||st.type!=='tower'||st.team!==target.team)continue;if(aramV167Dist(st,attacker)>190)continue;const s=this.state.get(st.id)||{mode:'IDLE',target:null,cd:0,lockUntil:0,shots:0};s.target=attacker;s.lockUntil=this.e.bs.time+2.8;s.shots=Math.max(1,s.shots||0);this.state.set(st.id,s)}}
- update(dt){for(const st of this.e.bs.structures||[]){if(!st.alive||st.type!=='tower')continue;let s=this.state.get(st.id)||{mode:'IDLE',target:null,cd:0,lockUntil:0,shots:0};s.cd=Math.max(0,s.cd-dt);let t=s.target;if(!t||!t.alive||aramV167Dist(st,t)>195){t=null;s.shots=0}s.target=t;if((s.lockUntil||0)<=this.e.bs.time&&!t){const minions=this.e.index.enemies(st.team,'minion').filter(x=>aramV167Dist(st,x)<=190).sort((a,b)=>aramV167Dist(st,a)-aramV167Dist(st,b));const champs=this.e.index.enemies(st.team,'champ').filter(x=>aramV167Dist(st,x)<=190).sort((a,b)=>aramV167Dist(st,a)-aramV167Dist(st,b));t=minions[0]||champs[0]||null;s.target=t;s.shots=0}if(t&&s.cd<=0){s.mode='FIRING';const ramp=t.kind==='champ'?Math.min(1.75,1+(s.shots||0)*.18):1;const dmg=(t.kind==='minion'?12:15)*ramp;this.e.projectiles.spawn({id:st.id,kind:'structure',team:st.team,x:st.x,y:st.y,nick:st.name},t,dmg,{speed:620,kind:'tower'});s.cd=1.15;s.shots=(s.shots||0)+1}else s.mode=t?'COOLDOWN':'IDLE';this.state.set(st.id,s)}}
+ update(dt){for(const st of this.e.bs.structures||[]){if(!st.alive||st.type!=='tower')continue;let s=this.state.get(st.id)||{mode:'IDLE',target:null,cd:0,lockUntil:0,shots:0};s.cd=Math.max(0,s.cd-dt);let t=s.target;if(!t||!t.alive||aramV167Dist(st,t)>195){t=null;s.shots=0}s.target=t;if((s.lockUntil||0)<=this.e.bs.time&&!t){const minions=this.e.index.enemies(st.team,'minion').filter(x=>aramV167Dist(st,x)<=190).sort((a,b)=>aramV167Dist(st,a)-aramV167Dist(st,b));const champs=this.e.index.enemies(st.team,'champ').filter(x=>aramV167Dist(st,x)<=190).sort((a,b)=>aramV167Dist(st,a)-aramV167Dist(st,b));t=minions[0]||champs[0]||null;s.target=t;s.shots=0}if(t&&s.cd<=0){s.mode='FIRING';const ramp=t.kind==='champ'?Math.min(1.75,1+(s.shots||0)*.18):1,dmg=(t.kind==='minion'?12:15)*ramp;this.e.projectiles.spawn({id:st.id,kind:'structure',team:st.team,x:st.x,y:st.y,nick:st.name},t,dmg,{speed:620,kind:'tower'});s.cd=1.15;s.shots=(s.shots||0)+1}else s.mode=t?'COOLDOWN':'IDLE';this.state.set(st.id,s)}}
 }
 class AramWaveSystemV167{
  constructor(engine){this.e=engine;this.waves=[];this.seq=0}
@@ -3824,32 +4039,66 @@ class AramDangerZoneSystemV170{
 }
 class AramTeamFightDirectorV169{
  constructor(engine){this.e=engine;this.team={team:this.make('team'),enemy:this.make('enemy')}}
- make(team){return{team,phase:'FORMATION',phaseUntil:0,pushUntil:0,lineX:team==='team'?520:1880,frontlineX:0,backlineX:0,waveFrontX:0,ultReady:0,avgHp:1,engageScore:0,aliveCount:5}}
- skillReady(u,key='R'){const s=u.v2Skills?.[key];return !!s&&this.e.bs.time>=(s.readyAt||0)}
- updateOne(team){const own=this.e.index.allies(team,'champ'),enemy=this.e.index.enemies(team,'champ'),m=this.team[team],dir=team==='team'?1:-1;if(!own.length)return m;const xs=own.map(u=>u.x),now=this.e.bs.time;m.frontlineX=dir===1?Math.max(...xs):Math.min(...xs);m.backlineX=dir===1?Math.min(...xs):Math.max(...xs);m.waveFrontX=this.e.waves.teamFront(team);m.avgHp=own.reduce((a,u)=>a+u.hp/u.maxHp,0)/own.length;m.ultReady=own.filter(u=>this.skillReady(u,'R')).length;m.aliveCount=own.length;const enemyHp=enemy.length?enemy.reduce((a,u)=>a+u.hp/u.maxHp,0)/enemy.length:0,ownDead=5-own.length,enemyDead=5-enemy.length;const carriesLow=enemy.filter(e=>['MARKSMAN','MAGE'].includes(e.v2Role)&&e.hp/e.maxHp<(e.v2Role==='MARKSMAN'?.40:.35)).length;const isolated=enemy.filter(e=>enemy.filter(x=>x!==e&&aramV167Dist(x,e)<150).length<=1).length;const clustered=enemy.reduce((a,e)=>a+enemy.filter(x=>x!==e&&aramV167Dist(x,e)<115).length,0)/Math.max(1,enemy.length);const waveSupport=this.e.index.allies(team,'minion').some(x=>Math.abs(x.x-m.frontlineX)<190);const spread=Math.abs(m.frontlineX-m.backlineX);const tank=own.find(u=>u.v2Role==='TANK'),tankReady=tank&&tank.hp/tank.maxHp>.42?1:0;const enemyTower=this.e.bs.structures.some(st=>st.alive&&st.type==='tower'&&st.team!==team&&own.some(u=>aramV167Dist(u,st)<205));m.engageScore=(m.avgHp-enemyHp)*3+(own.length-enemy.length)*.65+carriesLow*.7+isolated*.18+clustered*.12+m.ultReady*.20+tankReady*.32+(waveSupport?.25:-.30)-(enemyTower?.55:0)-Math.max(0,spread-330)/350;if(enemyDead>=3&&own.length>=2){m.pushUntil=Math.max(m.pushUntil,now+8);m.phase='SIEGE';m.phaseUntil=m.pushUntil}else if(now>=m.phaseUntil){if(ownDead>=2&&ownDead>enemyDead){m.phase='DISENGAGE';m.phaseUntil=now+3}else if(m.engageScore>1.25){m.phase='CATCH';m.phaseUntil=now+1.1}else if(m.engageScore>.72){m.phase='PRESSURE';m.phaseUntil=now+2.7}else if(m.avgHp>.48&&enemyHp>.40){m.phase='POKE';m.phaseUntil=now+3.5}else{m.phase='FORMATION';m.phaseUntil=now+2.5}}if(m.phase==='CATCH'&&now>m.phaseUntil-.35){m.phase='ENGAGE';m.phaseUntil=now+1.5}if(m.phase==='ENGAGE'&&now>m.phaseUntil-.45){m.phase='ALL_IN';m.phaseUntil=now+2.4}if(m.phase==='ALL_IN'&&now>m.phaseUntil-.55){m.phase='SCRAMBLE';m.phaseUntil=now+3.2}if(m.phase==='SCRAMBLE'&&now>=m.phaseUntil){m.phase=m.engageScore>0?'CHASE':'DISENGAGE';m.phaseUntil=now+2.4}const wave=m.waveFrontX,enemyFront=enemy.length?(dir===1?Math.min(...enemy.map(u=>u.x)):Math.max(...enemy.map(u=>u.x))):(dir===1?2100:300);let desired=wave-dir*78;if(m.phase==='PRESSURE'||m.phase==='POKE')desired=wave-dir*48;if(['CATCH','ENGAGE','ALL_IN','SCRAMBLE','CHASE'].includes(m.phase))desired=enemyFront-dir*(m.phase==='CHASE'?42:66);if(m.phase==='SIEGE')desired=wave-dir*22;if(m.phase==='DISENGAGE')desired=m.frontlineX-dir*105;m.lineX=Math.max(360,Math.min(2040,desired));return m}
+ make(team){return{team,phase:'PRE_WAVE_FORMATION',phaseUntil:0,engageCommitUntil:0,pushUntil:0,lineX:team==='team'?1010:1390,frontlineX:0,backlineX:0,waveFrontX:0,ultReady:0,avgHp:1,engageScore:0,aliveCount:5}}
+ skillReady(u,key='R'){const sk=u.v2Skills?.[key];return !!sk&&this.e.bs.time>=(sk.readyAt||0)}
+ updateOne(team){const own=this.e.index.allies(team,'champ'),enemy=this.e.index.enemies(team,'champ'),m=this.team[team],dir=team==='team'?1:-1,now=this.e.bs.time;if(!own.length)return m;const xs=own.map(u=>u.x);m.frontlineX=dir===1?Math.max(...xs):Math.min(...xs);m.backlineX=dir===1?Math.min(...xs):Math.max(...xs);m.waveFrontX=this.e.waves.teamFront(team);m.avgHp=own.reduce((a,u)=>a+u.hp/u.maxHp,0)/own.length;m.ultReady=own.filter(u=>this.skillReady(u,'R')).length;m.aliveCount=own.length;
+ const enemyHp=enemy.length?enemy.reduce((a,u)=>a+u.hp/u.maxHp,0)/enemy.length:0,ownDead=5-own.length,enemyDead=5-enemy.length,preWave=(this.e.bs.waveCount||0)===0;
+ const carriesLow=enemy.filter(e=>['MARKSMAN','MAGE'].includes(e.v2Role)&&e.hp/e.maxHp<(e.v2Role==='MARKSMAN'?.40:.35)).length,isolated=enemy.filter(e=>enemy.filter(x=>x!==e&&aramV167Dist(x,e)<150).length<=1).length,clustered=enemy.reduce((a,e)=>a+enemy.filter(x=>x!==e&&aramV167Dist(x,e)<115).length,0)/Math.max(1,enemy.length),spread=Math.abs(m.frontlineX-m.backlineX);
+ const tank=own.find(u=>u.v2Role==='TANK'),tankReady=tank&&tank.hp/tank.maxHp>.46?1:0,allySupport=own.filter(a=>a.hp/a.maxHp>.30).length>=3,enemyTower=this.e.bs.structures.some(st=>st.alive&&st.type==='tower'&&st.team!==team&&own.some(u=>aramV167Dist(u,st)<210)),enemyUltReady=enemy.filter(u=>this.skillReady(u,'R')).length;
+ const currentStructure=this.e.structure.targetable(team)[0]||null,waveCanSiege=currentStructure?this.e.structure.canSiege(team,currentStructure):false,waveSupport=this.e.index.allies(team,'minion').some(x=>Math.abs(x.x-m.frontlineX)<200),towerZone=!!(currentStructure&&!waveCanSiege&&enemy.some(e=>aramV167Dist(e,currentStructure)<235));
+ m.engageScore=(m.avgHp-enemyHp)*3+(own.length-enemy.length)*.70+carriesLow*.75+isolated*.17+clustered*.10+(m.ultReady-enemyUltReady)*.18+tankReady*.28+(waveSupport?.18:-.20)-(enemyTower&&!waveCanSiege?.75:0)-(towerZone?1.35:0)-Math.max(0,spread-300)/300;
+ if(preWave){m.phase='PRE_WAVE_FORMATION';m.phaseUntil=now+.8;m.engageCommitUntil=0;m.lineX=team==='team'?1010:1390;return m}
+ if(m.phase==='SIEGE'&&!waveCanSiege){m.phase='FORMATION';m.phaseUntil=now+1.4;m.pushUntil=0}
+ if(enemyDead>=3&&own.length>=2&&waveCanSiege){m.pushUntil=Math.max(m.pushUntil,now+7);m.phase='SIEGE';m.phaseUntil=m.pushUntil}
+ else if(now<(m.engageCommitUntil||0)&&['CATCH','ENGAGE','ALL_IN','SCRAMBLE'].includes(m.phase)){
+   if(m.phase==='CATCH'&&now>m.phaseUntil-.25){m.phase='ENGAGE';m.phaseUntil=now+1.35}
+   else if(m.phase==='ENGAGE'&&now>m.phaseUntil-.35){m.phase='ALL_IN';m.phaseUntil=now+2.0}
+   else if(m.phase==='ALL_IN'&&now>m.phaseUntil-.45){m.phase='SCRAMBLE';m.phaseUntil=Math.min(m.engageCommitUntil,now+2.6)}
+ }else if(now>=m.phaseUntil){
+   if(ownDead>=2&&ownDead>enemyDead||m.avgHp<.34){m.phase='DISENGAGE';m.phaseUntil=now+3.0}
+   else if(m.engageScore>1.32&&allySupport&&!enemyTower&&!towerZone){m.phase='CATCH';m.phaseUntil=now+1.0;m.engageCommitUntil=now+5.2}
+   else if(m.engageScore>.80){m.phase='PRESSURE';m.phaseUntil=now+2.8}
+   else if(m.avgHp>.42&&enemyHp>.32){m.phase='POKE';m.phaseUntil=now+3.6}
+   else{m.phase='FORMATION';m.phaseUntil=now+2.5}
+ }
+ if(m.phase==='SCRAMBLE'&&now>=m.phaseUntil){m.phase=m.engageScore>.55?'CHASE':'DISENGAGE';m.phaseUntil=now+1.8}
+ if(m.phase==='CHASE'&&now>=m.phaseUntil){m.phase='FORMATION';m.phaseUntil=now+1.8}
+ const wave=m.waveFrontX,enemyFront=enemy.length?(dir===1?Math.min(...enemy.map(u=>u.x)):Math.max(...enemy.map(u=>u.x))):(dir===1?2050:350);let desired=wave-dir*82;
+ if(m.phase==='PRESSURE'||m.phase==='POKE')desired=wave-dir*55;else if(['CATCH','ENGAGE','ALL_IN','SCRAMBLE'].includes(m.phase))desired=enemyFront-dir*80;else if(m.phase==='CHASE')desired=enemyFront-dir*65;else if(m.phase==='SIEGE'&&waveCanSiege)desired=wave-dir*30;else if(m.phase==='DISENGAGE')desired=m.frontlineX-dir*115;
+ m.lineX=Math.max(370,Math.min(2030,desired));return m}
  update(){this.updateOne('team');this.updateOne('enemy');this.e.bs.teamFightV169={team:{...this.team.team},enemy:{...this.team.enemy}}}
  get(team){return this.team[team]}
 }
 class AramChampionAISystemV167{
  constructor(engine){this.e=engine}
- perceive(u){const enemies=this.e.index.enemies(u.team,'champ'),enemyMinions=this.e.index.enemies(u.team,'minion'),allies=this.e.index.allies(u.team,'champ'),minions=this.e.index.allies(u.team,'minion'),sorted=enemies.slice().sort((a,b)=>aramV167Dist(u,a)-aramV167Dist(u,b)),tf=this.e.teamFight.get(u.team),enemyTf=this.e.teamFight.get(u.team==='team'?'enemy':'team');return{enemies,enemyMinions,allies,minions,nearest:sorted[0]||null,low:enemies.filter(e=>e.hp/e.maxHp<.32).sort((a,b)=>aramV167Dist(u,a)-aramV167Dist(u,b))[0]||null,alliedAlive:allies.length,enemyAlive:enemies.length,structure:this.e.structure.nearestTarget(u),phase:tf.phase,lineX:tf.lineX,waveFrontX:tf.waveFrontX,engageScore:tf.engageScore,allyUltimateReady:tf.ultReady,enemyThreatCooldown:Math.max(0,3-(enemyTf.ultReady||0)),enemyCCReady:enemies.filter(e=>['TANK','SUPPORT','MAGE'].includes(e.v2Role)&&this.e.skills.isReady(e,'E')).length,burstPotential:(tf.ultReady||0)+(allies.length-enemies.length)*.7}}
- chooseState(u,p){const now=this.e.bs.time,role=u.v2Role,hr=u.hp/u.maxHp;if(hr<.18)return'RETREAT';if(p.phase==='SIEGE')return'SIEGE';if(p.phase==='DISENGAGE'&&hr<.65)return'RETREAT';if(role==='ASSASSIN'&&['CATCH','ENGAGE','ALL_IN','SCRAMBLE','CHASE'].includes(p.phase))return p.phase==='CHASE'?'CHASE':'FLANK';if(['ENGAGE','ALL_IN','SCRAMBLE','CATCH'].includes(p.phase))return'ENGAGE';if(p.phase==='CHASE')return'CHASE';if(p.phase==='POKE'||p.phase==='PRESSURE')return['MARKSMAN','MAGE','SUPPORT'].includes(role)?'POKE':'LANE';if(p.low&&aramV167Dist(u,p.low)<240&&hr>.48)return'CHASE';if(role==='MARKSMAN'||role==='MAGE')return'KITING';return'LANE'}
- roleOffset(role){return{TANK:62,FIGHTER:34,ASSASSIN:14,MAGE:-30,MARKSMAN:-56,SUPPORT:-64}[role]||0}
- ySlot(u,p,state){const role=u.v2Role,base={TANK:-20,FIGHTER:28,ASSASSIN:-62,MAGE:50,MARKSMAN:-42,SUPPORT:12}[role]||0;const teamOrder=(u.team==='team'?this.e.index.blueChamps:this.e.index.redChamps).indexOf(u),jitter=((teamOrder%2)*2-1)*12;if(state==='FLANK')return 450+(u.v2FlankSide||(u.v2FlankSide=this.e.rng.next()<.5?-1:1))*Math.max(72,this.e.geometry.widthAt(u.x)*.55);return 450+base+jitter+(u.v2LaneOffset||0)*.12}
- targetScore(u,e,p,state){const d=aramV167Dist(u,e),hp=e.hp/e.maxHp,nearEnemies=p.enemies.filter(x=>x!==e&&aramV167Dist(x,e)<130).length,nearAllies=p.allies.filter(x=>aramV167Dist(x,e)<150).length,isolated=Math.max(0,2-nearEnemies),tower=this.e.danger.towerThreat(u,e.x,e.y),kill=(1-hp)*1.6,role=aramV170RolePriority(e.v2Role),dist=Math.max(-1.5,1-d/310);let sc=role+kill+isolated*.28+nearAllies*.08+dist-tower*.9-nearEnemies*.12;if(u.v2Role==='ASSASSIN'){if(['MARKSMAN','MAGE','SUPPORT'].includes(e.v2Role))sc+=.8;if(e.v2Role==='TANK')sc-=.9;if(state==='FLANK')sc+=.25*isolated}if(u.v2Role==='MARKSMAN'){sc=d<170?2.2-d/120:sc*.72;if(e.v2Role==='TANK')sc+=.18}if(u.v2Role==='MAGE')sc+=p.enemies.filter(x=>aramV167Dist(x,e)<115).length*.24;if(u.v2Role==='TANK'&&['ASSASSIN','FIGHTER'].includes(e.v2Role)){const carry=p.allies.find(a=>['MARKSMAN','MAGE'].includes(a.v2Role)&&aramV167Dist(a,e)<120);if(carry)sc+=1.3}return sc}
+ perceive(u){const enemies=this.e.index.enemies(u.team,'champ'),enemyMinions=this.e.index.enemies(u.team,'minion'),allies=this.e.index.allies(u.team,'champ'),minions=this.e.index.allies(u.team,'minion'),sorted=enemies.slice().sort((a,b)=>aramV167Dist(u,a)-aramV167Dist(u,b)),tf=this.e.teamFight.get(u.team),enemyTf=this.e.teamFight.get(u.team==='team'?'enemy':'team'),structure=this.e.structure.nearestTarget(u,true);return{enemies,enemyMinions,allies,minions,nearest:sorted[0]||null,low:enemies.filter(e=>e.hp/e.maxHp<.30).sort((a,b)=>aramV167Dist(u,a)-aramV167Dist(u,b))[0]||null,alliedAlive:allies.length,enemyAlive:enemies.length,structure,phase:tf.phase,lineX:tf.lineX,waveFrontX:tf.waveFrontX,engageScore:tf.engageScore,allyUltimateReady:tf.ultReady,enemyThreatCooldown:Math.max(0,3-(enemyTf.ultReady||0)),enemyCCReady:enemies.filter(e=>['TANK','SUPPORT','MAGE'].includes(e.v2Role)&&this.e.skills.isReady(e,'E')).length,burstPotential:(tf.ultReady||0)+(allies.length-enemies.length)*.7,preWave:(this.e.bs.waveCount||0)===0}}
+ personality(u){if(u.v173Personality)return u.v173Personality;let h=2166136261;for(const c of String(u.champ?.id||u.id)){h^=c.charCodeAt(0);h=Math.imul(h,16777619)}const n=(h>>>0)/4294967295;return u.v173Personality={aggression:.92+n*.16,safety:1.08-n*.13}}
+ roleOffset(role){return{TANK:66,FIGHTER:35,ASSASSIN:12,MAGE:-38,MARKSMAN:-66,SUPPORT:-72}[role]||0}
+ forwardLeash(role,combat=false){const calm={TANK:80,FIGHTER:52,ASSASSIN:32,MAGE:5,MARKSMAN:-12,SUPPORT:-22},fight={TANK:150,FIGHTER:120,ASSASSIN:130,MAGE:48,MARKSMAN:35,SUPPORT:36};return(combat?fight:calm)[role]??40}
+ maxChase(role){return{ASSASSIN:235,FIGHTER:210,TANK:145,MARKSMAN:125,MAGE:115,SUPPORT:95}[role]||120}
+ ySlot(u,p,state){const role=u.v2Role,base={TANK:-18,FIGHTER:28,ASSASSIN:-58,MAGE:48,MARKSMAN:-42,SUPPORT:12}[role]||0,teamOrder=(u.team==='team'?this.e.index.blueChamps:this.e.index.redChamps).indexOf(u),jitter=((teamOrder%2)*2-1)*11;if(state==='FLANK')return 450+(u.v2FlankSide||(u.v2FlankSide=this.e.rng.next()<.5?-1:1))*Math.max(66,this.e.geometry.widthAt(u.x)*.52);return 450+base+jitter+(u.v2LaneOffset||0)*.10}
+ chooseState(u,p){const role=u.v2Role,hr=u.hp/u.maxHp;if(!u.alive)return'DEAD';if(p.preWave)return['MAGE','MARKSMAN','SUPPORT'].includes(role)?'POKE':'POSITION';if(hr<.20)return'RETREAT';if(p.phase==='DISENGAGE'||(hr<.38&&!['ALL_IN','SCRAMBLE'].includes(p.phase)))return'RETREAT';if(p.phase==='SIEGE'&&p.structure)return'PUSH';if(role==='ASSASSIN'&&['CATCH','ENGAGE','ALL_IN','SCRAMBLE'].includes(p.phase))return'FLANK';if(['CATCH','ENGAGE','ALL_IN','SCRAMBLE'].includes(p.phase))return['MAGE','MARKSMAN','SUPPORT'].includes(role)?'FOLLOW':'ENGAGE';if(p.phase==='CHASE'&&p.low&&this.chaseAllowed(u,p.low,p))return'CHASE';if(p.phase==='POKE'||p.phase==='PRESSURE'){if(role==='MAGE')return'POKE';if(role==='SUPPORT')return u.v2AttackType==='RANGED'||aramV170Subtype(u)==='CATCHER'?'POKE':'POSITION';if(role==='MARKSMAN')return this.personality(u).aggression>1.0?'POKE':(p.enemyMinions.length?'FARM':'POSITION');return p.enemyMinions.length?'LANE':'POSITION'}if(p.enemyMinions.length)return['MAGE','MARKSMAN'].includes(role)?'FARM':'LANE';return['MAGE','MARKSMAN'].includes(role)?'POSITION':'LANE'}
+ targetScore(u,e,p,state){const d=aramV167Dist(u,e),hp=e.hp/e.maxHp,nearEnemies=p.enemies.filter(x=>x!==e&&aramV167Dist(x,e)<135).length,nearAllies=p.allies.filter(x=>aramV167Dist(x,e)<155).length,tower=this.e.structure.towerThreatAt(u.team,e.x,e.y)?1:0,isolated=Math.max(0,2-nearEnemies);let sc=aramV170RolePriority(e.v2Role)+(1-hp)*1.5+isolated*.25+nearAllies*.08+Math.max(-1,1-d/300)-tower*2.25-nearEnemies*.13;if(u.v2Role==='ASSASSIN'){if(['MARKSMAN','MAGE','SUPPORT'].includes(e.v2Role))sc+=.85;if(e.v2Role==='TANK')sc-=1.0}if(u.v2Role==='MARKSMAN')sc=(d<190?2.15-d/150:sc*.62)+(e.v2Role==='TANK'?.22:0);if(u.v2Role==='MAGE')sc+=p.enemies.filter(x=>aramV167Dist(x,e)<115).length*.22;if(u.v2Role==='TANK'&&['ASSASSIN','FIGHTER'].includes(e.v2Role)&&p.allies.some(a=>['MARKSMAN','MAGE'].includes(a.v2Role)&&aramV167Dist(a,e)<120))sc+=1.1;return sc}
  pickTarget(u,p,state){let best=null,score=-1e9;for(const e of p.enemies){const sc=this.targetScore(u,e,p,state);if(sc>score){score=sc;best=e}}u.v2TargetScore=score;return best}
- pickWaveTarget(u,p){const dir=u.team==='team'?1:-1,range=u.v2AttackRange||70;const candidates=(p.enemyMinions||[]).filter(m=>{const dx=(m.x-u.x)*dir;return dx>-55&&dx<Math.max(260,range*1.65)&&Math.abs(m.y-u.y)<150});if(!candidates.length)return null;return candidates.sort((a,b)=>{const ak=(a.minionType==='cannon'?2:a.minionType==='ranged'?1:0),bk=(b.minionType==='cannon'?2:b.minionType==='ranged'?1:0);const as=(1-a.hp/a.maxHp)*1.8+ak*.20-aramV167Dist(u,a)/500,bs=(1-b.hp/b.maxHp)*1.8+bk*.20-aramV167Dist(u,b)/500;return bs-as})[0]}
- processAttackAction(u,dt){const a=u.v2Action;if(!a)return false;const now=this.e.bs.time;if(a.state==='ATTACK_WINDUP'){if(now<a.until)return true;const t=a.target;if(t?.alive&&aramV167Dist(u,t)<=u.v2AttackRange*1.08){if(t.type)this.e.combat.damageStructure(u,t,a.damage*.46);else if((u.v2AttackType||aramV171AttackType(u))==='MELEE')this.e.combat.applyHit(u,t,a.damage,{kind:'basic-melee'});else this.e.projectiles.spawn(u,t,a.damage,{speed:590,kind:'champ-basic',mode:'TARGET_PROJECTILE'})}u.attackCd=a.cooldown;u.v2Action={state:'ATTACK_RECOVERY',until:now+.13};return true}if(a.state==='ATTACK_RECOVERY'||a.state==='CAST_RECOVERY'){if(now<a.until)return true;u.v2Action={state:'MOVE',until:0};return false}return ['DASH','CAST_WINDUP','CC'].includes(a.state)}
- startAttack(u,t){const ranged=(u.v2AttackType||aramV171AttackType(u))==='RANGED',cd=(u.v2Role==='MARKSMAN'?1.20:u.v2Role==='MAGE'?1.55:ranged?1.42:1.38)*(u.attackRateMod||1),windup=ranged?(u.v2Role==='MARKSMAN'?.14:.17):.10;u.v2Action={state:'ATTACK_WINDUP',until:this.e.bs.time+windup,target:t,damage:u.atk*(.56+this.e.rng.range(0,.22)),cooldown:cd}}
- update(dt){for(const u of this.e.index.blueChamps.concat(this.e.index.redChamps)){u.attackCd=Math.max(0,(u.attackCd||0)-dt);u.v2Role=u.v2Role||aramV167Role(u);aramV170Subtype(u);if(this.processAttackAction(u,dt))continue;const p=this.perceive(u),state=this.chooseState(u,p);u.v2State=state;const danger=this.e.danger.assess(u);u.v2DangerScore=danger.score;if(this.e.danger.shouldDodge(u,danger)){const dodge=this.e.danger.dodgePoint(u,danger);if(dodge){u.v2Intent={state:'DODGE',phase:p.phase,moveTarget:dodge,attackTarget:null,threat:danger.score};continue}}const dir=u.team==='team'?1:-1,role=u.v2Role;u.v2AttackType=u.v2AttackType||aramV171AttackType(u);u.v2AttackRange=aramV171BasicRange(u);const range=u.v2AttackRange,champTarget=this.pickTarget(u,p,state),waveTarget=this.pickWaveTarget(u,p);const waveState=['LANE','POKE','KITING'].includes(state)&&!['CATCH','ENGAGE','ALL_IN','SCRAMBLE','CHASE'].includes(p.phase);const champDist=champTarget?aramV167Dist(u,champTarget):1e9,minionDist=waveTarget?aramV167Dist(u,waveTarget):1e9;const useWave=!!waveTarget&&waveState&&(minionDist<=range*1.15||champDist>range*1.20||p.phase==='FORMATION');const target=useWave?waveTarget:champTarget,isWaveTarget=useWave;let move=null,attack=null;const slotX=p.lineX+dir*this.roleOffset(role),slotY=this.ySlot(u,p,state);if(state==='RETREAT'){move={x:p.lineX-dir*(role==='TANK'?65:100),y:slotY}}else if(state==='SIEGE'&&p.structure){const siegeRange=(role==='MARKSMAN'||role==='MAGE')?Math.max(75,range):55,d=aramV167Dist(u,p.structure);if(d<=siegeRange)attack=p.structure;else move={x:p.structure.x-dir*(siegeRange*.86),y:slotY}}else if(target){const d=aramV167Dist(u,target),skillUsed=isWaveTarget?false:this.e.skills.tryCast(u,p,state,target);if(skillUsed){u.v2Intent={state,phase:p.phase,moveTarget:{x:u.x,y:u.y},attackTarget:target,threat:danger.score};continue}if(state==='FLANK'){const flankY=slotY,backX=target.x-dir*Math.max(42,range*.5);move={x:backX,y:flankY};if(d<=range*.72)attack=target}else if(state==='ENGAGE'||state==='CHASE'){const desired=u.v2AttackType==='MELEE'?Math.min(42,range*.66):range*.86;if(d<=range)attack=target;else move={x:target.x-dir*desired,y:target.y+(slotY-450)*.18}}else if(state==='POKE'||state==='KITING'){const desired=Math.max(78,range*.92);if(d<desired*.74)move={x:slotX-dir*52,y:slotY};else if(d>desired*1.15)move={x:target.x-dir*desired,y:slotY};else move={x:slotX,y:slotY};if(d<=range)attack=target}else{move={x:slotX,y:slotY};if(d<=range*.95)attack=target}}else move={x:slotX,y:slotY};if(['LANE','POKE','KITING'].includes(state)&&move){if(dir===1)move.x=Math.max(move.x,Math.min(slotX,p.waveFrontX-20));else move.x=Math.min(move.x,Math.max(slotX,p.waveFrontX+20))}if(move){const fake={x:move.x,y:move.y};this.e.movement.clampToLane(fake);move=fake}u.v2Intent={state,phase:p.phase,moveTarget:move,attackTarget:attack,threat:danger.score};if(attack&&u.attackCd<=0&&aramV167Dist(u,attack)<=range)this.startAttack(u,attack)}}
+ pickWaveTarget(u,p){const dir=u.team==='team'?1:-1,range=u.v2AttackRange||68,front=p.waveFrontX,candidates=p.enemyMinions.filter(m=>{const dx=(m.x-u.x)*dir,unsafe=this.e.structure.towerThreatAt(u.team,m.x,m.y)&&!this.e.structure.canSiege(u.team,this.e.structure.targetable(u.team)[0]);return !unsafe&&dx>-45&&dx<Math.max(245,range*1.55)&&Math.abs(m.y-u.y)<145&&(dir===1?m.x<front+180:m.x>front-180)});if(!candidates.length)return null;return candidates.sort((a,b)=>{const av=(a.minionType==='cannon'?1.0:a.minionType==='ranged'?.35:0)+(1-a.hp/a.maxHp)*1.5-aramV167Dist(u,a)/520,bv=(b.minionType==='cannon'?1.0:b.minionType==='ranged'?.35:0)+(1-b.hp/b.maxHp)*1.5-aramV167Dist(u,b)/520;return bv-av})[0]}
+ chaseAllowed(u,t,p){if(!t||!t.alive||t.hp/t.maxHp>.34||u.hp/u.maxHp<.44)return false;const d=aramV167Dist(u,t);if(d>this.maxChase(u.v2Role))return false;if(this.e.structure.towerThreatAt(u.team,t.x,t.y)&&!this.e.structure.canSiege(u.team,this.e.structure.targetable(u.team)[0]))return false;const support=p.allies.filter(a=>a!==u&&aramV167Dist(a,u)<175).length,enemySupport=p.enemies.filter(e=>e!==t&&aramV167Dist(e,t)<150).length;if(support<1||enemySupport>support+1)return false;return true}
+ formationPoint(u,p,state,target=null){const dir=u.team==='team'?1:-1,role=u.v2Role,combat=['ENGAGE','FOLLOW','FLANK','CHASE'].includes(state),slotY=this.ySlot(u,p,state);let base=p.preWave?(u.team==='team'?1010:1390):p.waveFrontX-dir*78;let x=base+dir*this.roleOffset(role);if(!p.preWave&&state==='POKE'&&['MAGE','MARKSMAN','SUPPORT'].includes(role)){base=p.waveFrontX-dir*26;const pokeBack={MAGE:-10,MARKSMAN:-22,SUPPORT:-28}[role]||-16;x=base+dir*pokeBack}const cap=base+dir*this.forwardLeash(role,combat);if(dir===1)x=Math.min(x,cap);else x=Math.max(x,cap);if(state==='RETREAT')x=base-dir*(role==='TANK'?95:135);if(state==='FLANK'&&target){const x2=target.x-dir*Math.max(72,(u.v2AttackRange||68)*.60),hardCap=base+dir*this.forwardLeash(role,true);x=dir===1?Math.min(x2,hardCap):Math.max(x2,hardCap)}if(state==='FOLLOW'){base=p.waveFrontX-dir*22;const followBack={MAGE:-8,MARKSMAN:-24,SUPPORT:-32}[role]??-18;x=base+dir*followBack}if(state==='ENGAGE'&&target){const desired=u.v2AttackType==='MELEE'?42:(u.v2AttackRange||168)*.86,x2=target.x-dir*desired,hardCap=base+dir*this.forwardLeash(role,true);x=dir===1?Math.min(x2,hardCap):Math.max(x2,hardCap)}if(state==='CHASE'&&target){const desired=u.v2AttackType==='MELEE'?38:(u.v2AttackRange||168)*.82,x2=target.x-dir*desired,hardCap=base+dir*this.maxChase(role);x=dir===1?Math.min(x2,hardCap):Math.max(x2,hardCap)}const siegeSt=this.e.structure.targetable(u.team)[0]||null;if(siegeSt&&!this.e.structure.canSiege(u.team,siegeSt)){const stopX=siegeSt.x-dir*222;x=dir===1?Math.min(x,stopX):Math.max(x,stopX)}let move={x,y:slotY};this.e.movement.clampToLane(move);return this.e.structure.clampChampionOutOfTower(u,move)}
+ processAttackAction(u,dt){const a=u.v2Action;if(!a)return false;const now=this.e.bs.time;if(a.state==='ATTACK_WINDUP'){if(now<a.until)return true;const t=a.target;if(t?.alive&&aramV167Dist(u,t)<=u.v2AttackRange*1.08){if(t.type)this.e.combat.damageStructure(u,t,a.damage*.46);else if(u.v2AttackType==='MELEE')this.e.combat.applyHit(u,t,a.damage,{kind:'basic-melee'});else this.e.projectiles.spawn(u,t,a.damage,{speed:590,kind:'champ-basic',mode:'TARGET_PROJECTILE'})}u.attackCd=a.cooldown;u.v2Action={state:'ATTACK_RECOVERY',until:now+.13};return true}if(a.state==='ATTACK_RECOVERY'||a.state==='CAST_RECOVERY'){if(now<a.until)return true;u.v2Action={state:'MOVE',until:0};return false}return['DASH','CAST_WINDUP','CC'].includes(a.state)}
+ startAttack(u,t){const ranged=u.v2AttackType==='RANGED',cd=(u.v2Role==='MARKSMAN'?1.20:u.v2Role==='MAGE'?1.55:ranged?1.42:1.38)*(u.attackRateMod||1),windup=ranged?(u.v2Role==='MARKSMAN'?.14:.17):.10;u.v2Action={state:'ATTACK_WINDUP',until:this.e.bs.time+windup,target:t,damage:u.atk*(.56+this.e.rng.range(0,.22)),cooldown:cd}}
+ update(dt){for(const u of this.e.index.blueChamps.concat(this.e.index.redChamps)){u.attackCd=Math.max(0,(u.attackCd||0)-dt);u.v2Role=u.v2Role||aramV167Role(u);aramV170Subtype(u);if(this.processAttackAction(u,dt))continue;let p=this.perceive(u),state=this.chooseState(u,p);updateAdaptiveFormV173(u,p,state,dt);p=this.perceive(u);state=this.chooseState(u,p);u.v2State=state;const danger=this.e.danger.assess(u);u.v2DangerScore=danger.score;if(this.e.danger.shouldDodge(u,danger)){const dodge=this.e.danger.dodgePoint(u,danger);if(dodge){u.v2Intent={state:'DODGE',phase:p.phase,moveTarget:this.e.structure.clampChampionOutOfTower(u,dodge),attackTarget:null,threat:danger.score};continue}}
+ const range=u.v2AttackRange,champTarget=this.pickTarget(u,p,state),waveTarget=this.pickWaveTarget(u,p),inFight=['CATCH','ENGAGE','ALL_IN','SCRAMBLE','CHASE'].includes(p.phase),preferWave=!!waveTarget&&!inFight&&['LANE','FARM','POSITION','POKE'].includes(state),target=preferWave?waveTarget:champTarget,isWave=preferWave;let move=this.formationPoint(u,p,state,champTarget),attack=null;
+ if(state==='PUSH'&&p.structure){if(this.e.structure.canSiege(u.team,p.structure)){const d=aramV167Dist(u,p.structure),siegeRange=u.v2AttackType==='RANGED'?Math.max(90,range):58;if(d<=siegeRange)attack=p.structure;else move=this.e.structure.clampChampionOutOfTower(u,{x:p.structure.x-(u.team==='team'?1:-1)*siegeRange*.88,y:this.ySlot(u,p,state)})}else state='POSITION'}
+ else if(target){const d=aramV167Dist(u,target),skillUsed=!isWave&&['POKE','ENGAGE','FOLLOW','FLANK','CHASE'].includes(state)?this.e.skills.tryCast(u,p,state,target):false;if(skillUsed){u.v2Intent={state,phase:p.phase,moveTarget:{x:u.x,y:u.y},attackTarget:target,threat:danger.score};continue}if(isWave){if(d<=range)attack=target;else move=this.formationPoint(u,p,'LANE')}else if(['ENGAGE','FOLLOW','FLANK','CHASE'].includes(state)){if(d<=range)attack=target}else if(['POKE','POSITION','LANE','FARM'].includes(state)){if(u.v2AttackType==='RANGED'&&d<=range)attack=target;else if(u.v2AttackType==='MELEE'&&d<=range&&p.engageScore>.75)attack=target}}
+ if(p.preWave){const dir=u.team==='team'?1:-1,hard=u.team==='team'?1090:1310;move.x=dir===1?Math.min(move.x,hard):Math.max(move.x,hard);attack=champTarget&&aramV167Dist(u,champTarget)<=range&&u.v2AttackType==='RANGED'?champTarget:null}
+ u.v2Intent={state,phase:p.phase,moveTarget:move,attackTarget:attack,threat:danger.score};if(attack&&u.attackCd<=0&&aramV167Dist(u,attack)<=range)this.startAttack(u,attack)}}
 }
 class AramRespawnSystemV167{
  constructor(engine){this.e=engine}
- update(dt){for(const u of (this.e.bs.units||[])){if(u.kind!=='champ'||u.alive)continue;u.respawn=Math.max(0,(u.respawn||0)-dt);if(u.respawn>0)continue;u.alive=true;u.hp=u.maxHp;u.v2Shield=0;u.x=u.team==='team'?305:2095;u.y=450+(u.v2LaneOffset||0);u.v2Vel={x:0,y:0};u.v2State='LANE';u.v2StateUntil=0;u.v2Action={state:'MOVE',until:0};u.v2Dash=null;u.spawnProtection=1.5;u.shopLocked=false;u.shopGraceUntil=this.e.bs.time+1.2;u.ccUntil=0;u.slowUntil=0}}
+ update(dt){for(const u of (this.e.bs.units||[])){if(u.kind!=='champ'||u.alive)continue;u.respawn=Math.max(0,(u.respawn||0)-dt);if(u.respawn>0)continue;u.alive=true;u.hp=u.maxHp;u.v2Shield=0;u.x=u.team==='team'?305:2095;u.y=450+(u.v2LaneOffset||0);u.v2Vel={x:0,y:0};u.v2State='RETURN_TO_LANE';u.v2StateUntil=0;u.v2Action={state:'MOVE',until:0};u.v2Dash=null;u.spawnProtection=1.5;u.shopLocked=false;u.shopGraceUntil=this.e.bs.time+1.2;u.ccUntil=0;u.slowUntil=0;syncAttackProfileV173(u)}}
 }
 class AramEconomySystemV167{
  constructor(engine){this.e=engine}
- update(dt){for(const u of this.e.bs.team.concat(this.e.bs.enemy)){if(!u.alive)continue;/* V172 ARAM: base grants no passive HP regeneration. HP may only change via combat, champion/augment effects, or respawn. */u.gold+=6*dt;u.xp+=5*teamXpCatchup(u.team)*dt;u.level=levelFromXp(u.xp);u.spawnProtection=Math.max(0,(u.spawnProtection||0)-dt);const inBase=u.team==='team'?u.x<430:u.x>1970;if(!u.shopLocked&&inBase)autoBuyItems(u);if(!inBase&&this.e.bs.time>(u.shopGraceUntil||0))u.shopLocked=true}}
+ update(dt){for(const u of this.e.bs.team.concat(this.e.bs.enemy)){if(!u.alive)continue;u.gold+=6*dt;u.xp+=5*teamXpCatchup(u.team)*dt;const oldLevel=u.level||3,newLevel=levelFromXp(u.xp);u.level=newLevel;if(newLevel!==oldLevel)syncAttackProfileV173(u);u.spawnProtection=Math.max(0,(u.spawnProtection||0)-dt);const inBase=u.team==='team'?u.x<430:u.x>1970;if(!u.shopLocked&&inBase)autoBuyItems(u);if(!inBase&&this.e.bs.time>(u.shopGraceUntil||0))u.shopLocked=true}}
 }
 class AramSkillSystemV167{
  constructor(engine){this.e=engine;this.archetypes=['LINE_PROJECTILE','TARGET_PROJECTILE','AOE_CIRCLE','CONE','DASH','HEAL','SHIELD','CC','SELF_BUFF','EXECUTE','ULTIMATE'];this.kits={TANK:{Q:['LINE_PROJECTILE',6,155,.55],W:['SELF_BUFF',10,0,0],E:['DASH',8,150,.38],R:['ULTIMATE',34,150,1.00]},FIGHTER:{Q:['TARGET_PROJECTILE',5,145,.68],W:['SELF_BUFF',11,0,0],E:['DASH',8,138,.42],R:['ULTIMATE',38,135,.95]},ASSASSIN:{Q:['LINE_PROJECTILE',5,185,.72],W:['DASH',7,170,.42],E:['EXECUTE',9,118,.72],R:['ULTIMATE',36,175,1.08]},MAGE:{Q:['LINE_PROJECTILE',5.5,215,.66],W:['AOE_CIRCLE',8,180,.55],E:['CC',10,175,.28],R:['ULTIMATE',40,225,1.00]},MARKSMAN:{Q:['TARGET_PROJECTILE',5,210,.72],W:['SELF_BUFF',12,0,0],E:['AOE_CIRCLE',10,155,.40],R:['ULTIMATE',42,240,.94]},SUPPORT:{Q:['LINE_PROJECTILE',7,180,.36],W:['HEAL',9,0,.22],E:['CC',9,170,.24],R:['ULTIMATE',38,170,.50]}}}
@@ -3871,11 +4120,11 @@ class AramEventBridgeV167{constructor(engine){this.e=engine}pause(){this.e.bs.pa
 class AramMatchEngineV2{
  constructor(bs){this.bs=bs;this.rng=new AramSeededRngV167((bs.v2Seed||170031)>>>0);this.geometry=new AramMapGeometryV164();this.index=new AramEntityIndexV167(bs);this.minionSeq=0;this.projectiles=new AramProjectileSystemV167(this);this.combat=new AramCombatSystemV167(this);this.structure=new AramStructureSystemV167(this);this.waves=new AramWaveSystemV167(this);this.minionAI=new AramMinionAISystemV167(this);this.movement=new AramMovementSystemV167(this);this.aoes=new AramAoeSystemV170(this);this.dash=new AramDashSystemV170(this);this.danger=new AramDangerZoneSystemV170(this);this.skills=new AramSkillSystemV167(this);this.teamFight=new AramTeamFightDirectorV169(this);this.championAI=new AramChampionAISystemV167(this);this.respawn=new AramRespawnSystemV167(this);this.economy=new AramEconomySystemV167(this);this.events=new AramEventBridgeV167(this);this.steps=0;this.totalUpdateMs=0;this.migrate();}
  oldToWorld(x,y){return{x:150+Math.max(0,Math.min(100,Number(x)||50))/100*2100,y:450+(Number(y||50)-50)*10.6}}
- migrate(){const bs=this.bs;if(bs.engineV2Active)return;for(const u of bs.units||[]){const q=this.oldToWorld(u.x,u.y);u.x=q.x;u.y=q.y;u.v2LaneOffset=(u.y-450);u.v2MoveSpeed=Math.max(42,(u.speed||2.1)*24);u.v2AttackRange=Math.max(42,(u.range||5)*21);u.v2Role=aramV167Role(u);u.v2AttackType=aramV171AttackType(u);u.v2AttackRange=aramV171BasicRange(u);u.v2Intent={};u.v2Vel={x:0,y:0};u.v2State='LANE';u.v2StateUntil=0;u.v2Action={state:'MOVE',until:0};u.v2Dash=null;u.v2Subtype=null;u.v2Reaction=.08+this.rng.next()*.18;u.shopLocked=false;u.shopGraceUntil=1.2;u.v2Skills=null}const oldMap=new Map((bs.structures||[]).map(s=>[s.id,s]));bs.structures=ARAM_V167_STRUCTURE_LAYOUT.map(c=>{const o=oldMap.get(c.id)||{};return{...o,...c,hp:Number.isFinite(o.hp)?o.hp:100,alive:o.alive!==false}});bs.team=bs.units.filter(u=>u.kind==='champ'&&u.team==='team');bs.enemy=bs.units.filter(u=>u.kind==='champ'&&u.team==='enemy');bs.nextWaveAt=bs.time<1?45:Math.max(bs.time+1,bs.nextWaveAt||45);bs.v2Projectiles=[];bs.v2Aoes=[];bs.engineV2Active=true;bs.simulation={version:'V171',fixedDt:ARAM_V167_SIM_DT,accumulator:0,steps:0};bs.engineV2Telemetry={states:{},projectiles:0,steps:0,avgUpdateMs:0};this.index.refresh()}
- update(dt){const t0=performance.now();this.bs.time+=dt;this.waves.updateSchedule();this.index.refresh();this.skills.update(dt);this.dash.update(dt);this.aoes.update(dt);this.teamFight.update();this.economy.update(dt);this.championAI.update(dt);this.minionAI.update();this.movement.update(dt);this.index.refresh();this.structure.update(dt);this.projectiles.update(dt);this.respawn.update(dt);if(this.bs.units.length>90)this.bs.units=this.bs.units.filter(u=>u.kind==='champ'||u.alive);this.steps++;this.totalUpdateMs+=performance.now()-t0;const tel=this.bs.engineV2Telemetry;tel.steps=this.steps;tel.projectiles=this.projectiles.items.length;tel.aoes=this.aoes.items.length;tel.avgUpdateMs=this.totalUpdateMs/Math.max(1,this.steps);tel.states={};for(const u of this.bs.team.concat(this.bs.enemy))tel.states[u.id]={currentState:u.v2State,actionState:u.v2Action?.state||'MOVE',phase:u.v2Intent?.phase||null,targetId:u.v2Intent?.attackTarget?.id||null,dangerScore:u.v2DangerScore||0,targetScore:u.v2TargetScore||0,currentSkill:u.v2Action?.cast?.key||null,dashState:u.v2Dash?.active?'DASHING':null,attackType:u.v2AttackType||aramV171AttackType(u),vx:u.v2Vel?.x||0,vy:u.v2Vel?.y||0};tel.teams={team:{...this.teamFight.get('team')},enemy:{...this.teamFight.get('enemy')}}}
+ migrate(){const bs=this.bs;if(bs.engineV2Active)return;for(const u of bs.units||[]){const q=this.oldToWorld(u.x,u.y);u.x=q.x;u.y=q.y;u.v2LaneOffset=(u.y-450);u.v2MoveSpeed=Math.max(42,(u.speed||2.1)*24);u.v2AttackRange=Math.max(42,(u.range||5)*21);u.v2Role=aramV167Role(u);u.v173Form=null;syncAttackProfileV173(u);u.v2Intent={};u.v2Vel={x:0,y:0};u.v2State='LANE';u.v2StateUntil=0;u.v2Action={state:'MOVE',until:0};u.v2Dash=null;u.v2Subtype=null;u.v2Reaction=.08+this.rng.next()*.18;u.shopLocked=false;u.shopGraceUntil=1.2;u.v2Skills=null}const oldMap=new Map((bs.structures||[]).map(s=>[s.id,s]));bs.structures=ARAM_V167_STRUCTURE_LAYOUT.map(c=>{const o=oldMap.get(c.id)||{};return{...o,...c,hp:Number.isFinite(o.hp)?o.hp:100,alive:o.alive!==false}});bs.team=bs.units.filter(u=>u.kind==='champ'&&u.team==='team');bs.enemy=bs.units.filter(u=>u.kind==='champ'&&u.team==='enemy');bs.nextWaveAt=bs.time<1?45:Math.max(bs.time+1,bs.nextWaveAt||45);bs.v2Projectiles=[];bs.v2Aoes=[];bs.engineV2Active=true;bs.simulation={version:'V173',fixedDt:ARAM_V167_SIM_DT,accumulator:0,steps:0};bs.engineV2Telemetry={states:{},projectiles:0,steps:0,avgUpdateMs:0,towerEntryBlocked:0,champStructureBlocked:0,chaseAborts:0};this.index.refresh()}
+ update(dt){const t0=performance.now();this.bs.time+=dt;this.waves.updateSchedule();this.index.refresh();this.skills.update(dt);this.dash.update(dt);this.aoes.update(dt);this.teamFight.update();this.economy.update(dt);this.championAI.update(dt);this.minionAI.update();this.movement.update(dt);this.index.refresh();this.structure.update(dt);this.projectiles.update(dt);this.respawn.update(dt);if(this.bs.units.length>90)this.bs.units=this.bs.units.filter(u=>u.kind==='champ'||u.alive);this.steps++;this.totalUpdateMs+=performance.now()-t0;const tel=this.bs.engineV2Telemetry;tel.steps=this.steps;tel.projectiles=this.projectiles.items.length;tel.aoes=this.aoes.items.length;tel.avgUpdateMs=this.totalUpdateMs/Math.max(1,this.steps);tel.states={};for(const u of this.bs.team.concat(this.bs.enemy))tel.states[u.id]={currentState:u.v2State,actionState:u.v2Action?.state||'MOVE',phase:u.v2Intent?.phase||null,targetId:u.v2Intent?.attackTarget?.id||null,dangerScore:u.v2DangerScore||0,targetScore:u.v2TargetScore||0,currentSkill:u.v2Action?.cast?.key||null,dashState:u.v2Dash?.active?'DASHING':null,attackType:resolveAttackProfile(u).attackType,vx:u.v2Vel?.x||0,vy:u.v2Vel?.y||0};tel.teams={team:{...this.teamFight.get('team')},enemy:{...this.teamFight.get('enemy')}}}
 }
 function ensureAramMatchEngineV2(){const bs=battleState;if(!bs)return null;if(!bs.__engineV2||bs.__engineV2.bs!==bs)bs.__engineV2=new AramMatchEngineV2(bs);return bs.__engineV2}
-function processLegacyBattleEventsV167(){const bs=battleState;if(!bs)return false;
+function processLegacyBattleEventsV167(){const bs=battleState;if(!bs)return false;if(bs.tournamentBattle)return false;
  if(!bs.devForcedEventDone&&!bs.augmentOpen){if(triggerDeveloperForcedEvent())return true}
  if(!bs.akaliChatDone&&party.some(c=>c.id==='nguyen')&&bs.enemy.some(u=>u.champ?.id==='akali')&&bs.time>=bs.akaliChatAt){bs.chat.push(`<span class="all-tag">[전체]</span> <span class="ally-chat">Nguyen Ngoc Tu:</span> 아칼리 사기 챔피언 하면 재미있음?`);bs.akaliChatDone=true}
  if(bs.galioMessiMatch&&bs.galioMessiChatStage===0&&bs.time>=1){bs.chat.push(`<span class="all-tag">[전체]</span> <span class="ally-chat">갈리오:</span> 무슨 고트가 메시임?`);bs.galioMessiChatStage=1}if(bs.galioMessiMatch&&bs.galioMessiChatStage===1&&bs.time>=4){bs.chat.push(`<span class="all-tag">[전체]</span> <span class="ally-chat">갈리오:</span> 우리 날두횽이 고트지;`);bs.galioMessiChatStage=2}
@@ -3887,7 +4136,7 @@ function processLegacyBattleEventsV167(){const bs=battleState;if(!bs)return fals
  if(bs.siljeomPenaltyEnabled&&!bs.siljeomPenaltyDone&&!anyCharacterPopupOpen(bs)&&bs.time>=bs.siljeomPenaltyAt){if(triggerSiljeomPenaltyEvent())return true}
  if(bs.munchulEnabled&&!bs.munchulDone&&!anyCharacterPopupOpen(bs)&&bs.time>=bs.munchulAt){if(triggerMunchulEvent())return true}
  return false}
-// ===== END V171 ARAM READABILITY + WAVECLEAR + RANGE SPLIT PATCH =====
+// ===== END V173 ARAM DATA-DRIVEN ATTACK PROFILE + FRONTLINE AI PATCH =====
 
 function battleFrame(ts){
  if(mode!=='battle'||!battleState||!battleState.engineStarted)return;
